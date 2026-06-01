@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AI Poster Generator Demo</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="control-panel" aria-label="Poster generation controls">
+        <div class="brand-row">
+          <div>
+            <p class="eyebrow">Source-grounded poster compiler</p>
+            <h1>Generate an academic data science poster</h1>
+          </div>
+          <span class="status-pill">Prototype</span>
+        </div>
+
+        <label class="field">
+          <span>Prompt</span>
+          <textarea id="promptInput" rows="5">Create a results-first poster about fraud model monitoring. Use a NatWest-inspired theme, include a workflow diagram, confusion matrix, Sankey decision flow, and a QA summary.</textarea>
+        </label>
+
+        <div class="selectors">
+          <label class="field">
+            <span>Theme</span>
+            <select id="themeSelect">
+              <option value="natwest">NatWest Group</option>
+              <option value="comic">Comic Strip Research</option>
+              <option value="clean">Clean Academic</option>
+              <option value="retro">Retro Time Lab</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Primary source</span>
+            <select id="sourceSelect">
+              <option value="mock">Mock Confluence + GitLab + paper</option>
+              <option value="web">Web and research paper</option>
+              <option value="local">Local files</option>
+            </select>
+          </label>
+        </div>
+
+        <button id="generateButton" type="button">Generate poster</button>
+      </section>
+
+      <section class="trace-panel" aria-label="Generation trace">
+        <div class="panel-header">
+          <h2>Trace</h2>
+          <span id="traceStatus">Idle</span>
+        </div>
+        <ol id="traceList" class="trace-list"></ol>
+      </section>
+
+      <section class="poster-panel" aria-label="Poster preview">
+        <div class="panel-header">
+          <h2>Preview</h2>
+          <span>HTML render</span>
+        </div>
+
+        <article id="posterPreview" class="poster natwest-theme">
+          <header class="poster-hero">
+            <div>
+              <p class="poster-kicker">Generated preview</p>
+              <h2>Ready to create a poster</h2>
+              <p>Enter a prompt and generate a source-grounded academic poster concept.</p>
+            </div>
+            <div class="hero-art" aria-hidden="true"></div>
+          </header>
+        </article>
+      </section>
+    </main>
+
+    <script src="./script.js"></script>
+  </body>
+</html>
+

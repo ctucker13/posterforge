@@ -1,0 +1,16 @@
+{
+  "id": "natwest-group",
+  "name": "NatWest Group",
+  "type": "theme",
+  "description": "A polished corporate-academic poster theme inspired by NatWest Group colours and geometric visual language.",
+  "palette": "natwest-group",
+  "tokens": {
+    "font_heading": "Aptos Display",
+    "font_body": "Aptos",
+    "panel_radius": 6,
+    "motifs": ["angular panels", "cube geometry", "crisp section dividers"],
+    "chart_style": "high contrast with purple base and red highlights"
+  },
+  "image_prompt_prefix": "Polished academic data science poster visual, NatWest-inspired purple and red colour palette, crisp geometric panels, high-end corporate research aesthetic"
+}
+

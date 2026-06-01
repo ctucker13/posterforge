@@ -1,0 +1,15 @@
+{
+  "id": "clean-academic",
+  "name": "Clean Academic",
+  "type": "theme",
+  "description": "A restrained conference-poster style focused on readability, source traceability, and strong chart hierarchy.",
+  "tokens": {
+    "font_heading": "Aptos Display",
+    "font_body": "Aptos",
+    "panel_radius": 4,
+    "motifs": ["thin rules", "spacious sections", "numbered findings"],
+    "chart_style": "minimal axes, large labels, high contrast"
+  },
+  "image_prompt_prefix": "Clean academic data science poster visual, subtle scientific illustration, precise and readable, restrained professional composition"
+}
+

@@ -1,0 +1,15 @@
+{
+  "id": "comic-strip",
+  "name": "Comic Strip Research",
+  "type": "theme",
+  "description": "A panel-based academic storytelling theme with clean editorial comic framing.",
+  "tokens": {
+    "font_heading": "Aptos Display",
+    "font_body": "Aptos",
+    "panel_radius": 4,
+    "motifs": ["panel gutters", "callout bubbles", "inked borders", "halftone accents"],
+    "chart_style": "bold labels with simplified axes and annotated takeaways"
+  },
+  "image_prompt_prefix": "Clean editorial comic-strip research poster visual, panelled scientific storytelling, crisp linework, subtle halftone texture, professional academic tone"
+}
+

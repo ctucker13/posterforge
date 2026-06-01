@@ -1,0 +1,16 @@
+{
+  "id": "natwest-group",
+  "name": "NatWest Group Palette",
+  "source_note": "Publicly referenced NatWest colour values. Replace with official internal brand tokens if available.",
+  "colors": {
+    "primary": "#3C1053",
+    "accent": "#E90000",
+    "accent_dark": "#C20000",
+    "soft_accent": "#FBC9CF",
+    "light_accent": "#FEDFE2",
+    "background": "#FFFFFF",
+    "panel": "#F7F3F8",
+    "ink": "#1E1028"
+  }
+}
+

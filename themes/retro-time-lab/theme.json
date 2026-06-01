@@ -1,0 +1,15 @@
+{
+  "id": "retro-time-lab",
+  "name": "Retro Time Lab",
+  "type": "theme",
+  "description": "A retro science-fiction research dashboard theme using timelines, instrument panels, and kinetic visual storytelling without copying protected film assets.",
+  "tokens": {
+    "font_heading": "Aptos Display",
+    "font_body": "Aptos",
+    "panel_radius": 3,
+    "motifs": ["timeline arcs", "instrument panels", "neon annotations", "dashboard labels"],
+    "chart_style": "dark panel charts with bright annotated highlights"
+  },
+  "image_prompt_prefix": "Retro 1980s time-travel science dashboard aesthetic, neon timeline motifs, polished academic poster, no logos, no copyrighted characters, no direct film poster imitation"
+}
+

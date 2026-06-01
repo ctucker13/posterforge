@@ -1,0 +1,95 @@
+{
+  "visuals": [
+    {
+      "id": "table",
+      "category": "structured_data",
+      "description": "Compact table for metrics, cohorts, ablations, or references.",
+      "preferred_render": ["pptx_native", "html", "svg"]
+    },
+    {
+      "id": "plotly_generic",
+      "category": "chart",
+      "description": "General Plotly specification for custom charts.",
+      "preferred_render": ["html", "svg", "png"]
+    },
+    {
+      "id": "confusion_matrix",
+      "category": "model_performance",
+      "description": "Classification performance matrix with counts, percentages, and error highlighting.",
+      "preferred_render": ["svg", "html", "png"]
+    },
+    {
+      "id": "roc_curve",
+      "category": "model_performance",
+      "description": "Receiver operating characteristic curve.",
+      "preferred_render": ["svg", "html", "png"]
+    },
+    {
+      "id": "precision_recall_curve",
+      "category": "model_performance",
+      "description": "Precision-recall curve for imbalanced classification.",
+      "preferred_render": ["svg", "html", "png"]
+    },
+    {
+      "id": "calibration_plot",
+      "category": "model_performance",
+      "description": "Predicted probability calibration visual.",
+      "preferred_render": ["svg", "html", "png"]
+    },
+    {
+      "id": "feature_importance",
+      "category": "explainability",
+      "description": "Ranked feature contribution chart.",
+      "preferred_render": ["svg", "html", "png"]
+    },
+    {
+      "id": "shap_summary",
+      "category": "explainability",
+      "description": "SHAP summary or beeswarm-style explanation visual.",
+      "preferred_render": ["png", "svg"]
+    },
+    {
+      "id": "sankey",
+      "category": "flow",
+      "description": "Flow between states, segments, decisions, or process stages.",
+      "preferred_render": ["svg", "html", "png"]
+    },
+    {
+      "id": "timeline",
+      "category": "time",
+      "description": "Chronological events or milestones.",
+      "preferred_render": ["svg", "html", "pptx_shapes"]
+    },
+    {
+      "id": "gantt",
+      "category": "time",
+      "description": "Project plan, experiment schedule, or delivery roadmap.",
+      "preferred_render": ["svg", "html", "pptx_shapes"]
+    },
+    {
+      "id": "mermaid_flow",
+      "category": "diagram",
+      "description": "Mermaid diagram source rendered to SVG.",
+      "preferred_render": ["svg", "html"]
+    },
+    {
+      "id": "math",
+      "category": "scientific_notation",
+      "description": "LaTeX equation rendered with KaTeX or MathJax.",
+      "preferred_render": ["svg", "html", "png"]
+    },
+    {
+      "id": "code_block",
+      "category": "technical_detail",
+      "description": "Syntax-highlighted code block rendered with Shiki.",
+      "preferred_render": ["svg", "html", "png"]
+    },
+    {
+      "id": "ai_image",
+      "category": "generated_asset",
+      "description": "Generated visual asset for backgrounds, panels, illustrations, and themed atmosphere.",
+      "preferred_render": ["png", "webp"]
+    }
+  ]
+}
+

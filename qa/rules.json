@@ -1,0 +1,40 @@
+{
+  "rules": [
+    {
+      "id": "claims_require_sources",
+      "severity": "high",
+      "description": "Every factual claim must reference at least one source."
+    },
+    {
+      "id": "ai_images_not_factual",
+      "severity": "high",
+      "description": "AI generated images must not be used as the sole evidence for factual results, charts, equations, or tables."
+    },
+    {
+      "id": "poster_text_density",
+      "severity": "medium",
+      "description": "Sections should use concise poster copy and avoid long report-style paragraphs."
+    },
+    {
+      "id": "visual_source_traceability",
+      "severity": "high",
+      "description": "Factual visuals should reference their source data, paper, project note, or code evidence."
+    },
+    {
+      "id": "print_readability",
+      "severity": "medium",
+      "description": "Titles, section headings, labels, and annotations must remain readable at physical poster scale."
+    },
+    {
+      "id": "theme_palette_scope",
+      "severity": "medium",
+      "description": "NatWest palette tokens should only apply when the NatWest theme or palette is explicitly selected."
+    },
+    {
+      "id": "export_completeness",
+      "severity": "high",
+      "description": "A complete run should produce a poster spec, preview render, trace log, and export artifacts."
+    }
+  ]
+}
+

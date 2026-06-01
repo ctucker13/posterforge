@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/poster.schema.json",
+  "title": "Poster Project",
+  "type": "object",
+  "required": ["id", "title", "format", "theme", "layout", "sections", "sources", "claims", "visuals"],
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "subtitle": {
+      "type": "string"
+    },
+    "format": {
+      "type": "object",
+      "required": ["size", "orientation"],
+      "properties": {
+        "size": {
+          "enum": ["A0", "A1", "A2", "custom"]
+        },
+        "orientation": {
+          "enum": ["portrait", "landscape"]
+        }
+      }
+    },
+    "theme": {
+      "type": "string"
+    },
+    "palette": {
+      "type": "string"
+    },
+    "layout": {
+      "type": "string"
+    },
+    "audience": {
+      "type": "string"
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/source"
+      }
+    },
+    "claims": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/claim"
+      }
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/section"
+      }
+    },
+    "visuals": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/visual"
+      }
+    },
+    "references": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "required": ["id", "type", "title"],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "enum": ["mock", "local_file", "web", "research_paper", "confluence", "gitlab"]
+        },
+        "title": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
+        },
+        "accessed_at": {
+          "type": "string"
+        },
+        "trust_level": {
+          "enum": ["low", "medium", "high"]
+        }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "required": ["id", "text", "source_ids"],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "text": {
+          "type": "string"
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "confidence": {
+          "enum": ["low", "medium", "high"]
+        }
+      }
+    },
+    "section": {
+      "type": "object",
+      "required": ["id", "type", "title", "blocks"],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "enum": ["hero", "background", "methods", "results", "discussion", "timeline", "references", "custom"]
+        },
+        "title": {
+          "type": "string"
+        },
+        "blocks": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "visual": {
+      "type": "object",
+      "required": ["id", "type", "title"],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "data": {
+          "type": "object"
+        },
+        "options": {
+          "type": "object"
+        },
+        "asset": {
+          "type": "object"
+        }
+      }
+    }
+  }
+}
+
