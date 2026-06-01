@@ -1,6 +1,6 @@
 # PosterForge
 
-PosterForge explores a schema-driven approach for generating academic and data science posters with agent assistance.
+PosterForge is a source-grounded poster generation workspace for academic and data science posters.
 
 The core idea is:
 
@@ -15,17 +15,38 @@ user prompt + sources
 
 The poster spec is the source of truth. PPTX, PDF, HTML, images, and trace logs are generated outputs.
 
-## First Prototype
+## Current Prototype
 
-The current prototype is dependency-free and can be opened directly in a browser:
+PosterForge now uses a Vite, React, and TypeScript app for the demo UI.
 
-- `demo/index.html` - prompt UI, trace panel, and poster preview
-- `spec/poster.schema.json` - early poster project schema
-- `spec/example-poster.json` - example generated poster
-- `themes/` - theme and palette modules
-- `visuals/registry.json` - visual types the system should support
-- `qa/rules.json` - initial quality-control rules
-- `docs/architecture.md` - design approach and roadmap
+```bash
+npm install
+npm run dev
+```
+
+Then open the local Vite URL shown in the terminal.
+
+## What It Demonstrates
+
+- prompt-driven poster generation flow
+- trace events showing generation progress
+- theme and palette selection
+- NatWest palette scoped as an optional palette/theme
+- mock source modes for Confluence, GitLab, web, papers, and local files
+- typed poster project model
+- visual registry for data science poster elements
+- basic QA checks for source grounding and poster quality
+- HTML poster preview
+
+## Planned Stack
+
+- TypeScript and React for the main app.
+- PptxGenJS for editable PowerPoint export.
+- Playwright for PDF/PNG render checks.
+- Plotly, Mermaid, KaTeX, and Shiki for deterministic visuals.
+- GPT Image 2 for generated visual assets.
+- Python with `uv` later for data science helpers only where useful.
+- Kiro skill wrapper for agent orchestration and MCP source access.
 
 ## Design Principles
 
@@ -36,14 +57,3 @@ The current prototype is dependency-free and can be opened directly in a browser
 - Make generation observable through structured trace events.
 - Run a QA loop before export.
 - Treat NatWest as an optional theme or palette, not a global visual requirement.
-
-## Planned Stack
-
-- TypeScript and React for the real UI.
-- PptxGenJS for editable PowerPoint export.
-- Playwright for PDF/PNG render checks.
-- Plotly, Mermaid, KaTeX, and Shiki for deterministic visuals.
-- GPT Image 2 for generated visual assets.
-- Python only where data science computation is useful.
-- Kiro skill wrapper for agent orchestration and MCP source access.
-
