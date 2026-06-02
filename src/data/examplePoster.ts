@@ -274,7 +274,7 @@ export const examplePoster: PosterProject = {
         role: "section_art",
         title: "Monitoring workflow comic panel",
         prompt: "Editorial comic panel about reviewing model monitoring evidence, no text, no numbers, no charts",
-        model: "gpt-image-2",
+        model: "gpt-image-1.5",
         theme: "comic-strip",
         palette: "comic-ink",
         width_px: 1800,
@@ -290,7 +290,7 @@ export const examplePoster: PosterProject = {
       title: "Geometric monitoring backdrop",
       prompt:
         "Polished academic data science poster background with abstract monitoring workflow geometry, no text, no charts, no factual labels",
-      model: "gpt-image-2",
+      model: "gpt-image-1.5",
       theme: "natwest-group",
       palette: "natwest-group",
       width_px: 2400,

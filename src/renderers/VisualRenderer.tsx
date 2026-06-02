@@ -245,12 +245,20 @@ export function VisualRenderer({ visual }: { visual: PosterVisual }) {
       return <InvalidVisualData visual={visual} message={parsed.message} />;
     }
 
+    const imageUrl = visual.asset?.url;
+
     return (
       <div className="visual-box generated-asset">
         <h3>{visual.title}</h3>
-        <div className="generated-asset-frame">
-          <span>{visual.type.replace(/_/g, " ")}</span>
-          <p>{visual.asset?.prompt ?? parsed.data.prompt ?? "Generated visual asset placeholder."}</p>
+        <div className={`generated-asset-frame ${imageUrl ? "has-image" : ""}`}>
+          {imageUrl ? (
+            <img className="generated-asset-image" src={imageUrl} alt={visual.asset?.title ?? visual.title} />
+          ) : (
+            <>
+              <span>{visual.type.replace(/_/g, " ")}</span>
+              <p>{visual.asset?.prompt ?? parsed.data.prompt ?? "Generated visual asset placeholder."}</p>
+            </>
+          )}
         </div>
       </div>
     );

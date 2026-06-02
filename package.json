@@ -8,6 +8,8 @@
     "build": "tsc --noEmit && vite build",
     "test": "vitest",
     "test:run": "vitest run",
+    "image:plan": "node scripts/generate-image-asset.mjs --dry-run",
+    "image:generate": "node scripts/generate-image-asset.mjs",
     "preview": "vite preview --host 127.0.0.1",
     "dev:local": "vite --host 127.0.0.1"
   },

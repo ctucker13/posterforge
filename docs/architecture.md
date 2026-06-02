@@ -158,8 +158,16 @@ Current lightweight renderers/placeholders:
 - math source placeholder
 - code block placeholder
 - generated asset placeholder
+- generated asset image rendering when `PosterVisual.asset.url` is present
 - typed renderer data parsers in `src/visuals/data.ts`
 - derived renderer calculations for confusion matrix metrics, Sankey link shares, and Gantt layout segments
+
+Current generated asset path:
+
+- `src/assets/imagePrompts.ts` plans non-factual image asset requests from `PosterProject` visual assets and project assets.
+- `scripts/generate-image-asset.mjs` runs outside the browser, reads poster JSON, calls the OpenAI Images API when `OPENAI_API_KEY` is set, saves PNG and metadata under `public/generated-assets/`, and writes an updated importable poster JSON.
+- Dry-run mode records the planned prompt and metadata without making an API call.
+- Model names remain configurable in poster JSON and CLI args so future GPT Image versions can be tested without changing the app code.
 
 Planned deterministic renderers:
 
@@ -170,7 +178,7 @@ Planned deterministic renderers:
 - richer table/timeline/Gantt rendering
 - ROC, PR, calibration, lift/gains, feature importance, SHAP, residuals, actual vs predicted, missingness, fairness, choropleth, network graph, and embedding projection visuals
 
-Factual visuals should be deterministic. GPT Image 2 should only create atmosphere, backgrounds, section art, comic panels, and similar non-factual assets.
+Factual visuals should be deterministic. GPT Image models should only create atmosphere, backgrounds, section art, comic panels, and similar non-factual assets.
 
 ## Theme, Palette, And Layout
 

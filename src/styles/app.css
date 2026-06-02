@@ -1556,6 +1556,7 @@ textarea {
   display: grid;
   place-items: center;
   min-height: 160px;
+  overflow: hidden;
   border: 1px dashed color-mix(in srgb, var(--theme-primary), white 48%);
   border-radius: 7px;
   padding: 16px;
@@ -1563,6 +1564,21 @@ textarea {
   background:
     repeating-linear-gradient(45deg, color-mix(in srgb, var(--theme-accent), transparent 86%) 0 8px, transparent 8px 18px),
     color-mix(in srgb, var(--theme-primary), white 92%);
+}
+
+.generated-asset-frame.has-image {
+  padding: 0;
+  border-style: solid;
+  background: #111827;
+}
+
+.generated-asset-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 180px;
+  aspect-ratio: 3 / 2;
+  object-fit: cover;
 }
 
 .generated-asset-frame span {

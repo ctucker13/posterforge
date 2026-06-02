@@ -24,9 +24,13 @@ The `PosterProject` / `poster.json` spec is the source of truth. HTML, PPTX, PDF
 npm install
 npm run dev
 npm run build
+npm run image:plan -- --visual vis_generated_panel
+OPENAI_API_KEY=... npm run image:generate -- --visual vis_generated_panel --model gpt-image-1.5
 ```
 
 `npm run dev` starts Vite on `0.0.0.0`.
+
+`npm run image:plan` writes prompt metadata without calling OpenAI. `npm run image:generate` calls the OpenAI Images API from Node, saves the PNG and metadata under `public/generated-assets/`, and writes an updated importable poster JSON. The sample spec keeps image asset model names configurable; the current OpenAI image-generation docs list `gpt-image-1.5`, `gpt-image-1`, and `gpt-image-1-mini`, so pass `--model gpt-image-1.5` if a future placeholder model name is rejected.
 
 ## Current Stack
 
@@ -64,6 +68,7 @@ Python is intentionally not the app core. It can be added later with `uv` for da
   - other/generated assets
 - Typed visual data parsers for deterministic renderer inputs.
 - Lightweight deterministic renderers/placeholders for confusion matrix, Sankey-style flow, table, timeline, Gantt, metric card, Mermaid source, math source, code block, and generated asset slots.
+- GPT Image asset planning/generation script for non-factual backgrounds, comic panels, and section art, with prompt/model/theme/palette metadata preserved.
 - Derived renderer summaries for confusion matrix metrics, Sankey flow shares, and Gantt timeline segments.
 - Structured trace UI showing observable work, not hidden reasoning.
 - QA panel with actionable issues, renderer data-shape checks, preview density risks, and a simple safe auto-fix for generated references.
@@ -141,7 +146,7 @@ docs/architecture.md
 
 ## Long-Term Roadmap
 
-- GPT Image 2 generated image assets for backgrounds, panels, section art, comic-strip frames, and atmosphere.
+- GPT Image generated image assets for backgrounds, panels, section art, comic-strip frames, and atmosphere.
 - PptxGenJS editable PowerPoint compiler.
 - Playwright PDF/PNG render checks.
 - Confluence and GitLab source access through Kiro MCP.
