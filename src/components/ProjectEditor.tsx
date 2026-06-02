@@ -1,5 +1,6 @@
 import { FileText, LayoutTemplate, Maximize2, Users } from "lucide-react";
-import type { PosterProject } from "../domain/poster";
+import type { PosterLayoutId, PosterProject } from "../domain/poster";
+import { layoutTemplates, resolveLayoutTemplate } from "../layouts";
 
 interface ProjectEditorProps {
   poster: PosterProject;
@@ -7,6 +8,8 @@ interface ProjectEditorProps {
 }
 
 export function ProjectEditor({ poster, onPosterChange }: ProjectEditorProps) {
+  const selectedLayout = resolveLayoutTemplate(poster.layout);
+
   function updateField<Key extends keyof PosterProject>(key: Key, value: PosterProject[Key]) {
     onPosterChange({ ...poster, [key]: value });
   }
@@ -38,11 +41,12 @@ export function ProjectEditor({ poster, onPosterChange }: ProjectEditorProps) {
             <span>
               <LayoutTemplate size={15} /> Layout
             </span>
-            <select value={poster.layout} onChange={(event) => updateField("layout", event.target.value)}>
-              <option value="results-first">Results first</option>
-              <option value="methods-first">Methods first</option>
-              <option value="narrative">Narrative</option>
-              <option value="dashboard">Dashboard</option>
+            <select value={poster.layout} onChange={(event) => updateField("layout", event.target.value as PosterLayoutId)}>
+              {layoutTemplates.map((layout) => (
+                <option value={layout.id} key={layout.id}>
+                  {layout.name}
+                </option>
+              ))}
             </select>
           </label>
 
@@ -93,6 +97,16 @@ export function ProjectEditor({ poster, onPosterChange }: ProjectEditorProps) {
             </select>
           </label>
         </div>
+
+        <aside className="layout-note">
+          <strong>{selectedLayout.name}</strong>
+          <p>{selectedLayout.description}</p>
+          <div>
+            {selectedLayout.motifs.map((motif) => (
+              <span key={motif}>{motif}</span>
+            ))}
+          </div>
+        </aside>
 
         <dl className="spec-metrics" aria-label="Project counts">
           <div>

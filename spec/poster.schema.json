@@ -36,7 +36,14 @@
       "type": "string"
     },
     "layout": {
-      "type": "string"
+      "enum": [
+        "three-column-academic",
+        "results-first",
+        "timeline-process",
+        "dashboard-poster",
+        "comic-strip-narrative",
+        "case-study-poster"
+      ]
     },
     "audience": {
       "type": "string"

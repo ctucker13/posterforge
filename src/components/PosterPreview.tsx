@@ -1,6 +1,7 @@
 import { type CSSProperties } from "react";
 import { FileCheck2, Image, Link2 } from "lucide-react";
 import type { PosterBlock, PosterProject } from "../domain/poster";
+import { isFeaturedSection, resolveLayoutTemplate } from "../layouts";
 import { resolvePalette } from "../themes";
 import { VisualRenderer } from "./VisualRenderer";
 
@@ -10,6 +11,7 @@ interface PosterPreviewProps {
 
 export function PosterPreview({ poster }: PosterPreviewProps) {
   const palette = resolvePalette(poster.theme, poster.palette);
+  const layout = resolveLayoutTemplate(poster.layout);
   const visuals = new Map(poster.visuals.map((visual) => [visual.id, visual]));
   const sources = new Map(poster.sources.map((source) => [source.id, source]));
 
@@ -20,7 +22,7 @@ export function PosterPreview({ poster }: PosterPreviewProps) {
         <span>HTML render</span>
       </div>
       <article
-        className={`poster poster-${poster.theme}`}
+        className={`poster poster-${poster.theme} poster-layout-${layout.cssClass}`}
         style={
           {
             "--theme-primary": palette.colors.primary,
@@ -33,7 +35,7 @@ export function PosterPreview({ poster }: PosterPreviewProps) {
       >
         <header className="poster-hero">
           <div>
-            <p className="poster-kicker">{poster.layout} · {poster.audience}</p>
+            <p className="poster-kicker">{layout.name} · {poster.audience}</p>
             <h2>{poster.title}</h2>
             <p>{poster.subtitle}</p>
           </div>
@@ -45,7 +47,10 @@ export function PosterPreview({ poster }: PosterPreviewProps) {
 
         <div className="poster-grid">
           {poster.sections.map((section) => (
-            <section className="poster-card" key={section.id}>
+            <section
+              className={`poster-card section-${section.type} section-${section.id} ${isFeaturedSection(layout, section) ? "featured-section" : ""}`}
+              key={section.id}
+            >
               <h3>{section.title}</h3>
               {section.blocks.map((block, index) => renderBlock(block, index, visuals))}
             </section>

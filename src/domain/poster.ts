@@ -9,6 +9,13 @@ export type SourceType =
 export type TrustLevel = "low" | "medium" | "high";
 export type TraceStatus = "queued" | "running" | "complete";
 export type QaSeverity = "high" | "medium" | "low";
+export type PosterLayoutId =
+  | "three-column-academic"
+  | "results-first"
+  | "timeline-process"
+  | "dashboard-poster"
+  | "comic-strip-narrative"
+  | "case-study-poster";
 
 export interface PosterMetadata {
   prompt?: string;
@@ -130,7 +137,7 @@ export interface PosterProject {
   };
   theme: string;
   palette?: string;
-  layout: string;
+  layout: PosterLayoutId;
   audience?: string;
   sources: PosterSource[];
   sourceDocuments?: SourceDocument[];
