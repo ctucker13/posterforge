@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { CheckCircle2, Clock3, Download, FileJson, FileText, Image, PackageCheck, Presentation } from "lucide-react";
 import type { PosterProject } from "../domain/poster";
-import { downloadPosterJson, downloadProjectBundleManifest, type ExportTarget } from "../exports";
+import { downloadPosterJson, downloadPosterPptx, downloadProjectBundleManifest, type ExportTarget } from "../exports";
 import { getExportReadiness } from "../exports/readiness";
 
 interface ExportPanelProps {
@@ -12,10 +12,21 @@ export function ExportPanel({ poster }: ExportPanelProps) {
   const readiness = getExportReadiness(poster);
   const [message, setMessage] = useState("JSON and bundle manifest exports are available when readiness checks pass.");
 
-  function handleExport(target: ExportTarget) {
+  async function handleExport(target: ExportTarget) {
     if (target === "poster_json") {
       downloadPosterJson(poster);
       setMessage("Exported poster JSON.");
+      return;
+    }
+
+    if (target === "pptx") {
+      setMessage("Preparing editable PPTX export.");
+      try {
+        await downloadPosterPptx(poster);
+        setMessage("Exported editable PPTX.");
+      } catch (error) {
+        setMessage(error instanceof Error ? `PPTX export failed: ${error.message}` : "PPTX export failed.");
+      }
       return;
     }
 

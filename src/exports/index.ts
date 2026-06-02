@@ -1,6 +1,7 @@
 import type { PosterProject } from "../domain/poster";
 import { buildHtmlPreviewArtifact } from "./htmlPreview";
 import type { ExportArtifact, ExportManifest, ExportTarget } from "./model";
+export { buildPosterPptx, buildPptxPosterPlan, downloadPosterPptx } from "./pptx";
 export type { ExportArtifact, ExportArtifactStatus, ExportJob, ExportManifest, ExportTarget } from "./model";
 
 export interface ExportCapability {
@@ -24,10 +25,10 @@ export const exportCapabilities: ExportCapability[] = [
   {
     id: "pptx",
     label: "Export editable PPTX",
-    status: "planned",
+    status: "available",
     description: "Editable PowerPoint export with native text, shapes, and image fallbacks.",
     output: "poster.pptx",
-    requirements: ["PptxGenJS", "layout-to-slide compiler", "visual SVG/PNG fallbacks"],
+    requirements: ["PptxGenJS", "layout-to-slide compiler", "editable text and visual placeholders"],
   },
   {
     id: "pdf",
@@ -76,7 +77,7 @@ export function buildProjectBundleManifest(poster: PosterProject, createdAt = ne
       buildArtifact("traces", "project_bundle", "trace_log", "traces/trace.json", "application/json", "Trace log", poster.traces?.length ?? 0),
       buildArtifact("qa", "project_bundle", "qa_report", "qa/qa-results.json", "application/json", "QA report", poster.qaResults?.length ?? 0),
       buildArtifact("references", "project_bundle", "reference", "references/references.json", "application/json", "References", poster.references?.length ?? 0),
-      buildArtifact("pptx", "pptx", "export", "exports/poster.pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "Editable PPTX", undefined, "planned"),
+      buildArtifact("pptx", "pptx", "export", "exports/poster.pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "Editable PPTX"),
       buildArtifact("pdf", "pdf", "export", "exports/poster.pdf", "application/pdf", "Print PDF", undefined, "planned"),
       buildArtifact("png", "png", "export", "exports/poster-preview.png", "image/png", "Preview PNG", undefined, "planned"),
     ],

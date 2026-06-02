@@ -92,6 +92,7 @@ src/
     export capability registry
     target readiness service
     browser JSON and bundle-manifest downloads
+    first-pass editable PPTX compiler
     HTML preview artifact descriptor
 ```
 
@@ -266,6 +267,23 @@ Planned QA checks:
 - data/paper separation
 - poster density
 - visual hierarchy
+
+## PPTX Export
+
+Current:
+
+- `src/exports/pptx.ts` compiles the current `PosterProject` into a one-slide editable PowerPoint poster using PptxGenJS.
+- The compiler preserves native title, subtitle, section headings, and text blocks as editable PowerPoint text.
+- Deterministic visuals currently export as editable placeholder cards carrying visual title, type, and source-link count.
+- Generated image assets with `PosterVisual.asset.url` are embedded as images when the browser can fetch the URL.
+- PptxGenJS is loaded by dynamic import so the main app bundle does not pay the compiler cost until the user exports PPTX.
+
+Planned:
+
+- export deterministic renderer outputs as native PowerPoint shapes where practical
+- add SVG/PNG fallbacks for charts, Mermaid, math, and code
+- add print-size layout constraints instead of the current scaled one-slide wide canvas
+- add export QA for text overflow, clipping, and missing image assets
 
 ## Exports
 

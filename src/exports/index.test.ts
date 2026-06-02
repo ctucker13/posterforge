@@ -1,15 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { examplePoster } from "../data/examplePoster";
-import { buildProjectBundleManifest, exportCapabilities } from "./index";
+import { buildProjectBundleManifest, buildPptxPosterPlan, exportCapabilities } from "./index";
 import { buildHtmlPreviewArtifact, buildHtmlPreviewDescriptor } from "./htmlPreview";
 import { createExportJob } from "./model";
 import { getExportReadiness, getExportReadinessForTarget } from "./readiness";
 
 describe("exports", () => {
-  it("marks JSON and bundle manifest export as available", () => {
+  it("marks JSON, PPTX, and bundle manifest export as available", () => {
     const availableIds = exportCapabilities.filter((capability) => capability.status === "available").map((capability) => capability.id);
 
-    expect(availableIds).toEqual(expect.arrayContaining(["poster_json", "project_bundle"]));
+    expect(availableIds).toEqual(expect.arrayContaining(["poster_json", "pptx", "project_bundle"]));
   });
 
   it("builds a project bundle manifest with current and planned entries", () => {
@@ -21,7 +21,7 @@ describe("exports", () => {
         expect.objectContaining({ id: "poster_json", status: "ready", path: "poster.json" }),
         expect.objectContaining({ id: "html_preview_descriptor", status: "ready", path: "preview/html-preview.json" }),
         expect.objectContaining({ id: "source_documents", count: examplePoster.sourceDocuments?.length }),
-        expect.objectContaining({ id: "pptx", status: "planned" }),
+        expect.objectContaining({ id: "pptx", status: "ready" }),
         expect.objectContaining({ id: "pdf", status: "planned" }),
       ]),
     );
@@ -44,7 +44,7 @@ describe("exports", () => {
 
     expect(readiness.find((target) => target.target === "poster_json")?.status).toBe("ready");
     expect(readiness.find((target) => target.target === "project_bundle")?.status).toBe("ready");
-    expect(readiness.find((target) => target.target === "pptx")?.status).toBe("planned");
+    expect(readiness.find((target) => target.target === "pptx")?.status).toBe("ready");
   });
 
   it("blocks JSON readiness when trace and QA artifacts are missing", () => {
@@ -67,5 +67,14 @@ describe("exports", () => {
         path: "preview/html-preview.json",
       }),
     );
+  });
+
+  it("builds a one-slide PPTX poster layout plan from sections", () => {
+    const plan = buildPptxPosterPlan(examplePoster);
+
+    expect(plan.slideWidth).toBeGreaterThan(13);
+    expect(plan.slideHeight).toBe(7.5);
+    expect(plan.cells).toHaveLength(examplePoster.sections.length);
+    expect(plan.cells[0]).toEqual(expect.objectContaining({ sectionId: "hero", blockCount: 1 }));
   });
 });

@@ -74,7 +74,8 @@ Python is intentionally not the app core. It can be added later with `uv` for da
 - QA panel with actionable issues, renderer data-shape checks, preview density risks, and a simple safe auto-fix for generated references.
 - Poster JSON import, export, and reset.
 - Export job/artifact model with centralized readiness checks.
-- Export capability panel with JSON and project bundle manifest available; PPTX/PDF/PNG marked as planned.
+- Export capability panel with JSON, editable PPTX, and project bundle manifest available; PDF/PNG marked as planned.
+- First-pass PptxGenJS compiler for one-slide editable poster export with native text, visual placeholder cards, and generated image embedding when asset URLs are available.
 - HTML preview artifact descriptor for future Playwright PDF/PNG export.
 - HTML poster preview.
 
@@ -138,8 +139,8 @@ docs/architecture.md
    - poster density
    - visual hierarchy
 
-5. Add export implementations:
-   - PptxGenJS editable PPTX export
+5. Strengthen export implementations:
+   - richer PptxGenJS editable PPTX export with deterministic visual shape rendering
    - Playwright PDF export
    - Playwright PNG preview export
    - project bundle ZIP output
@@ -147,7 +148,7 @@ docs/architecture.md
 ## Long-Term Roadmap
 
 - GPT Image generated image assets for backgrounds, panels, section art, comic-strip frames, and atmosphere.
-- PptxGenJS editable PowerPoint compiler.
+- Full-fidelity PptxGenJS editable PowerPoint compiler.
 - Playwright PDF/PNG render checks.
 - Confluence and GitLab source access through Kiro MCP.
 - Thin Kiro skill wrapper that calls the PosterForge engine.

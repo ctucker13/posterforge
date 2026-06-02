@@ -16,7 +16,7 @@ export interface ExportReadiness {
 export function getExportReadiness(poster: PosterProject): ExportReadiness[] {
   return exportCapabilities.map((capability) => {
     const blockers = getTargetBlockers(poster, capability.id);
-    const status = capability.id === "pptx" || capability.id === "pdf" || capability.id === "png" ? "planned" : blockers.length > 0 ? "blocked" : "ready";
+    const status = capability.id === "pdf" || capability.id === "png" ? "planned" : blockers.length > 0 ? "blocked" : "ready";
 
     return {
       target: capability.id,
@@ -24,7 +24,7 @@ export function getExportReadiness(poster: PosterProject): ExportReadiness[] {
       output: capability.output,
       status,
       requirements: capability.requirements,
-      blockers: capability.id === "pptx" || capability.id === "pdf" || capability.id === "png" ? [...blockers, getPlannedBlocker(capability.id)] : blockers,
+      blockers: capability.id === "pdf" || capability.id === "png" ? [...blockers, getPlannedBlocker(capability.id)] : blockers,
     };
   });
 }
@@ -110,10 +110,6 @@ function validateRendererData(visual: PosterProject["visuals"][number]): string 
 }
 
 function getPlannedBlocker(target: ExportTarget): string {
-  if (target === "pptx") {
-    return "PptxGenJS editable export compiler is not implemented.";
-  }
-
   if (target === "pdf") {
     return "Print PDF export is planned for the Playwright export layer.";
   }
