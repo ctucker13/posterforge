@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { examplePoster } from "../data/examplePoster";
 import { buildProjectBundleManifest, exportCapabilities } from "./index";
+import { buildHtmlPreviewArtifact, buildHtmlPreviewDescriptor } from "./htmlPreview";
+import { createExportJob } from "./model";
+import { getExportReadiness, getExportReadinessForTarget } from "./readiness";
 
 describe("exports", () => {
   it("marks JSON and bundle manifest export as available", () => {
@@ -13,13 +16,56 @@ describe("exports", () => {
     const manifest = buildProjectBundleManifest(examplePoster, "2026-06-02T00:00:00.000Z");
 
     expect(manifest.posterId).toBe(examplePoster.id);
-    expect(manifest.entries).toEqual(
+    expect(manifest.artifacts).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ id: "poster_json", status: "available", path: "poster.json" }),
+        expect.objectContaining({ id: "poster_json", status: "ready", path: "poster.json" }),
+        expect.objectContaining({ id: "html_preview_descriptor", status: "ready", path: "preview/html-preview.json" }),
         expect.objectContaining({ id: "source_documents", count: examplePoster.sourceDocuments?.length }),
         expect.objectContaining({ id: "pptx", status: "planned" }),
         expect.objectContaining({ id: "pdf", status: "planned" }),
       ]),
+    );
+  });
+
+  it("builds export jobs using the shared export model", () => {
+    const job = createExportJob(examplePoster, "poster_json", "2026-06-02T00:00:00.000Z");
+
+    expect(job).toEqual(
+      expect.objectContaining({
+        posterId: examplePoster.id,
+        target: "poster_json",
+        status: "planned",
+      }),
+    );
+  });
+
+  it("reports readiness for current and planned export targets", () => {
+    const readiness = getExportReadiness(examplePoster);
+
+    expect(readiness.find((target) => target.target === "poster_json")?.status).toBe("ready");
+    expect(readiness.find((target) => target.target === "project_bundle")?.status).toBe("ready");
+    expect(readiness.find((target) => target.target === "pptx")?.status).toBe("planned");
+  });
+
+  it("blocks JSON readiness when trace and QA artifacts are missing", () => {
+    const readiness = getExportReadinessForTarget({ ...examplePoster, traces: [], qaResults: undefined }, "poster_json");
+
+    expect(readiness.status).toBe("blocked");
+    expect(readiness.blockers).toEqual(expect.arrayContaining(["trace events are missing", "QA results field is missing"]));
+  });
+
+  it("builds an HTML preview artifact descriptor", () => {
+    const descriptor = buildHtmlPreviewDescriptor(examplePoster);
+    const artifact = buildHtmlPreviewArtifact(examplePoster, "2026-06-02T00:00:00.000Z");
+
+    expect(descriptor.visualIds).toContain("vis_confusion_matrix");
+    expect(artifact).toEqual(
+      expect.objectContaining({
+        id: "html_preview_descriptor",
+        target: "html_preview",
+        status: "ready",
+        path: "preview/html-preview.json",
+      }),
     );
   });
 });

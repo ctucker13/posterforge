@@ -68,7 +68,9 @@ Python is intentionally not the app core. It can be added later with `uv` for da
 - Structured trace UI showing observable work, not hidden reasoning.
 - QA panel with actionable issues, renderer data-shape checks, preview density risks, and a simple safe auto-fix for generated references.
 - Poster JSON import, export, and reset.
+- Export job/artifact model with centralized readiness checks.
 - Export capability panel with JSON and project bundle manifest available; PPTX/PDF/PNG marked as planned.
+- HTML preview artifact descriptor for future Playwright PDF/PNG export.
 - HTML poster preview.
 
 ## Source-Grounding Rules
@@ -87,7 +89,7 @@ src/
   components/   React UI panels
   data/         sample PosterProject data
   domain/       poster types, generator, evidence helpers, compatibility re-exports
-  exports/      export capability registry and JSON download helper
+  exports/      export model, readiness checks, JSON downloads, bundle manifest, preview descriptor
   layouts/      typed layout template registry
   qa/           QA rules and safe fixes
   renderers/    deterministic visual renderers and placeholders

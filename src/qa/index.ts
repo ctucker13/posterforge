@@ -1,4 +1,5 @@
 import type { PosterAsset, PosterProject, QaIssue } from "../domain/poster";
+import { getExportReadiness } from "../exports/readiness";
 import {
   parseCodeBlockData,
   parseConfusionMatrixData,
@@ -359,44 +360,17 @@ export function runQa(poster: PosterProject): QaIssue[] {
     });
   }
 
-  const jsonMissingParts = [
-    !hasText(poster.id) ? "poster id" : "",
-    !hasText(poster.title) ? "title" : "",
-    poster.sections.length === 0 ? "sections" : "",
-    poster.sources.length === 0 ? "sources" : "",
-    poster.claims.length === 0 ? "claims" : "",
-    poster.visuals.length === 0 ? "visuals" : "",
-    (poster.traces?.length ?? 0) === 0 ? "trace events" : "",
-    poster.qaResults === undefined ? "QA results field" : "",
-  ].filter(Boolean);
+  for (const readiness of getExportReadiness(poster)) {
+    if (readiness.status !== "blocked") {
+      continue;
+    }
 
-  if (jsonMissingParts.length > 0) {
     issues.push({
       id: "export_target_readiness",
       severity: "medium",
-      location: "exports.poster_json",
-      message: `Poster JSON export is missing ${jsonMissingParts.join(", ")}.`,
-      suggestedFix: "Complete the PosterProject source-of-truth fields before exporting poster.json.",
-    });
-  }
-
-  const bundleMissingParts = [
-    (poster.sourceDocuments?.length ?? 0) === 0 ? "source documents" : "",
-    (poster.sourceSummaries?.length ?? 0) === 0 ? "source summaries" : "",
-    (poster.evidence?.length ?? 0) === 0 ? "evidence items" : "",
-    (poster.claimMap?.entries.length ?? 0) === 0 ? "claim map" : "",
-    poster.sources.length > 0 && (poster.references?.length ?? 0) === 0 ? "references" : "",
-    (poster.assets?.length ?? 0) === 0 && !poster.visuals.some((visual) => visual.asset) ? "asset metadata" : "",
-    (poster.traces?.length ?? 0) === 0 ? "trace log" : "",
-  ].filter(Boolean);
-
-  if (bundleMissingParts.length > 0) {
-    issues.push({
-      id: "export_target_readiness",
-      severity: "medium",
-      location: "exports.project_bundle",
-      message: `Project bundle export is missing ${bundleMissingParts.join(", ")}.`,
-      suggestedFix: "Keep parsed sources, evidence, claim map, asset metadata, traces, QA, and references with the project bundle.",
+      location: `exports.${readiness.target}`,
+      message: `${readiness.label} is blocked.`,
+      suggestedFix: readiness.blockers.join("; "),
     });
   }
 

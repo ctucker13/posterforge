@@ -1,6 +1,7 @@
 import type { PosterProject } from "../domain/poster";
-
-export type ExportTarget = "poster_json" | "pptx" | "pdf" | "png" | "project_bundle";
+import { buildHtmlPreviewArtifact } from "./htmlPreview";
+import type { ExportArtifact, ExportManifest, ExportTarget } from "./model";
+export type { ExportArtifact, ExportArtifactStatus, ExportJob, ExportManifest, ExportTarget } from "./model";
 
 export interface ExportCapability {
   id: ExportTarget;
@@ -58,51 +59,26 @@ export function downloadPosterJson(poster: PosterProject) {
   downloadJson(`${poster.id || "poster"}.json`, poster);
 }
 
-export interface ProjectBundleManifest {
-  id: string;
-  posterId: string;
-  createdAt: string;
-  schemaVersion: string;
-  entries: Array<{
-    id: string;
-    kind: "poster_spec" | "source_document" | "source_summary" | "evidence" | "claim_map" | "asset" | "trace_log" | "qa_report" | "reference" | "export";
-    path: string;
-    count?: number;
-    status: "available" | "planned";
-  }>;
-}
-
-export function buildProjectBundleManifest(poster: PosterProject, createdAt = new Date().toISOString()): ProjectBundleManifest {
+export function buildProjectBundleManifest(poster: PosterProject, createdAt = new Date().toISOString()): ExportManifest {
   return {
     id: `${poster.id || "poster"}_bundle_manifest`,
     posterId: poster.id,
     createdAt,
     schemaVersion: "posterforge.bundle.v0",
-    entries: [
-      { id: "poster_json", kind: "poster_spec", path: "poster.json", status: "available" },
-      {
-        id: "source_documents",
-        kind: "source_document",
-        path: "sources/documents.json",
-        count: poster.sourceDocuments?.length ?? 0,
-        status: "available",
-      },
-      {
-        id: "source_summaries",
-        kind: "source_summary",
-        path: "sources/summaries.json",
-        count: poster.sourceSummaries?.length ?? 0,
-        status: "available",
-      },
-      { id: "evidence", kind: "evidence", path: "evidence/evidence.json", count: poster.evidence?.length ?? 0, status: "available" },
-      { id: "claim_map", kind: "claim_map", path: "evidence/claim-map.json", count: poster.claimMap?.entries.length ?? 0, status: "available" },
-      { id: "assets", kind: "asset", path: "assets/manifest.json", count: countAssets(poster), status: "available" },
-      { id: "traces", kind: "trace_log", path: "traces/trace.json", count: poster.traces?.length ?? 0, status: "available" },
-      { id: "qa", kind: "qa_report", path: "qa/qa-results.json", count: poster.qaResults?.length ?? 0, status: "available" },
-      { id: "references", kind: "reference", path: "references/references.json", count: poster.references?.length ?? 0, status: "available" },
-      { id: "pptx", kind: "export", path: "exports/poster.pptx", status: "planned" },
-      { id: "pdf", kind: "export", path: "exports/poster.pdf", status: "planned" },
-      { id: "png", kind: "export", path: "exports/poster-preview.png", status: "planned" },
+    artifacts: [
+      buildArtifact("poster_json", "poster_json", "poster_spec", "poster.json", "application/json", "Poster project JSON"),
+      buildHtmlPreviewArtifact(poster, createdAt),
+      buildArtifact("source_documents", "project_bundle", "source_document", "sources/documents.json", "application/json", "Source documents", poster.sourceDocuments?.length ?? 0),
+      buildArtifact("source_summaries", "project_bundle", "source_summary", "sources/summaries.json", "application/json", "Source summaries", poster.sourceSummaries?.length ?? 0),
+      buildArtifact("evidence", "project_bundle", "evidence", "evidence/evidence.json", "application/json", "Evidence items", poster.evidence?.length ?? 0),
+      buildArtifact("claim_map", "project_bundle", "claim_map", "evidence/claim-map.json", "application/json", "Claim map", poster.claimMap?.entries.length ?? 0),
+      buildArtifact("assets", "project_bundle", "asset", "assets/manifest.json", "application/json", "Asset manifest", countAssets(poster)),
+      buildArtifact("traces", "project_bundle", "trace_log", "traces/trace.json", "application/json", "Trace log", poster.traces?.length ?? 0),
+      buildArtifact("qa", "project_bundle", "qa_report", "qa/qa-results.json", "application/json", "QA report", poster.qaResults?.length ?? 0),
+      buildArtifact("references", "project_bundle", "reference", "references/references.json", "application/json", "References", poster.references?.length ?? 0),
+      buildArtifact("pptx", "pptx", "export", "exports/poster.pptx", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "Editable PPTX", undefined, "planned"),
+      buildArtifact("pdf", "pdf", "export", "exports/poster.pdf", "application/pdf", "Print PDF", undefined, "planned"),
+      buildArtifact("png", "png", "export", "exports/poster-preview.png", "image/png", "Preview PNG", undefined, "planned"),
     ],
   };
 }
@@ -113,6 +89,28 @@ export function downloadProjectBundleManifest(poster: PosterProject) {
 
 function countAssets(poster: PosterProject): number {
   return (poster.assets?.length ?? 0) + poster.visuals.filter((visual) => visual.asset).length;
+}
+
+function buildArtifact(
+  id: string,
+  target: ExportArtifact["target"],
+  kind: ExportArtifact["kind"],
+  path: string,
+  mimeType: string,
+  label: string,
+  count?: number,
+  status: ExportArtifact["status"] = "ready",
+): ExportArtifact {
+  return {
+    id,
+    target,
+    kind,
+    path,
+    mimeType,
+    status,
+    label,
+    count,
+  };
 }
 
 function downloadJson(filename: string, value: unknown) {

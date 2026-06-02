@@ -366,9 +366,18 @@ textarea {
   background: #ffffff;
 }
 
-.export-target.available {
+.export-target.ready {
   border-color: #b7e4d5;
   background: #f7fffb;
+}
+
+.export-target.blocked {
+  border-color: #fedf89;
+  background: #fffcf5;
+}
+
+.export-target.planned {
+  background: #f8fafc;
 }
 
 .export-target-main {
@@ -426,6 +435,16 @@ textarea {
   font-size: 10px;
   font-weight: 900;
   background: #f2f4f7;
+}
+
+.export-blockers {
+  display: grid;
+  gap: 3px;
+  margin: 8px 0 0;
+  padding-left: 16px;
+  color: #667085;
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .export-status {

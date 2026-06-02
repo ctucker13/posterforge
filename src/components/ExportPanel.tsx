@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { CheckCircle2, Clock3, Download, FileJson, FileText, Image, PackageCheck, Presentation } from "lucide-react";
 import type { PosterProject } from "../domain/poster";
-import { downloadPosterJson, downloadProjectBundleManifest, exportCapabilities, type ExportTarget } from "../exports";
+import { downloadPosterJson, downloadProjectBundleManifest, type ExportTarget } from "../exports";
+import { getExportReadiness } from "../exports/readiness";
 
 interface ExportPanelProps {
   poster: PosterProject;
 }
 
 export function ExportPanel({ poster }: ExportPanelProps) {
-  const [message, setMessage] = useState("JSON export is available now. Other outputs are planned.");
+  const readiness = getExportReadiness(poster);
+  const [message, setMessage] = useState("JSON and bundle manifest exports are available when readiness checks pass.");
 
   function handleExport(target: ExportTarget) {
     if (target === "poster_json") {
@@ -27,29 +29,40 @@ export function ExportPanel({ poster }: ExportPanelProps) {
     <section className="export-panel" aria-label="Export actions">
       <div className="panel-header compact">
         <h2>Exports</h2>
-        <span>{exportCapabilities.filter((capability) => capability.status === "available").length} available</span>
+        <span>{readiness.filter((item) => item.status === "ready").length} ready</span>
       </div>
 
       <div className="export-list">
-        {exportCapabilities.map((capability) => (
-          <article className={`export-target ${capability.status}`} key={capability.id}>
+        {readiness.map((capability) => (
+          <article className={`export-target ${capability.status}`} key={capability.target}>
             <div className="export-target-main">
-              <div className="export-target-icon">{renderExportIcon(capability.id)}</div>
+              <div className="export-target-icon">{renderExportIcon(capability.target)}</div>
               <div>
                 <strong>{capability.label}</strong>
-                <p>{capability.description}</p>
+                <p>{capability.status === "ready" ? "Ready to export from the current PosterProject." : capability.blockers[0]}</p>
                 <div className="export-requirements">
                   <span>{capability.output}</span>
                   {capability.requirements.map((requirement) => (
-                    <span key={`${capability.id}-${requirement}`}>{requirement}</span>
+                    <span key={`${capability.target}-${requirement}`}>{requirement}</span>
                   ))}
                 </div>
+                {capability.blockers.length > 1 ? (
+                  <ul className="export-blockers">
+                    {capability.blockers.slice(1, 4).map((blocker) => (
+                      <li key={`${capability.target}-${blocker}`}>{blocker}</li>
+                    ))}
+                  </ul>
+                ) : null}
               </div>
             </div>
-            <button type="button" disabled={capability.status !== "available"} onClick={() => handleExport(capability.id)}>
-              {capability.status === "available" ? (
+            <button type="button" disabled={capability.status !== "ready"} onClick={() => handleExport(capability.target)}>
+              {capability.status === "ready" ? (
                 <>
                   <Download size={15} /> Export
+                </>
+              ) : capability.status === "blocked" ? (
+                <>
+                  <Clock3 size={15} /> Blocked
                 </>
               ) : (
                 <>

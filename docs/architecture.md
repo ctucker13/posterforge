@@ -88,8 +88,11 @@ src/
     QA checks and deterministic safe fixes
 
   exports/
+    export job/artifact model
     export capability registry
-    browser JSON download helper
+    target readiness service
+    browser JSON and bundle-manifest downloads
+    HTML preview artifact descriptor
 ```
 
 ## Sources
@@ -260,12 +263,17 @@ Planned QA checks:
 
 Current:
 
+- export job and artifact model
+- centralized readiness service for JSON, PPTX, PDF, PNG, and bundle targets
 - browser JSON export for the current `PosterProject`
 - browser project bundle manifest export
 - export capability registry
 - UI showing PPTX/PDF/PNG as planned outputs with requirements
+- HTML preview descriptor artifact for future Playwright export
 
 The project bundle manifest is a JSON placeholder for the future ZIP bundle. It records expected entries for poster spec, source documents, summaries, evidence, claim map, assets, traces, QA, references, and planned export outputs.
+
+The readiness service is shared by the export UI and QA layer so target requirements are not duplicated. JSON and bundle manifest exports can be ready now; PPTX, PDF, and PNG remain planned until the PptxGenJS and Playwright layers exist.
 
 Planned:
 
