@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.local/poster.schema.json",
+  "$id": "https://posterforge.local/poster.schema.json",
   "title": "Poster Project",
   "type": "object",
   "required": ["id", "title", "format", "theme", "layout", "sections", "sources", "claims", "visuals"],
@@ -12,7 +12,21 @@
       "type": "string"
     },
     "metadata": {
-      "type": "object"
+      "type": "object",
+      "properties": {
+        "prompt": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string"
+        },
+        "generator": {
+          "type": "string"
+        }
+      }
     },
     "subtitle": {
       "type": "string"
@@ -300,10 +314,47 @@
         "blocks": {
           "type": "array",
           "items": {
-            "type": "object"
+            "$ref": "#/$defs/block"
           }
         }
       }
+    },
+    "block": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["type", "text"],
+          "properties": {
+            "type": {
+              "const": "text"
+            },
+            "text": {
+              "type": "string"
+            },
+            "claim_ids": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "required": ["type", "visual_id"],
+          "properties": {
+            "type": {
+              "const": "visual_ref"
+            },
+            "visual_id": {
+              "type": "string"
+            },
+            "caption": {
+              "type": "string"
+            }
+          }
+        }
+      ]
     },
     "visual": {
       "type": "object",
@@ -455,6 +506,9 @@
         },
         "autoFixable": {
           "type": "boolean"
+        },
+        "fixId": {
+          "enum": ["create_references"]
         }
       }
     }

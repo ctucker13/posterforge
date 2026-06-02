@@ -1,6 +1,7 @@
 import { useRef, useState, type ChangeEvent } from "react";
 import { AlertTriangle, CheckCircle2, FileJson, RotateCcw, Upload } from "lucide-react";
 import type { PosterProject } from "../domain/poster";
+import { parsePosterProjectJson } from "../domain/validation";
 
 interface JsonProjectControlsProps {
   poster: PosterProject;
@@ -23,11 +24,7 @@ export function JsonProjectControls({ poster, onImport, onReset }: JsonProjectCo
     }
 
     try {
-      const parsed = JSON.parse(await file.text()) as unknown;
-      if (!isPosterProject(parsed)) {
-        throw new Error("File is not a PosterProject spec.");
-      }
-
+      const parsed = parsePosterProjectJson(await file.text());
       onImport(parsed);
       setStatus({ kind: "success", message: `Imported ${file.name}` });
     } catch (error) {
@@ -60,26 +57,5 @@ export function JsonProjectControls({ poster, onImport, onReset }: JsonProjectCo
         <span>{status.message}</span>
       </div>
     </section>
-  );
-}
-
-function isPosterProject(value: unknown): value is PosterProject {
-  if (!value || typeof value !== "object") {
-    return false;
-  }
-
-  const candidate = value as Partial<PosterProject>;
-  return (
-    typeof candidate.id === "string" &&
-    typeof candidate.title === "string" &&
-    Boolean(candidate.format) &&
-    typeof candidate.format?.size === "string" &&
-    typeof candidate.format?.orientation === "string" &&
-    typeof candidate.theme === "string" &&
-    typeof candidate.layout === "string" &&
-    Array.isArray(candidate.sources) &&
-    Array.isArray(candidate.claims) &&
-    Array.isArray(candidate.sections) &&
-    Array.isArray(candidate.visuals)
   );
 }
