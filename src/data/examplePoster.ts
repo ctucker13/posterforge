@@ -107,6 +107,7 @@ export const examplePoster: PosterProject = {
       blocks: [
         {
           type: "text",
+          claim_ids: ["claim_002"],
           text: "The QA loop checks source links, poster readability, visual integrity, and export readiness before final handoff.",
         },
       ],
@@ -207,6 +208,9 @@ export const examplePoster: PosterProject = {
           { source: "Manual review", target: "Declined", value: 260 },
           { source: "Manual review", target: "Approved", value: 840 },
         ],
+      },
+      options: {
+        labelStrategy: "short node labels with value badges; long labels wrapped before export",
       },
     },
     {

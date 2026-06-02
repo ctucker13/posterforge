@@ -1,4 +1,4 @@
-import type { PosterProject, QaIssue } from "../domain/poster";
+import type { PosterAsset, PosterProject, QaIssue } from "../domain/poster";
 
 const factualVisualTypes = new Set([
   "table",
@@ -28,11 +28,38 @@ const factualVisualTypes = new Set([
 ]);
 
 const generatedVisualTypes = new Set(["ai_image", "generated_background", "generated_comic_panel"]);
+const generatedAssetTypes = new Set<PosterAsset["type"]>(["ai_image", "generated_background", "generated_panel"]);
+
+function hasText(value: string | undefined): boolean {
+  return Boolean(value?.trim());
+}
+
+function collectGeneratedAssets(poster: PosterProject): Array<{ asset: PosterAsset; location: string }> {
+  const assets: Array<{ asset: PosterAsset; location: string }> = [];
+
+  for (const asset of poster.assets ?? []) {
+    if (generatedAssetTypes.has(asset.type)) {
+      assets.push({ asset, location: `assets.${asset.id}` });
+    }
+  }
+
+  for (const visual of poster.visuals) {
+    if (visual.asset && (generatedVisualTypes.has(visual.type) || generatedAssetTypes.has(visual.asset.type))) {
+      assets.push({ asset: visual.asset, location: `visuals.${visual.id}.asset` });
+    }
+  }
+
+  return assets;
+}
 
 export function runQa(poster: PosterProject): QaIssue[] {
   const issues: QaIssue[] = [];
   const sourceIds = new Set(poster.sources.map((source) => source.id));
+  const sourceDocumentIds = new Set((poster.sourceDocuments ?? []).map((document) => document.source.id));
+  const sourceSummaryIds = new Set((poster.sourceSummaries ?? []).map((summary) => summary.source_id));
+  const evidenceSourceIds = new Set((poster.evidence ?? []).map((evidence) => evidence.source_id));
   const visualIds = new Set(poster.visuals.map((visual) => visual.id));
+  const claimIds = new Set(poster.claims.map((claim) => claim.id));
   const referencedSourceIds = new Set<string>();
 
   if (poster.title.trim().length === 0) {
@@ -53,6 +80,38 @@ export function runQa(poster: PosterProject): QaIssue[] {
       message: "Poster must have at least one source.",
       suggestedFix: "Add a mock, local, web, paper, Confluence, or GitLab source before generation.",
     });
+  }
+
+  for (const source of poster.sources) {
+    if (!sourceDocumentIds.has(source.id)) {
+      issues.push({
+        id: "source_document_missing",
+        severity: "medium",
+        location: `sources.${source.id}`,
+        message: "Source has no parsed document artifact.",
+        suggestedFix: "Fetch or parse this source into a SourceDocument before relying on it for generation.",
+      });
+    }
+
+    if (!sourceSummaryIds.has(source.id)) {
+      issues.push({
+        id: "source_summary_missing",
+        severity: "medium",
+        location: `sources.${source.id}`,
+        message: "Source has no extracted summary.",
+        suggestedFix: "Run source interpretation so the poster can separate methods, metrics, figures, and claims.",
+      });
+    }
+
+    if (!evidenceSourceIds.has(source.id)) {
+      issues.push({
+        id: "source_evidence_missing",
+        severity: "medium",
+        location: `sources.${source.id}`,
+        message: "Source has no evidence items linked to it.",
+        suggestedFix: "Extract claim, method, metric, figure, or reference evidence from this source.",
+      });
+    }
   }
 
   const hasResultsSection = poster.sections.some((section) => {
@@ -156,16 +215,70 @@ export function runQa(poster: PosterProject): QaIssue[] {
     }
   }
 
+  for (const { asset, location } of collectGeneratedAssets(poster)) {
+    if (!hasText(asset.prompt)) {
+      issues.push({
+        id: "generated_asset_prompt_missing",
+        severity: "medium",
+        location,
+        message: "Generated asset is missing the prompt metadata.",
+        suggestedFix: "Record the image-generation prompt so the asset can be audited or regenerated.",
+      });
+    }
+
+    if (!hasText(asset.model)) {
+      issues.push({
+        id: "generated_asset_model_missing",
+        severity: "medium",
+        location,
+        message: "Generated asset is missing the model metadata.",
+        suggestedFix: "Record the image model used for this generated asset.",
+      });
+    }
+  }
+
   for (const section of poster.sections) {
-    for (const block of section.blocks) {
+    for (const [index, block] of section.blocks.entries()) {
       if (block.type === "text" && block.text.length > 420) {
         issues.push({
           id: "poster_text_density",
           severity: "medium",
-          location: `sections.${section.id}`,
+          location: `sections.${section.id}.blocks.${index}`,
           message: "Text block is long for a poster panel.",
           suggestedFix: "Shorten this block into a finding, method point, or caption-sized summary.",
         });
+      }
+
+      if (block.type === "text" && block.text.length > 280) {
+        issues.push({
+          id: "text_overflow_risk",
+          severity: "low",
+          location: `sections.${section.id}.blocks.${index}`,
+          message: "Text block may overflow or crowd a poster panel.",
+          suggestedFix: "Reduce this text to one concise finding, or move supporting detail into source notes.",
+        });
+      }
+
+      if (block.type === "text" && block.text.trim().length > 0 && (block.claim_ids?.length ?? 0) === 0) {
+        issues.push({
+          id: "text_block_claim_links",
+          severity: "medium",
+          location: `sections.${section.id}.blocks.${index}`,
+          message: "Text block has no claim links.",
+          suggestedFix: "Link this block to one or more PosterClaim IDs so preview and exports can show source grounding.",
+        });
+      }
+
+      for (const claimId of block.type === "text" ? block.claim_ids ?? [] : []) {
+        if (!claimIds.has(claimId)) {
+          issues.push({
+            id: "text_block_unknown_claim",
+            severity: "high",
+            location: `sections.${section.id}.blocks.${index}`,
+            message: `Text block references unknown claim '${claimId}'.`,
+            suggestedFix: "Add the missing claim or update the block to point at an existing PosterClaim ID.",
+          });
+        }
       }
 
       if (block.type === "visual_ref" && !visualIds.has(block.visual_id)) {
@@ -189,6 +302,47 @@ export function runQa(poster: PosterProject): QaIssue[] {
       suggestedFix: "Generate reference records from the source bundle before export.",
       autoFixable: true,
       fixId: "create_references",
+    });
+  }
+
+  const jsonMissingParts = [
+    !hasText(poster.id) ? "poster id" : "",
+    !hasText(poster.title) ? "title" : "",
+    poster.sections.length === 0 ? "sections" : "",
+    poster.sources.length === 0 ? "sources" : "",
+    poster.claims.length === 0 ? "claims" : "",
+    poster.visuals.length === 0 ? "visuals" : "",
+    (poster.traces?.length ?? 0) === 0 ? "trace events" : "",
+    poster.qaResults === undefined ? "QA results field" : "",
+  ].filter(Boolean);
+
+  if (jsonMissingParts.length > 0) {
+    issues.push({
+      id: "export_target_readiness",
+      severity: "medium",
+      location: "exports.poster_json",
+      message: `Poster JSON export is missing ${jsonMissingParts.join(", ")}.`,
+      suggestedFix: "Complete the PosterProject source-of-truth fields before exporting poster.json.",
+    });
+  }
+
+  const bundleMissingParts = [
+    (poster.sourceDocuments?.length ?? 0) === 0 ? "source documents" : "",
+    (poster.sourceSummaries?.length ?? 0) === 0 ? "source summaries" : "",
+    (poster.evidence?.length ?? 0) === 0 ? "evidence items" : "",
+    (poster.claimMap?.entries.length ?? 0) === 0 ? "claim map" : "",
+    poster.sources.length > 0 && (poster.references?.length ?? 0) === 0 ? "references" : "",
+    (poster.assets?.length ?? 0) === 0 && !poster.visuals.some((visual) => visual.asset) ? "asset metadata" : "",
+    (poster.traces?.length ?? 0) === 0 ? "trace log" : "",
+  ].filter(Boolean);
+
+  if (bundleMissingParts.length > 0) {
+    issues.push({
+      id: "export_target_readiness",
+      severity: "medium",
+      location: "exports.project_bundle",
+      message: `Project bundle export is missing ${bundleMissingParts.join(", ")}.`,
+      suggestedFix: "Keep parsed sources, evidence, claim map, asset metadata, traces, QA, and references with the project bundle.",
     });
   }
 

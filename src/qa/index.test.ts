@@ -4,6 +4,10 @@ import type { PosterProject } from "../domain/poster";
 import { runQa } from "./index";
 
 describe("runQa", () => {
+  it("passes the bundled sample poster", () => {
+    expect(runQa(examplePoster)).toEqual([]);
+  });
+
   it("flags unsupported claims and factual visuals without sources", () => {
     const poster: PosterProject = {
       ...examplePoster,
@@ -79,5 +83,85 @@ describe("runQa", () => {
 
     expect(issueIds).not.toContain("visual_source_traceability");
     expect(issueIds).not.toContain("ai_images_not_factual");
+  });
+
+  it("flags dense text blocks that are not linked to claims", () => {
+    const poster: PosterProject = {
+      ...examplePoster,
+      sections: [
+        {
+          id: "results",
+          type: "results",
+          title: "Results",
+          blocks: [
+            {
+              type: "text",
+              text:
+                "This poster panel contains a long paragraph that would be difficult to fit cleanly in a conference poster card. It describes results, methods, source handling, preview rendering, export readiness, quality assurance, and visual planning in one dense block that should be reduced before print export.",
+            },
+          ],
+        },
+      ],
+    };
+
+    const issueIds = runQa(poster).map((issue) => issue.id);
+
+    expect(issueIds).toContain("text_block_claim_links");
+    expect(issueIds).toContain("text_overflow_risk");
+  });
+
+  it("flags sources that have no parsed document, summary, or evidence artifacts", () => {
+    const poster: PosterProject = {
+      ...examplePoster,
+      sourceDocuments: [],
+      sourceSummaries: [],
+      evidence: [],
+    };
+
+    const issueIds = runQa(poster).map((issue) => issue.id);
+
+    expect(issueIds).toContain("source_document_missing");
+    expect(issueIds).toContain("source_summary_missing");
+    expect(issueIds).toContain("source_evidence_missing");
+  });
+
+  it("flags generated assets that are missing prompt or model metadata", () => {
+    const poster: PosterProject = {
+      ...examplePoster,
+      assets: [
+        {
+          id: "asset_without_metadata",
+          type: "generated_background",
+          role: "background",
+          width_px: 2400,
+          height_px: 1400,
+        },
+      ],
+    };
+
+    const issueIds = runQa(poster).map((issue) => issue.id);
+
+    expect(issueIds).toContain("generated_asset_prompt_missing");
+    expect(issueIds).toContain("generated_asset_model_missing");
+  });
+
+  it("flags missing export artifacts by target", () => {
+    const poster: PosterProject = {
+      ...examplePoster,
+      sourceDocuments: [],
+      sourceSummaries: [],
+      evidence: [],
+      claimMap: { entries: [] },
+      traces: [],
+      qaResults: undefined,
+      references: [],
+      assets: [],
+      visuals: examplePoster.visuals.map((visual) => ({ ...visual, asset: undefined })),
+    };
+
+    const exportIssues = runQa(poster).filter((issue) => issue.id === "export_target_readiness");
+
+    expect(exportIssues.map((issue) => issue.location)).toContain("exports.poster_json");
+    expect(exportIssues.map((issue) => issue.location)).toContain("exports.project_bundle");
   });
 });

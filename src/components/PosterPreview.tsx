@@ -1,6 +1,6 @@
 import { type CSSProperties } from "react";
 import { FileCheck2, Image, Link2 } from "lucide-react";
-import type { PosterBlock, PosterProject } from "../domain/poster";
+import type { PosterBlock, PosterClaim, PosterProject, PosterSource } from "../domain/poster";
 import { isFeaturedSection, resolveLayoutTemplate } from "../layouts";
 import { resolvePalette } from "../themes";
 import { VisualRenderer } from "./VisualRenderer";
@@ -14,6 +14,7 @@ export function PosterPreview({ poster }: PosterPreviewProps) {
   const layout = resolveLayoutTemplate(poster.layout);
   const visuals = new Map(poster.visuals.map((visual) => [visual.id, visual]));
   const sources = new Map(poster.sources.map((source) => [source.id, source]));
+  const claims = new Map(poster.claims.map((claim) => [claim.id, claim]));
 
   return (
     <section className="preview-panel" aria-label="Poster preview">
@@ -52,7 +53,7 @@ export function PosterPreview({ poster }: PosterPreviewProps) {
               key={section.id}
             >
               <h3>{section.title}</h3>
-              {section.blocks.map((block, index) => renderBlock(block, index, visuals))}
+              {section.blocks.map((block, index) => renderBlock(block, index, visuals, claims, sources))}
             </section>
           ))}
 
@@ -88,9 +89,31 @@ export function PosterPreview({ poster }: PosterPreviewProps) {
   );
 }
 
-function renderBlock(block: PosterBlock, index: number, visuals: Map<string, PosterProject["visuals"][number]>) {
+function renderBlock(
+  block: PosterBlock,
+  index: number,
+  visuals: Map<string, PosterProject["visuals"][number]>,
+  claims: Map<string, PosterClaim>,
+  sources: Map<string, PosterSource>,
+) {
   if (block.type === "text") {
-    return <p key={index}>{block.text}</p>;
+    const blockClaims = (block.claim_ids ?? []).map((claimId) => claims.get(claimId)).filter(Boolean) as PosterClaim[];
+
+    return (
+      <div className="poster-text-block" key={index}>
+        <p>{block.text}</p>
+        {blockClaims.length > 0 ? (
+          <div className="text-claim-badges" aria-label="Text claim sources">
+            {blockClaims.map((claim) => (
+              <span className="text-claim-badge" key={claim.id} title={claim.text}>
+                <Link2 size={12} />
+                {claim.source_ids.map((sourceId) => sources.get(sourceId)?.title ?? sourceId).join(", ") || claim.id}
+              </span>
+            ))}
+          </div>
+        ) : null}
+      </div>
+    );
   }
 
   const visual = visuals.get(block.visual_id);
