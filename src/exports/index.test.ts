@@ -74,7 +74,8 @@ describe("exports", () => {
 
     expect(plan.slideWidth).toBeGreaterThan(13);
     expect(plan.slideHeight).toBe(7.5);
-    expect(plan.cells).toHaveLength(examplePoster.sections.length);
+    expect(plan.cells).toHaveLength(examplePoster.sections.length + 2);
     expect(plan.cells[0]).toEqual(expect.objectContaining({ sectionId: "hero", blockCount: 1 }));
+    expect(plan.cells.map((cell) => cell.sectionId)).toEqual(expect.arrayContaining(["claim_map", "source_bundle"]));
   });
 });

@@ -273,14 +273,14 @@ Planned QA checks:
 Current:
 
 - `src/exports/pptx.ts` compiles the current `PosterProject` into a one-slide editable PowerPoint poster using PptxGenJS.
-- The compiler preserves native title, subtitle, section headings, and text blocks as editable PowerPoint text.
-- Deterministic visuals currently export as editable placeholder cards carrying visual title, type, and source-link count.
+- The compiler preserves native title, subtitle, section headings, text blocks, Claim map, and Source bundle content as editable PowerPoint text.
+- Current lightweight visual types export with native PowerPoint text/shapes for confusion matrix, metric card, table, Sankey-style flow, timeline, Gantt, Mermaid source, math source, and code source.
 - Generated image assets with `PosterVisual.asset.url` are embedded as images when the browser can fetch the URL.
 - PptxGenJS is loaded by dynamic import so the main app bundle does not pay the compiler cost until the user exports PPTX.
 
 Planned:
 
-- export deterministic renderer outputs as native PowerPoint shapes where practical
+- improve visual fidelity and layout matching between HTML preview and PPTX export
 - add SVG/PNG fallbacks for charts, Mermaid, math, and code
 - add print-size layout constraints instead of the current scaled one-slide wide canvas
 - add export QA for text overflow, clipping, and missing image assets
@@ -293,17 +293,18 @@ Current:
 - centralized readiness service for JSON, PPTX, PDF, PNG, and bundle targets
 - browser JSON export for the current `PosterProject`
 - browser project bundle manifest export
+- browser editable PPTX export
 - export capability registry
-- UI showing PPTX/PDF/PNG as planned outputs with requirements
+- UI showing PPTX as available and PDF/PNG as planned outputs with requirements
 - HTML preview descriptor artifact for future Playwright export
 
 The project bundle manifest is a JSON placeholder for the future ZIP bundle. It records expected entries for poster spec, source documents, summaries, evidence, claim map, assets, traces, QA, references, and planned export outputs.
 
-The readiness service is shared by the export UI and QA layer so target requirements are not duplicated. JSON and bundle manifest exports can be ready now; PPTX, PDF, and PNG remain planned until the PptxGenJS and Playwright layers exist.
+The readiness service is shared by the export UI and QA layer so target requirements are not duplicated. JSON, editable PPTX, and bundle manifest exports can be ready now; PDF and PNG remain planned until the Playwright layer exists.
 
 Planned:
 
-- editable PPTX export with PptxGenJS
+- higher-fidelity editable PPTX export with PptxGenJS
 - print PDF export with Playwright
 - preview PNG export with Playwright
 - project bundle containing spec, sources, assets, renders, traces, QA, and exports

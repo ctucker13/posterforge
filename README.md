@@ -75,7 +75,7 @@ Python is intentionally not the app core. It can be added later with `uv` for da
 - Poster JSON import, export, and reset.
 - Export job/artifact model with centralized readiness checks.
 - Export capability panel with JSON, editable PPTX, and project bundle manifest available; PDF/PNG marked as planned.
-- First-pass PptxGenJS compiler for one-slide editable poster export with native text, visual placeholder cards, and generated image embedding when asset URLs are available.
+- First-pass PptxGenJS compiler for one-slide editable poster export with native text, claim/source cards, lightweight native visual renderers, and generated image embedding when asset URLs are available.
 - HTML preview artifact descriptor for future Playwright PDF/PNG export.
 - HTML poster preview.
 
