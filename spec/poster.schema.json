@@ -47,6 +47,27 @@
         "$ref": "#/$defs/source"
       }
     },
+    "sourceDocuments": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/sourceDocument"
+      }
+    },
+    "sourceSummaries": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/sourceSummary"
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/evidenceItem"
+      }
+    },
+    "claimMap": {
+      "$ref": "#/$defs/claimMap"
+    },
     "claims": {
       "type": "array",
       "items": {
@@ -111,6 +132,126 @@
           "type": "string"
         },
         "trust_level": {
+          "enum": ["low", "medium", "high"]
+        }
+      }
+    },
+    "sourceDocument": {
+      "type": "object",
+      "required": ["id", "source", "title", "body"],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "source": {
+          "$ref": "#/$defs/source"
+        },
+        "title": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "object"
+        }
+      }
+    },
+    "sourceSummary": {
+      "type": "object",
+      "required": ["source_id", "summary"],
+      "properties": {
+        "source_id": {
+          "type": "string"
+        },
+        "summary": {
+          "type": "string"
+        },
+        "methods": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "figures": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "evidenceItem": {
+      "type": "object",
+      "required": ["id", "source_id", "kind", "text"],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "source_id": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": ["claim", "method", "metric", "figure", "code_summary", "reference"]
+        },
+        "text": {
+          "type": "string"
+        },
+        "location": {
+          "type": "string"
+        },
+        "confidence": {
+          "enum": ["low", "medium", "high"]
+        }
+      }
+    },
+    "claimMap": {
+      "type": "object",
+      "required": ["entries"],
+      "properties": {
+        "entries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/claimMapEntry"
+          }
+        }
+      }
+    },
+    "claimMapEntry": {
+      "type": "object",
+      "required": ["claim_id", "claim_text", "source_ids", "evidence_ids", "section_ids"],
+      "properties": {
+        "claim_id": {
+          "type": "string"
+        },
+        "claim_text": {
+          "type": "string"
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "section_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "confidence": {
           "enum": ["low", "medium", "high"]
         }
       }

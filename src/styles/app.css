@@ -380,6 +380,7 @@ textarea {
 }
 
 .project-editor,
+.evidence-panel,
 .qa-panel,
 .trace-panel,
 .preview-panel,
@@ -388,14 +389,92 @@ textarea {
 }
 
 .project-editor-body,
+.evidence-body,
 .qa-panel .qa-overview,
 .registry-groups {
   padding: 16px;
 }
 
-.project-editor-body {
+.project-editor-body,
+.evidence-body {
   display: grid;
   gap: 14px;
+}
+
+.evidence-panel {
+  overflow: hidden;
+}
+
+.evidence-body {
+  max-height: 460px;
+  overflow: auto;
+}
+
+.source-summary-section,
+.claim-map-section {
+  display: grid;
+  gap: 10px;
+}
+
+.source-summary-section h3,
+.claim-map-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  color: #101828;
+  font-size: 15px;
+}
+
+.source-summary-list,
+.claim-map-list {
+  display: grid;
+  gap: 9px;
+}
+
+.source-summary-list article,
+.claim-map-list article {
+  border: 1px solid #e4e9ef;
+  border-radius: 8px;
+  padding: 10px;
+  background: #ffffff;
+}
+
+.source-summary-list strong,
+.claim-map-list strong {
+  display: block;
+  color: #101828;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.source-summary-list p {
+  margin: 5px 0 7px;
+  color: #526071;
+  font-size: 13px;
+  line-height: 1.38;
+}
+
+.source-summary-list span,
+.claim-map-meta span {
+  color: #667085;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.claim-map-meta {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.claim-map-meta span {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 5px;
+  line-height: 1.3;
+  text-transform: none;
 }
 
 .spec-metrics {

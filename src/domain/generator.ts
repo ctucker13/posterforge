@@ -1,5 +1,7 @@
 import type { PosterProject, TraceEvent } from "./poster";
 import { examplePoster } from "../data/examplePoster";
+import { buildClaimMap } from "./evidence";
+import { buildMockSourcePackage, createReferencesFromSources } from "../sources/mockConnectors";
 
 export interface GenerationOptions {
   prompt: string;
@@ -84,12 +86,31 @@ export const generationTrace: Omit<TraceEvent, "status">[] = [
 ];
 
 export function generatePoster(options: GenerationOptions): PosterProject {
+  const sourcePackage = buildMockSourcePackage(options.sourceMode);
   const sourceText =
     options.sourceMode === "mock"
       ? "mock Confluence, GitLab, and research-paper sources"
       : options.sourceMode === "web"
         ? "web pages and research papers"
         : "local project files";
+
+  const sections = examplePoster.sections.map((section) =>
+    section.id === "hero"
+      ? {
+          ...section,
+          blocks: [
+            {
+              type: "text" as const,
+              claim_ids: ["claim_001", "claim_002"],
+              text:
+                options.prompt.trim() ||
+                "Create a source-grounded academic data science poster with traceable claims and rich visuals.",
+            },
+          ],
+        }
+      : section,
+  );
+  const claimMap = buildClaimMap(examplePoster.claims, sections, sourcePackage.evidence);
 
   return {
     ...examplePoster,
@@ -102,20 +123,12 @@ export function generatePoster(options: GenerationOptions): PosterProject {
     theme: options.theme,
     palette: options.palette,
     subtitle: `Generated from ${sourceText}`,
-    sections: examplePoster.sections.map((section) =>
-      section.id === "hero"
-        ? {
-            ...section,
-            blocks: [
-              {
-                type: "text",
-                text:
-                  options.prompt.trim() ||
-                  "Create a source-grounded academic data science poster with traceable claims and rich visuals.",
-              },
-            ],
-          }
-        : section,
-    ),
+    sources: sourcePackage.sources,
+    sourceDocuments: sourcePackage.sourceDocuments,
+    sourceSummaries: sourcePackage.sourceSummaries,
+    evidence: sourcePackage.evidence,
+    claimMap,
+    references: createReferencesFromSources(sourcePackage.sources),
+    sections,
   };
 }

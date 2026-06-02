@@ -26,11 +26,51 @@ export interface PosterSource {
   trust_level?: TrustLevel;
 }
 
+export interface SourceDocument {
+  id: string;
+  source: PosterSource;
+  title: string;
+  body: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface SourceSummary {
+  source_id: string;
+  summary: string;
+  methods?: string[];
+  metrics?: string[];
+  figures?: string[];
+}
+
+export type EvidenceKind = "claim" | "method" | "metric" | "figure" | "code_summary" | "reference";
+
+export interface EvidenceItem {
+  id: string;
+  source_id: string;
+  kind: EvidenceKind;
+  text: string;
+  location?: string;
+  confidence?: TrustLevel;
+}
+
 export interface PosterClaim {
   id: string;
   text: string;
   source_ids: string[];
   confidence?: TrustLevel;
+}
+
+export interface ClaimMapEntry {
+  claim_id: string;
+  claim_text: string;
+  source_ids: string[];
+  evidence_ids: string[];
+  section_ids: string[];
+  confidence?: TrustLevel;
+}
+
+export interface ClaimMap {
+  entries: ClaimMapEntry[];
 }
 
 export interface PosterSection {
@@ -93,6 +133,10 @@ export interface PosterProject {
   layout: string;
   audience?: string;
   sources: PosterSource[];
+  sourceDocuments?: SourceDocument[];
+  sourceSummaries?: SourceSummary[];
+  evidence?: EvidenceItem[];
+  claimMap?: ClaimMap;
   claims: PosterClaim[];
   sections: PosterSection[];
   visuals: PosterVisual[];

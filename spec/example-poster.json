@@ -32,7 +32,209 @@
       "id": "src_paper_001",
       "type": "research_paper",
       "title": "Calibration and Interpretability in Risk Models",
+      "url": "mock://paper/calibration-interpretability-risk-models",
+      "accessed_at": "2026-06-01T00:00:00.000Z",
       "trust_level": "medium"
+    },
+    {
+      "id": "src_gitlab_002",
+      "type": "gitlab",
+      "title": "Experiment Log And Monitoring Notes",
+      "url": "mock://gitlab/fraud-monitoring/experiments.md",
+      "accessed_at": "2026-06-01T00:00:00.000Z",
+      "trust_level": "medium"
+    },
+    {
+      "id": "src_web_001",
+      "type": "web",
+      "title": "Public Model Monitoring Report Summary",
+      "url": "mock://web/public-model-monitoring-report",
+      "accessed_at": "2026-06-01T00:00:00.000Z",
+      "trust_level": "medium"
+    }
+  ],
+  "sourceDocuments": [
+    {
+      "id": "doc_src_confluence_001",
+      "source": {
+        "id": "src_confluence_001",
+        "type": "confluence",
+        "title": "Fraud Model Project Overview",
+        "url": "mock://confluence/fraud-model-project-overview",
+        "accessed_at": "2026-06-01T00:00:00.000Z",
+        "trust_level": "high"
+      },
+      "title": "Fraud Model Project Overview",
+      "body": "The monitoring poster should separate workflow, evidence extraction, performance monitoring, calibration, explainability, and operational impact. The delivery narrative should be results-first for an internal data science poster session.",
+      "metadata": {
+        "summary": "Project overview describing the monitoring workflow, target poster audience, and required separation between evidence streams."
+      }
+    },
+    {
+      "id": "doc_src_gitlab_001",
+      "source": {
+        "id": "src_gitlab_001",
+        "type": "gitlab",
+        "title": "Model Evaluation README",
+        "url": "mock://gitlab/fraud-monitoring/README.md",
+        "accessed_at": "2026-06-01T00:00:00.000Z",
+        "trust_level": "high"
+      },
+      "title": "Model Evaluation README",
+      "body": "The README records a sample confusion matrix for legitimate and fraud classes: 9412 true legitimate, 188 false legitimate, 73 false fraud, and 327 true fraud. It also notes that factual visuals should be rendered deterministically.",
+      "metadata": {
+        "summary": "Code summary containing sample model evaluation counts and renderer guidance."
+      }
+    },
+    {
+      "id": "doc_src_gitlab_002",
+      "source": {
+        "id": "src_gitlab_002",
+        "type": "gitlab",
+        "title": "Experiment Log And Monitoring Notes",
+        "url": "mock://gitlab/fraud-monitoring/experiments.md",
+        "accessed_at": "2026-06-01T00:00:00.000Z",
+        "trust_level": "medium"
+      },
+      "title": "Experiment Log And Monitoring Notes",
+      "body": "The experiment log tracks review capture rate, false positives, false negatives, and periodic review of calibration drift. It recommends surfacing the review capture rate as a headline metric.",
+      "metadata": {
+        "summary": "Experiment notes describing operational monitoring metrics and suggested poster emphasis."
+      }
+    },
+    {
+      "id": "doc_src_paper_001",
+      "source": {
+        "id": "src_paper_001",
+        "type": "research_paper",
+        "title": "Calibration and Interpretability in Risk Models",
+        "url": "mock://paper/calibration-interpretability-risk-models",
+        "accessed_at": "2026-06-01T00:00:00.000Z",
+        "trust_level": "medium"
+      },
+      "title": "Calibration and Interpretability in Risk Models",
+      "body": "The paper summary recommends reporting calibration separately from classification metrics. Expected calibration error can be summarized with binned accuracy and confidence differences. Interpretability should not be conflated with model performance.",
+      "metadata": {
+        "summary": "Research paper summary on calibration, interpretability, and risk-model reporting."
+      }
+    },
+    {
+      "id": "doc_src_web_001",
+      "source": {
+        "id": "src_web_001",
+        "type": "web",
+        "title": "Public Model Monitoring Report Summary",
+        "url": "mock://web/public-model-monitoring-report",
+        "accessed_at": "2026-06-01T00:00:00.000Z",
+        "trust_level": "medium"
+      },
+      "title": "Public Model Monitoring Report Summary",
+      "body": "A public report summary describes common monitoring dashboards with source traceability, model performance, drift checks, and operational review loops. It emphasizes chart readability and explicit references.",
+      "metadata": {
+        "summary": "Public report summary describing common monitoring dashboard and poster-quality reporting practices."
+      }
+    }
+  ],
+  "sourceSummaries": [
+    {
+      "source_id": "src_confluence_001",
+      "summary": "Project overview describing the monitoring workflow, target poster audience, and required separation between evidence streams.",
+      "methods": ["results-first poster narrative", "separate performance, calibration, explainability, and operational evidence"]
+    },
+    {
+      "source_id": "src_gitlab_001",
+      "summary": "Code summary containing sample model evaluation counts and renderer guidance.",
+      "metrics": ["9412 true legitimate", "188 false legitimate", "73 false fraud", "327 true fraud"],
+      "figures": ["confusion matrix", "decision flow"]
+    },
+    {
+      "source_id": "src_gitlab_002",
+      "summary": "Experiment notes describing operational monitoring metrics and suggested poster emphasis.",
+      "metrics": ["review capture rate", "false positives", "false negatives", "calibration drift"]
+    },
+    {
+      "source_id": "src_paper_001",
+      "summary": "Research paper summary on calibration, interpretability, and risk-model reporting.",
+      "methods": ["expected calibration error", "separate interpretability from model performance"]
+    },
+    {
+      "source_id": "src_web_001",
+      "summary": "Public report summary describing common monitoring dashboard and poster-quality reporting practices.",
+      "methods": ["source traceability", "chart readability", "explicit references"]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev_confluence_001_1",
+      "source_id": "src_confluence_001",
+      "kind": "claim",
+      "text": "The monitoring workflow separates model performance, calibration, explainability, and operational impact.",
+      "location": "Project overview / monitoring scope",
+      "confidence": "high"
+    },
+    {
+      "id": "ev_confluence_001_2",
+      "source_id": "src_confluence_001",
+      "kind": "method",
+      "text": "Use a results-first poster narrative for an internal data science poster session.",
+      "location": "Project overview / poster brief",
+      "confidence": "high"
+    },
+    {
+      "id": "ev_gitlab_001_1",
+      "source_id": "src_gitlab_001",
+      "kind": "metric",
+      "text": "The sample monitoring confusion matrix contains 9412 true legitimate, 188 false legitimate, 73 false fraud, and 327 true fraud cases.",
+      "location": "README / evaluation metrics",
+      "confidence": "high"
+    },
+    {
+      "id": "ev_gitlab_001_2",
+      "source_id": "src_gitlab_001",
+      "kind": "claim",
+      "text": "The prototype prioritises deterministic visuals for factual charts and generated images for atmosphere.",
+      "location": "README / renderer guidance",
+      "confidence": "high"
+    },
+    {
+      "id": "ev_gitlab_002_1",
+      "source_id": "src_gitlab_002",
+      "kind": "metric",
+      "text": "Review capture rate should be surfaced as a headline monitoring metric.",
+      "location": "Experiment log / poster emphasis",
+      "confidence": "medium"
+    },
+    {
+      "id": "ev_gitlab_002_2",
+      "source_id": "src_gitlab_002",
+      "kind": "method",
+      "text": "False positives, false negatives, and calibration drift are tracked separately.",
+      "location": "Experiment log / monitoring checklist",
+      "confidence": "medium"
+    },
+    {
+      "id": "ev_paper_001_1",
+      "source_id": "src_paper_001",
+      "kind": "claim",
+      "text": "Calibration monitoring is treated as a separate evidence stream from raw classification performance.",
+      "location": "Paper summary / methods",
+      "confidence": "medium"
+    },
+    {
+      "id": "ev_paper_001_2",
+      "source_id": "src_paper_001",
+      "kind": "method",
+      "text": "Expected calibration error uses binned accuracy and confidence differences.",
+      "location": "Paper summary / calibration metric",
+      "confidence": "medium"
+    },
+    {
+      "id": "ev_web_001_1",
+      "source_id": "src_web_001",
+      "kind": "reference",
+      "text": "Monitoring reports should include source traceability, chart readability, and explicit references.",
+      "location": "Public report summary / reporting practice",
+      "confidence": "medium"
     }
   ],
   "claims": [
@@ -55,6 +257,34 @@
       "confidence": "medium"
     }
   ],
+  "claimMap": {
+    "entries": [
+      {
+        "claim_id": "claim_001",
+        "claim_text": "The monitoring workflow separates model performance, calibration, explainability, and operational impact.",
+        "source_ids": ["src_confluence_001"],
+        "evidence_ids": ["ev_confluence_001_1", "ev_confluence_001_2"],
+        "section_ids": ["hero"],
+        "confidence": "high"
+      },
+      {
+        "claim_id": "claim_002",
+        "claim_text": "The prototype prioritises deterministic visuals for factual charts and generated images for atmosphere.",
+        "source_ids": ["src_gitlab_001"],
+        "evidence_ids": ["ev_gitlab_001_1", "ev_gitlab_001_2"],
+        "section_ids": ["hero"],
+        "confidence": "high"
+      },
+      {
+        "claim_id": "claim_003",
+        "claim_text": "Calibration monitoring is treated as a separate evidence stream from raw classification performance.",
+        "source_ids": ["src_paper_001", "src_gitlab_001"],
+        "evidence_ids": ["ev_paper_001_1", "ev_paper_001_2", "ev_gitlab_001_1", "ev_gitlab_001_2"],
+        "section_ids": ["technical_note"],
+        "confidence": "medium"
+      }
+    ]
+  },
   "sections": [
     {
       "id": "hero",
@@ -63,6 +293,7 @@
       "blocks": [
         {
           "type": "text",
+          "claim_ids": ["claim_001", "claim_002"],
           "text": "A source-grounded workflow turns project notes, code evidence, papers, and metrics into a print-ready academic poster with traceable claims."
         }
       ]
@@ -332,5 +563,41 @@
     }
   ],
   "qaResults": [],
-  "references": []
+  "references": [
+    {
+      "id": "src_confluence_001",
+      "title": "Fraud Model Project Overview",
+      "type": "confluence",
+      "url": "mock://confluence/fraud-model-project-overview",
+      "accessed_at": "2026-06-01T00:00:00.000Z"
+    },
+    {
+      "id": "src_gitlab_001",
+      "title": "Model Evaluation README",
+      "type": "gitlab",
+      "url": "mock://gitlab/fraud-monitoring/README.md",
+      "accessed_at": "2026-06-01T00:00:00.000Z"
+    },
+    {
+      "id": "src_gitlab_002",
+      "title": "Experiment Log And Monitoring Notes",
+      "type": "gitlab",
+      "url": "mock://gitlab/fraud-monitoring/experiments.md",
+      "accessed_at": "2026-06-01T00:00:00.000Z"
+    },
+    {
+      "id": "src_paper_001",
+      "title": "Calibration and Interpretability in Risk Models",
+      "type": "research_paper",
+      "url": "mock://paper/calibration-interpretability-risk-models",
+      "accessed_at": "2026-06-01T00:00:00.000Z"
+    },
+    {
+      "id": "src_web_001",
+      "title": "Public Model Monitoring Report Summary",
+      "type": "web",
+      "url": "mock://web/public-model-monitoring-report",
+      "accessed_at": "2026-06-01T00:00:00.000Z"
+    }
+  ]
 }

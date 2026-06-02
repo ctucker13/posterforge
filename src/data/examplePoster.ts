@@ -1,4 +1,7 @@
 import type { PosterProject } from "../domain/poster";
+import { buildMockSourcePackage, createReferencesFromSources } from "../sources/mockConnectors";
+
+const mockSourcePackage = buildMockSourcePackage("mock");
 
 export const examplePoster: PosterProject = {
   id: "poster_demo_fraud_model",
@@ -17,26 +20,10 @@ export const examplePoster: PosterProject = {
   palette: "natwest-group",
   layout: "results-first",
   audience: "internal data science poster session",
-  sources: [
-    {
-      id: "src_confluence_001",
-      type: "confluence",
-      title: "Fraud Model Project Overview",
-      trust_level: "high",
-    },
-    {
-      id: "src_gitlab_001",
-      type: "gitlab",
-      title: "Model Evaluation README",
-      trust_level: "high",
-    },
-    {
-      id: "src_paper_001",
-      type: "research_paper",
-      title: "Calibration and Interpretability in Risk Models",
-      trust_level: "medium",
-    },
-  ],
+  sources: mockSourcePackage.sources,
+  sourceDocuments: mockSourcePackage.sourceDocuments,
+  sourceSummaries: mockSourcePackage.sourceSummaries,
+  evidence: mockSourcePackage.evidence,
   claims: [
     {
       id: "claim_001",
@@ -57,6 +44,34 @@ export const examplePoster: PosterProject = {
       confidence: "medium",
     },
   ],
+  claimMap: {
+    entries: [
+      {
+        claim_id: "claim_001",
+        claim_text: "The monitoring workflow separates model performance, calibration, explainability, and operational impact.",
+        source_ids: ["src_confluence_001"],
+        evidence_ids: ["ev_confluence_001_1", "ev_confluence_001_2"],
+        section_ids: ["hero"],
+        confidence: "high",
+      },
+      {
+        claim_id: "claim_002",
+        claim_text: "The prototype prioritises deterministic visuals for factual charts and generated images for atmosphere.",
+        source_ids: ["src_gitlab_001"],
+        evidence_ids: ["ev_gitlab_001_1", "ev_gitlab_001_2"],
+        section_ids: ["hero"],
+        confidence: "high",
+      },
+      {
+        claim_id: "claim_003",
+        claim_text: "Calibration monitoring is treated as a separate evidence stream from raw classification performance.",
+        source_ids: ["src_paper_001", "src_gitlab_001"],
+        evidence_ids: ["ev_paper_001_1", "ev_paper_001_2", "ev_gitlab_001_1", "ev_gitlab_001_2"],
+        section_ids: ["technical_note"],
+        confidence: "medium",
+      },
+    ],
+  },
   sections: [
     {
       id: "hero",
@@ -65,6 +80,7 @@ export const examplePoster: PosterProject = {
       blocks: [
         {
           type: "text",
+          claim_ids: ["claim_001", "claim_002"],
           text: "A source-grounded workflow turns project notes, code evidence, papers, and metrics into a print-ready academic poster with traceable claims.",
         },
       ],
@@ -304,5 +320,5 @@ export const examplePoster: PosterProject = {
     },
   ],
   qaResults: [],
-  references: [],
+  references: createReferencesFromSources(mockSourcePackage.sources),
 };

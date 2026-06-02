@@ -1,4 +1,4 @@
-import type { PosterSource } from "../domain/poster";
+import type { PosterSource, SourceDocument } from "../domain/poster";
 
 export interface SourceRef {
   connectorId: string;
@@ -10,14 +10,6 @@ export interface SourceSearchResult {
   title: string;
   snippet: string;
   source: PosterSource;
-}
-
-export interface SourceDocument {
-  id: string;
-  source: PosterSource;
-  title: string;
-  body: string;
-  metadata?: Record<string, unknown>;
 }
 
 export interface SourceConnector {

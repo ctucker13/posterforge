@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Database, FileDown, FolderOpen, Globe2, PackageCheck, Palette, Play, Sparkles } from "lucide-react";
+import { EvidencePanel } from "./components/EvidencePanel";
 import { JsonProjectControls } from "./components/JsonProjectControls";
 import { PosterPreview } from "./components/PosterPreview";
 import { ProjectEditor } from "./components/ProjectEditor";
@@ -237,6 +238,7 @@ export default function App() {
             setQaIssues(nextQaIssues);
           }}
         />
+        <EvidencePanel poster={poster} />
         <QaPanel issues={qaIssues} onRunQa={handleRunQa} onApplyFix={handleQaFix} />
         <TracePanel events={trace} />
       </section>
