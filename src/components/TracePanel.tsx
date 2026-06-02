@@ -1,4 +1,4 @@
-import { CheckCircle2, Circle, Loader2 } from "lucide-react";
+import { CheckCircle2, Circle, FileCode2, Loader2 } from "lucide-react";
 import type { TraceEvent } from "../domain/poster";
 
 interface TracePanelProps {
@@ -21,7 +21,15 @@ export function TracePanel({ events }: TracePanelProps) {
             <div>
               <strong>{event.label}</strong>
               <p>{event.detail}</p>
-              <span>{event.status}</span>
+              <div className="trace-meta">
+                <span>{event.status}</span>
+                {event.timestamp ? <span>{new Date(event.timestamp).toLocaleTimeString()}</span> : null}
+                {event.artifactRefs?.map((artifact) => (
+                  <span key={`${event.id}-${artifact.kind}-${artifact.label}`}>
+                    <FileCode2 size={12} /> {artifact.label}
+                  </span>
+                ))}
+              </div>
             </div>
           </li>
         ))}

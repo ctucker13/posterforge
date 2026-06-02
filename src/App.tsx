@@ -1,57 +1,155 @@
-import { useMemo, useState } from "react";
-import { Database, Github, Globe2, Palette, Play, Sparkles } from "lucide-react";
+import { useState } from "react";
+import { Database, FileDown, FolderOpen, Globe2, PackageCheck, Palette, Play, Sparkles } from "lucide-react";
+import { JsonProjectControls } from "./components/JsonProjectControls";
 import { PosterPreview } from "./components/PosterPreview";
+import { ProjectEditor } from "./components/ProjectEditor";
+import { QaPanel } from "./components/QaPanel";
 import { TracePanel } from "./components/TracePanel";
+import { VisualRegistryPanel } from "./components/VisualRegistryPanel";
 import { generatePoster, generationTrace, type GenerationOptions } from "./domain/generator";
-import type { TraceEvent } from "./domain/poster";
-import { themes } from "./domain/themes";
-import { visualRegistry } from "./domain/visualRegistry";
+import type { PosterProject, QaIssue, TraceEvent } from "./domain/poster";
+import { applyQaFix, runQa } from "./qa";
+import { palettes, themes } from "./themes";
 import "./styles/app.css";
 
 const defaultPrompt =
   "Create a results-first poster about fraud model monitoring. Use a polished theme, include a workflow diagram, confusion matrix, Sankey decision flow, and a QA summary.";
 
-const initialTrace: TraceEvent[] = generationTrace.map((event) => ({ ...event, status: "queued" }));
+function createQueuedTrace(): TraceEvent[] {
+  return generationTrace.map((event) => ({ ...event, status: "queued" }));
+}
+
+const initialTrace = createQueuedTrace();
+const initialPoster = generatePoster({
+  prompt: defaultPrompt,
+  theme: "natwest-group",
+  palette: "natwest-group",
+  sourceMode: "mock",
+});
+const initialQaIssues = runQa(initialPoster);
 
 export default function App() {
   const [prompt, setPrompt] = useState(defaultPrompt);
-  const [theme, setTheme] = useState("natwest-group");
-  const [palette, setPalette] = useState("natwest-group");
+  const [theme, setTheme] = useState(initialPoster.theme);
+  const [palette, setPalette] = useState(initialPoster.palette ?? themes[initialPoster.theme]?.palette ?? "clean-blue");
   const [sourceMode, setSourceMode] = useState<GenerationOptions["sourceMode"]>("mock");
   const [trace, setTrace] = useState<TraceEvent[]>(initialTrace);
-  const [poster, setPoster] = useState(() =>
-    generatePoster({ prompt: defaultPrompt, theme: "natwest-group", palette: "natwest-group", sourceMode: "mock" }),
-  );
+  const [poster, setPoster] = useState<PosterProject>({ ...initialPoster, qaResults: initialQaIssues });
+  const [qaIssues, setQaIssues] = useState<QaIssue[]>(initialQaIssues);
   const [isGenerating, setIsGenerating] = useState(false);
 
   const selectedTheme = themes[theme];
-  const visibleVisuals = useMemo(() => visualRegistry.slice(0, 10), []);
+  const selectedPalette = palettes[palette];
+  const highQaCount = qaIssues.filter((issue) => issue.severity === "high").length;
 
   async function handleGenerate() {
     setIsGenerating(true);
-    setTrace(initialTrace);
+    setTrace(createQueuedTrace());
+    const completedTrace: TraceEvent[] = [];
 
     for (const step of generationTrace) {
-      setTrace((events) => events.map((event) => (event.id === step.id ? { ...event, status: "running" } : event)));
+      setTrace((events) =>
+        events.map((event) =>
+          event.id === step.id ? { ...event, status: "running", timestamp: new Date().toISOString() } : event,
+        ),
+      );
       await new Promise((resolve) => setTimeout(resolve, 260));
-      setTrace((events) => events.map((event) => (event.id === step.id ? { ...event, status: "complete" } : event)));
+      const completedEvent: TraceEvent = { ...step, status: "complete", timestamp: new Date().toISOString() };
+      completedTrace.push(completedEvent);
+      setTrace((events) => events.map((event) => (event.id === step.id ? completedEvent : event)));
     }
 
-    setPoster(generatePoster({ prompt, theme, palette, sourceMode }));
+    const nextPoster = { ...generatePoster({ prompt, theme, palette, sourceMode }), traces: completedTrace };
+    const nextQaIssues = runQa(nextPoster);
+    setPoster({ ...nextPoster, qaResults: nextQaIssues });
+    setQaIssues(nextQaIssues);
     setIsGenerating(false);
+  }
+
+  function handleThemeChange(nextTheme: string) {
+    const nextPoster = { ...poster, theme: nextTheme };
+    setTheme(nextTheme);
+    setPoster(nextPoster);
+    setQaIssues(runQa(nextPoster));
+  }
+
+  function handlePaletteChange(nextPalette: string) {
+    const nextPoster = { ...poster, palette: nextPalette };
+    setPalette(nextPalette);
+    setPoster(nextPoster);
+    setQaIssues(runQa(nextPoster));
+  }
+
+  function handleProjectImport(nextPoster: PosterProject) {
+    const nextTheme = themes[nextPoster.theme] ? nextPoster.theme : "clean-academic";
+    const nextPalette = nextPoster.palette && palettes[nextPoster.palette] ? nextPoster.palette : themes[nextTheme].palette ?? "clean-blue";
+    const normalizedPoster = { ...nextPoster, theme: nextTheme, palette: nextPalette };
+    const nextQaIssues = runQa(normalizedPoster);
+    setTheme(nextTheme);
+    setPalette(nextPalette);
+    setPoster({ ...normalizedPoster, qaResults: nextQaIssues });
+    setQaIssues(nextQaIssues);
+    setTrace(nextPoster.traces?.length ? nextPoster.traces : createQueuedTrace());
+  }
+
+  function handleResetProject() {
+    const nextPoster = generatePoster({ prompt: defaultPrompt, theme: "natwest-group", palette: "natwest-group", sourceMode: "mock" });
+    const nextQaIssues = runQa(nextPoster);
+    setPrompt(defaultPrompt);
+    setTheme(nextPoster.theme);
+    setPalette(nextPoster.palette ?? "natwest-group");
+    setSourceMode("mock");
+    setPoster({ ...nextPoster, qaResults: nextQaIssues });
+    setQaIssues(nextQaIssues);
+    setTrace(createQueuedTrace());
+  }
+
+  function handleRunQa() {
+    const nextQaIssues = runQa(poster);
+    setQaIssues(nextQaIssues);
+    setPoster((current) => ({ ...current, qaResults: nextQaIssues }));
+  }
+
+  function handleQaFix(fixId: NonNullable<QaIssue["fixId"]>) {
+    const nextPoster = applyQaFix(poster, fixId);
+    const nextQaIssues = runQa(nextPoster);
+    setPoster({ ...nextPoster, qaResults: nextQaIssues });
+    setQaIssues(nextQaIssues);
   }
 
   return (
     <main className="app-shell">
-      <section className="control-panel" aria-label="Generation controls">
+      <header className="workspace-header">
         <div className="product-mark">
           <div className="mark-icon">
             <Sparkles size={24} />
           </div>
           <div>
             <p>PosterForge</p>
-            <h1>Source-grounded poster generation</h1>
+            <h1>Schema-driven poster compiler</h1>
           </div>
+        </div>
+
+        <div className="workspace-status" aria-label="Project status">
+          <div>
+            <span>Spec</span>
+            <strong>{poster.format.size} {poster.format.orientation}</strong>
+          </div>
+          <div>
+            <span>Theme</span>
+            <strong>{selectedTheme?.name ?? poster.theme}</strong>
+          </div>
+          <div className={highQaCount > 0 ? "status-attention" : ""}>
+            <span>QA</span>
+            <strong>{qaIssues.length === 0 ? "Ready" : `${qaIssues.length} issue${qaIssues.length === 1 ? "" : "s"}`}</strong>
+          </div>
+        </div>
+      </header>
+
+      <section className="control-panel tool-panel" aria-label="Generation controls">
+        <div className="panel-header">
+          <h2>Generate</h2>
+          <span>{sourceMode}</span>
         </div>
 
         <label className="field">
@@ -64,7 +162,7 @@ export default function App() {
             <span>
               <Palette size={15} /> Theme
             </span>
-            <select value={theme} onChange={(event) => setTheme(event.target.value)}>
+            <select value={theme} onChange={(event) => handleThemeChange(event.target.value)}>
               {Object.values(themes).map((themeDefinition) => (
                 <option value={themeDefinition.id} key={themeDefinition.id}>
                   {themeDefinition.name}
@@ -77,11 +175,12 @@ export default function App() {
             <span>
               <Palette size={15} /> Palette
             </span>
-            <select value={palette} onChange={(event) => setPalette(event.target.value)}>
-              <option value="natwest-group">NatWest Group</option>
-              <option value="clean-blue">Clean Blue</option>
-              <option value="comic-ink">Comic Ink</option>
-              <option value="retro-lab">Retro Lab</option>
+            <select value={palette} onChange={(event) => handlePaletteChange(event.target.value)}>
+              {Object.values(palettes).map((paletteDefinition) => (
+                <option value={paletteDefinition.id} key={paletteDefinition.id}>
+                  {paletteDefinition.name}
+                </option>
+              ))}
             </select>
           </label>
         </div>
@@ -94,7 +193,7 @@ export default function App() {
             <Globe2 size={18} /> Web
           </button>
           <button className={sourceMode === "local" ? "selected" : ""} type="button" onClick={() => setSourceMode("local")}>
-            <Github size={18} /> Local
+            <FolderOpen size={18} /> Local
           </button>
         </div>
 
@@ -106,20 +205,46 @@ export default function App() {
         <aside className="theme-note">
           <strong>{selectedTheme.name}</strong>
           <p>{selectedTheme.description}</p>
+          <div className="palette-swatches" aria-label={`${selectedPalette.name} palette`}>
+            <span style={{ background: selectedPalette.colors.primary }} />
+            <span style={{ background: selectedPalette.colors.accent }} />
+            <span style={{ background: selectedPalette.colors.background }} />
+            <span style={{ background: selectedPalette.colors.ink }} />
+          </div>
         </aside>
 
-        <section className="visual-registry">
-          <h2>Visual registry</h2>
-          <div>
-            {visibleVisuals.map((visual) => (
-              <span key={visual.id}>{visual.id.replace(/_/g, " ")}</span>
-            ))}
-          </div>
+        <JsonProjectControls poster={poster} onImport={handleProjectImport} onReset={handleResetProject} />
+
+        <section className="export-actions" aria-label="Export actions">
+          <button type="button" disabled>
+            <FileDown size={17} /> PPTX
+          </button>
+          <button type="button" disabled>
+            <FileDown size={17} /> PDF
+          </button>
+          <button type="button" disabled>
+            <PackageCheck size={17} /> Bundle
+          </button>
         </section>
       </section>
 
-      <TracePanel events={trace} />
-      <PosterPreview poster={poster} />
+      <section className="inspector-column" aria-label="Poster inspectors">
+        <ProjectEditor
+          poster={poster}
+          onPosterChange={(nextPoster) => {
+            const nextQaIssues = runQa(nextPoster);
+            setPoster({ ...nextPoster, qaResults: nextQaIssues });
+            setQaIssues(nextQaIssues);
+          }}
+        />
+        <QaPanel issues={qaIssues} onRunQa={handleRunQa} onApplyFix={handleQaFix} />
+        <TracePanel events={trace} />
+      </section>
+
+      <section className="preview-column" aria-label="Poster workspace">
+        <PosterPreview poster={poster} />
+        <VisualRegistryPanel poster={poster} />
+      </section>
     </main>
   );
 }

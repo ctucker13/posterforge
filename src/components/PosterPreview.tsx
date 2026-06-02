@@ -1,7 +1,7 @@
-import { FileCheck2, Image, ShieldCheck } from "lucide-react";
+import { type CSSProperties } from "react";
+import { FileCheck2, Image, Link2 } from "lucide-react";
 import type { PosterBlock, PosterProject } from "../domain/poster";
-import { runQa } from "../domain/qa";
-import { resolvePalette } from "../domain/themes";
+import { resolvePalette } from "../themes";
 import { VisualRenderer } from "./VisualRenderer";
 
 interface PosterPreviewProps {
@@ -10,8 +10,8 @@ interface PosterPreviewProps {
 
 export function PosterPreview({ poster }: PosterPreviewProps) {
   const palette = resolvePalette(poster.theme, poster.palette);
-  const qaIssues = runQa(poster);
   const visuals = new Map(poster.visuals.map((visual) => [visual.id, visual]));
+  const sources = new Map(poster.sources.map((source) => [source.id, source]));
 
   return (
     <section className="preview-panel" aria-label="Poster preview">
@@ -28,7 +28,7 @@ export function PosterPreview({ poster }: PosterPreviewProps) {
             "--theme-bg": palette.colors.background,
             "--theme-panel": palette.colors.panel,
             "--theme-ink": palette.colors.ink,
-          } as React.CSSProperties
+          } as CSSProperties
         }
       >
         <header className="poster-hero">
@@ -51,19 +51,19 @@ export function PosterPreview({ poster }: PosterPreviewProps) {
             </section>
           ))}
 
-          <section className="poster-card qa-card">
-            <h3>Quality control</h3>
-            <div className="qa-summary">
-              <ShieldCheck size={22} />
-              <strong>{qaIssues.length === 0 ? "No QA issues" : `${qaIssues.length} QA issue${qaIssues.length === 1 ? "" : "s"}`}</strong>
+          <section className="poster-card claim-card">
+            <h3>Claim map</h3>
+            <div className="claim-list">
+              {poster.claims.map((claim) => (
+                <div key={claim.id}>
+                  <p>{claim.text}</p>
+                  <span>
+                    <Link2 size={14} />
+                    {claim.source_ids.map((sourceId) => sources.get(sourceId)?.title ?? sourceId).join(", ") || "No source"}
+                  </span>
+                </div>
+              ))}
             </div>
-            <ul>
-              {qaIssues.length === 0 ? (
-                <li>Claims and factual visuals are source-linked.</li>
-              ) : (
-                qaIssues.map((issue) => <li key={`${issue.id}-${issue.location}`}>{issue.message}</li>)
-              )}
-            </ul>
           </section>
 
           <section className="poster-card source-card">

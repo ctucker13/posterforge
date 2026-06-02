@@ -2,6 +2,11 @@ import type { PosterProject } from "../domain/poster";
 
 export const examplePoster: PosterProject = {
   id: "poster_demo_fraud_model",
+  metadata: {
+    prompt: "Create a results-first poster about fraud model monitoring.",
+    created_at: "2026-06-01T00:00:00.000Z",
+    generator: "posterforge-sample",
+  },
   title: "Source-Grounded Fraud Model Monitoring",
   subtitle: "A demonstration poster generated from mock project evidence",
   format: {
@@ -15,13 +20,13 @@ export const examplePoster: PosterProject = {
   sources: [
     {
       id: "src_confluence_001",
-      type: "mock",
+      type: "confluence",
       title: "Fraud Model Project Overview",
       trust_level: "high",
     },
     {
       id: "src_gitlab_001",
-      type: "mock",
+      type: "gitlab",
       title: "Model Evaluation README",
       trust_level: "high",
     },
@@ -130,5 +135,47 @@ export const examplePoster: PosterProject = {
       },
     },
   ],
+  assets: [
+    {
+      id: "asset_hero_atmosphere",
+      type: "generated_background",
+      role: "atmosphere",
+      title: "Geometric monitoring backdrop",
+      prompt:
+        "Polished academic data science poster background with abstract monitoring workflow geometry, no text, no charts, no factual labels",
+      model: "gpt-image-2",
+      theme: "natwest-group",
+      palette: "natwest-group",
+      width_px: 2400,
+      height_px: 1400,
+    },
+  ],
+  traces: [
+    {
+      id: "sample_plan",
+      label: "Planning poster",
+      detail: "Created a results-first poster brief from the sample fraud monitoring prompt.",
+      status: "complete",
+      timestamp: "2026-06-01T00:00:00.000Z",
+      artifactRefs: [{ kind: "poster_spec", label: "sample poster spec" }],
+    },
+    {
+      id: "sample_evidence",
+      label: "Creating claim map",
+      detail: "Linked sample claims and factual visuals to mock project, code, and paper sources.",
+      status: "complete",
+      timestamp: "2026-06-01T00:00:01.000Z",
+      artifactRefs: [{ kind: "claim_map", label: "sample claim map" }],
+    },
+    {
+      id: "sample_qa",
+      label: "Running QA",
+      detail: "Checked traceability, text density, factual visual source links, and export readiness.",
+      status: "complete",
+      timestamp: "2026-06-01T00:00:02.000Z",
+      artifactRefs: [{ kind: "qa_report", label: "sample QA summary" }],
+    },
+  ],
+  qaResults: [],
   references: [],
 };

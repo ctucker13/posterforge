@@ -13,31 +13,73 @@ export const generationTrace: Omit<TraceEvent, "status">[] = [
     id: "plan",
     label: "Planning poster",
     detail: "Interpreting the prompt, selecting a layout, and drafting a source-grounded poster brief.",
+    artifactRefs: [{ kind: "poster_spec", label: "poster brief" }],
   },
   {
     id: "sources",
     label: "Searching sources",
     detail: "Preparing source connectors for Confluence, GitLab, web, papers, and local files.",
+    artifactRefs: [{ kind: "source_index", label: "source connector plan" }],
+  },
+  {
+    id: "read_sources",
+    label: "Reading source documents",
+    detail: "Loading mock project notes, code summaries, evaluation metrics, and research-paper summaries.",
+    artifactRefs: [{ kind: "source_document", label: "parsed source documents" }],
   },
   {
     id: "evidence",
     label: "Extracting evidence",
-    detail: "Mapping claims and visuals back to source references.",
+    detail: "Extracting claims, methods, metrics, and visual evidence from structured source documents.",
+    artifactRefs: [{ kind: "evidence_map", label: "evidence items" }],
+  },
+  {
+    id: "claim_map",
+    label: "Creating claim map",
+    detail: "Connecting poster claims and factual visuals to source IDs and confidence levels.",
+    artifactRefs: [{ kind: "claim_map", label: "claim map" }],
+  },
+  {
+    id: "layout",
+    label: "Choosing layout",
+    detail: "Selecting a results-first poster structure and mapping sections to preview panels.",
+    artifactRefs: [{ kind: "layout_plan", label: "layout plan" }],
   },
   {
     id: "visuals",
     label: "Selecting visuals",
     detail: "Choosing deterministic data science visuals and AI-image asset roles.",
+    artifactRefs: [{ kind: "visual_plan", label: "visual plan" }],
   },
   {
-    id: "theme",
-    label: "Applying theme",
-    detail: "Applying visual grammar and palette tokens without leaking brand colours into other themes.",
+    id: "image_prompts",
+    label: "Preparing image-generation prompts",
+    detail: "Drafting non-factual asset prompts for atmosphere, panels, backgrounds, and theme art.",
+    artifactRefs: [{ kind: "image_prompt", label: "asset prompt plan" }],
+  },
+  {
+    id: "render_visuals",
+    label: "Rendering deterministic visuals",
+    detail: "Rendering factual diagrams, matrices, flow charts, math, code, and tables from structured data.",
+    artifactRefs: [{ kind: "render", label: "visual renders" }],
   },
   {
     id: "qa",
     label: "Running QA",
     detail: "Checking source traceability, text density, factual visual handling, and export readiness.",
+    artifactRefs: [{ kind: "qa_report", label: "QA report" }],
+  },
+  {
+    id: "self_fixes",
+    label: "Applying self-fixes",
+    detail: "Applying safe deterministic fixes such as generated references when source metadata is available.",
+    artifactRefs: [{ kind: "qa_report", label: "fix report" }],
+  },
+  {
+    id: "exports",
+    label: "Preparing exports",
+    detail: "Preparing the poster JSON source of truth and marking PPTX, PDF, PNG, and bundle exports as planned.",
+    artifactRefs: [{ kind: "export", label: "export plan" }],
   },
 ];
 
@@ -51,6 +93,12 @@ export function generatePoster(options: GenerationOptions): PosterProject {
 
   return {
     ...examplePoster,
+    metadata: {
+      ...examplePoster.metadata,
+      prompt: options.prompt,
+      updated_at: new Date().toISOString(),
+      generator: "posterforge-demo-generator",
+    },
     theme: options.theme,
     palette: options.palette,
     subtitle: `Generated from ${sourceText}`,

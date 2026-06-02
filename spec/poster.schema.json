@@ -11,6 +11,9 @@
     "title": {
       "type": "string"
     },
+    "metadata": {
+      "type": "object"
+    },
     "subtitle": {
       "type": "string"
     },
@@ -62,10 +65,28 @@
         "$ref": "#/$defs/visual"
       }
     },
+    "assets": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/asset"
+      }
+    },
     "references": {
       "type": "array",
       "items": {
         "type": "object"
+      }
+    },
+    "traces": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/trace"
+      }
+    },
+    "qaResults": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/qaIssue"
       }
     }
   },
@@ -123,7 +144,7 @@
           "type": "string"
         },
         "type": {
-          "enum": ["hero", "background", "methods", "results", "discussion", "timeline", "references", "custom"]
+          "enum": ["hero", "background", "methods", "results", "key_findings", "discussion", "timeline", "references", "custom"]
         },
         "title": {
           "type": "string"
@@ -162,10 +183,132 @@
           "type": "object"
         },
         "asset": {
+          "$ref": "#/$defs/asset"
+        }
+      }
+    },
+    "asset": {
+      "type": "object",
+      "required": ["id", "type", "role"],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "enum": ["ai_image", "generated_background", "generated_panel", "uploaded_image"]
+        },
+        "role": {
+          "enum": ["atmosphere", "section_art", "background", "comic_panel", "reference"]
+        },
+        "title": {
+          "type": "string"
+        },
+        "prompt": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string"
+        },
+        "theme": {
+          "type": "string"
+        },
+        "palette": {
+          "type": "string"
+        },
+        "source_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "url": {
+          "type": "string"
+        },
+        "width_px": {
+          "type": "number"
+        },
+        "height_px": {
+          "type": "number"
+        },
+        "metadata": {
           "type": "object"
+        }
+      }
+    },
+    "trace": {
+      "type": "object",
+      "required": ["id", "label", "detail", "status"],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "label": {
+          "type": "string"
+        },
+        "detail": {
+          "type": "string"
+        },
+        "status": {
+          "enum": ["queued", "running", "complete"]
+        },
+        "timestamp": {
+          "type": "string"
+        },
+        "artifactRefs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/artifactRef"
+          }
+        }
+      }
+    },
+    "artifactRef": {
+      "type": "object",
+      "required": ["kind", "label"],
+      "properties": {
+        "kind": {
+          "enum": [
+            "poster_spec",
+            "source_index",
+            "source_document",
+            "evidence_map",
+            "claim_map",
+            "layout_plan",
+            "visual_plan",
+            "image_prompt",
+            "render",
+            "qa_report",
+            "export"
+          ]
+        },
+        "label": {
+          "type": "string"
+        }
+      }
+    },
+    "qaIssue": {
+      "type": "object",
+      "required": ["id", "severity", "location", "message"],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "severity": {
+          "enum": ["high", "medium", "low"]
+        },
+        "location": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "suggestedFix": {
+          "type": "string"
+        },
+        "autoFixable": {
+          "type": "boolean"
         }
       }
     }
   }
 }
-
