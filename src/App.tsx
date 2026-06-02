@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Database, FileDown, FolderOpen, Globe2, PackageCheck, Palette, Play, Sparkles } from "lucide-react";
+import { Database, FolderOpen, Globe2, Palette, Play, Sparkles } from "lucide-react";
 import { EvidencePanel } from "./components/EvidencePanel";
+import { ExportPanel } from "./components/ExportPanel";
 import { JsonProjectControls } from "./components/JsonProjectControls";
 import { PosterPreview } from "./components/PosterPreview";
 import { ProjectEditor } from "./components/ProjectEditor";
@@ -215,18 +216,7 @@ export default function App() {
         </aside>
 
         <JsonProjectControls poster={poster} onImport={handleProjectImport} onReset={handleResetProject} />
-
-        <section className="export-actions" aria-label="Export actions">
-          <button type="button" disabled>
-            <FileDown size={17} /> PPTX
-          </button>
-          <button type="button" disabled>
-            <FileDown size={17} /> PDF
-          </button>
-          <button type="button" disabled>
-            <PackageCheck size={17} /> Bundle
-          </button>
-        </section>
+        <ExportPanel poster={poster} />
       </section>
 
       <section className="inspector-column" aria-label="Poster inspectors">

@@ -248,7 +248,7 @@ textarea {
 .primary-action,
 .panel-action,
 .json-actions button,
-.export-actions button,
+.export-target button,
 .qa-issue button {
   display: inline-flex;
   align-items: center;
@@ -319,10 +319,9 @@ textarea {
   gap: 10px;
 }
 
-.json-actions,
-.export-actions {
+.json-actions {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
 }
 
@@ -332,7 +331,7 @@ textarea {
 
 .panel-action,
 .json-actions button,
-.export-actions button,
+.export-target button,
 .qa-issue button {
   min-height: 40px;
   border: 1px solid #cfd7e2;
@@ -346,14 +345,99 @@ textarea {
   color: #0f766e;
 }
 
-.export-actions {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+.export-panel {
+  display: grid;
+  gap: 10px;
 }
 
-.export-actions button:disabled {
+.export-list {
+  display: grid;
+  gap: 9px;
+}
+
+.export-target {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 92px;
+  gap: 10px;
+  align-items: start;
+  border: 1px solid #e4e9ef;
+  border-radius: 8px;
+  padding: 10px;
+  background: #ffffff;
+}
+
+.export-target.available {
+  border-color: #b7e4d5;
+  background: #f7fffb;
+}
+
+.export-target-main {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  gap: 9px;
+}
+
+.export-target-icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  color: #0f766e;
+  background: #ecfdf8;
+}
+
+.export-target strong {
+  display: block;
+  color: #101828;
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.export-target p {
+  margin: 4px 0 8px;
+  color: #526071;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.export-target button {
+  min-height: 34px;
+  padding: 0 10px;
+  color: #0f766e;
+}
+
+.export-target button:disabled {
   cursor: not-allowed;
   color: #98a2b3;
   background: #f2f4f7;
+}
+
+.export-requirements {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.export-requirements span {
+  border-radius: 999px;
+  padding: 3px 7px;
+  color: #344054;
+  font-size: 10px;
+  font-weight: 900;
+  background: #f2f4f7;
+}
+
+.export-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 6px;
+  padding: 8px 9px;
+  color: #067647;
+  font-size: 12px;
+  font-weight: 800;
+  background: #ecfdf3;
 }
 
 .json-status {
@@ -1351,9 +1435,12 @@ textarea {
   }
 
   .source-options,
-  .export-actions,
   .spec-metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .export-target {
+    grid-template-columns: 1fr;
   }
 
   .poster-layout-results-first .poster-card.section-results,
