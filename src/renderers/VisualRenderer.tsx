@@ -1,4 +1,5 @@
 import type { PosterVisual } from "../domain/poster";
+import { buildGanttSegments, formatPercent, summarizeConfusionMatrix, summarizeSankeyLinks } from "./derived";
 import {
   parseCodeBlockData,
   parseConfusionMatrixData,
@@ -20,16 +21,31 @@ export function VisualRenderer({ visual }: { visual: PosterVisual }) {
     }
 
     const { labels, matrix } = parsed.data;
+    const summary = summarizeConfusionMatrix(parsed.data);
 
     return (
       <div className="visual-box">
-        <h3>{visual.title}</h3>
+        <VisualHeader title={visual.title} meta={`${summary.total.toLocaleString()} cases`} />
         <div className="matrix">
-          <MatrixCell label={`True ${labels[0]}`} value={matrix[0][0]} />
-          <MatrixCell label={`False ${labels[0]}`} value={matrix[0][1]} error />
-          <MatrixCell label={`False ${labels[1]}`} value={matrix[1][0]} error />
-          <MatrixCell label={`True ${labels[1]}`} value={matrix[1][1]} />
+          <MatrixCell label={`True ${labels[0]}`} value={matrix[0][0]} percent={summary.cellPercentages[0][0]} />
+          <MatrixCell label={`False ${labels[0]}`} value={matrix[0][1]} percent={summary.cellPercentages[0][1]} error />
+          <MatrixCell label={`False ${labels[1]}`} value={matrix[1][0]} percent={summary.cellPercentages[1][0]} error />
+          <MatrixCell label={`True ${labels[1]}`} value={matrix[1][1]} percent={summary.cellPercentages[1][1]} />
         </div>
+        <dl className="matrix-summary">
+          <div>
+            <dt>Accuracy</dt>
+            <dd>{formatPercent(summary.accuracy)}</dd>
+          </div>
+          <div>
+            <dt>Precision</dt>
+            <dd>{formatPercent(summary.precision)}</dd>
+          </div>
+          <div>
+            <dt>Recall</dt>
+            <dd>{formatPercent(summary.recall)}</dd>
+          </div>
+        </dl>
       </div>
     );
   }
@@ -44,7 +60,7 @@ export function VisualRenderer({ visual }: { visual: PosterVisual }) {
 
     return (
       <div className="visual-box">
-        <h3>{visual.title}</h3>
+        <VisualHeader title={visual.title} meta={`${rows.length} row${rows.length === 1 ? "" : "s"}`} />
         <div className="table-wrap">
           <table className="data-table">
             <thead>
@@ -66,6 +82,7 @@ export function VisualRenderer({ visual }: { visual: PosterVisual }) {
               ))}
             </tbody>
           </table>
+          {rows.length === 0 ? <p className="visual-empty">No table rows supplied.</p> : null}
         </div>
       </div>
     );
@@ -78,21 +95,25 @@ export function VisualRenderer({ visual }: { visual: PosterVisual }) {
     }
 
     const { links } = parsed.data;
-    const max = Math.max(...links.map((link) => link.value), 1);
+    const summaries = summarizeSankeyLinks(links);
+    const total = links.reduce((sum, link) => sum + link.value, 0);
+
     return (
       <div className="visual-box">
-        <h3>{visual.title}</h3>
+        <VisualHeader title={visual.title} meta={`${links.length} flows`} />
         <div className="flow-list">
-          {links.map((link) => (
+          {summaries.map((link) => (
             <div className="flow-row" key={`${link.source}-${link.target}`}>
-              <span>{`${link.source} -> ${link.target}`}</span>
+              <span>{`${link.source} to ${link.target}`}</span>
               <div className="flow-track">
-                <div className="flow-bar" style={{ width: `${Math.max(7, (link.value / max) * 100)}%` }} />
+                <div className="flow-bar" style={{ width: `${link.widthPercent}%` }} />
               </div>
               <strong>{link.value.toLocaleString()}</strong>
+              <em>{formatPercent(link.share)} of total</em>
             </div>
           ))}
         </div>
+        {links.length === 0 ? <p className="visual-empty">No flow links supplied.</p> : <p className="flow-total">Total flow: {total.toLocaleString()}</p>}
       </div>
     );
   }
@@ -106,16 +127,18 @@ export function VisualRenderer({ visual }: { visual: PosterVisual }) {
     const { events } = parsed.data;
     return (
       <div className="visual-box">
-        <h3>{visual.title}</h3>
+        <VisualHeader title={visual.title} meta={`${events.length} milestone${events.length === 1 ? "" : "s"}`} />
         <ol className="timeline-list">
-          {events.map((event) => (
+          {events.map((event, index) => (
             <li key={`${event.date}-${event.label}`}>
+              <span className="timeline-marker">{index + 1}</span>
               <time>{event.date}</time>
               <strong>{event.label}</strong>
               {event.detail ? <p>{event.detail}</p> : null}
             </li>
           ))}
         </ol>
+        {events.length === 0 ? <p className="visual-empty">No timeline events supplied.</p> : null}
       </div>
     );
   }
@@ -127,34 +150,26 @@ export function VisualRenderer({ visual }: { visual: PosterVisual }) {
     }
 
     const { tasks } = parsed.data;
-    const dates = tasks.flatMap((task) => [Date.parse(task.start), Date.parse(task.end)]).filter(Number.isFinite);
-    const min = dates.length ? Math.min(...dates) : 0;
-    const max = dates.length ? Math.max(...dates) : min + 1;
-    const span = Math.max(max - min, 1);
+    const segments = buildGanttSegments(tasks);
 
     return (
       <div className="visual-box">
-        <h3>{visual.title}</h3>
+        <VisualHeader title={visual.title} meta={`${tasks.length} task${tasks.length === 1 ? "" : "s"}`} />
         <div className="gantt-list">
-          {tasks.map((task) => {
-            const start = Date.parse(task.start);
-            const end = Date.parse(task.end);
-            const offset = Number.isFinite(start) ? ((start - min) / span) * 100 : 0;
-            const width = Number.isFinite(start) && Number.isFinite(end) ? Math.max(((end - start) / span) * 100, 8) : 30;
-
-            return (
-              <div className="gantt-row" key={`${task.label}-${task.start}`}>
-                <div>
-                  <strong>{task.label}</strong>
-                  <span>{task.status ?? `${task.start} to ${task.end}`}</span>
-                </div>
-                <div className="gantt-track">
-                  <div className="gantt-bar" style={{ marginLeft: `${offset}%`, width: `${Math.min(width, 100 - offset)}%` }} />
-                </div>
+          {segments.map((task) => (
+            <div className="gantt-row" key={`${task.label}-${task.start}`}>
+              <div>
+                <strong>{task.label}</strong>
+                <span>{`${task.start} to ${task.end}`}</span>
+                {task.status ? <em>{task.status}</em> : null}
               </div>
-            );
-          })}
+              <div className="gantt-track">
+                <div className="gantt-bar" style={{ marginLeft: `${task.offsetPercent}%`, width: `${task.widthPercent}%` }} />
+              </div>
+            </div>
+          ))}
         </div>
+        {tasks.length === 0 ? <p className="visual-empty">No Gantt tasks supplied.</p> : null}
       </div>
     );
   }
@@ -257,6 +272,15 @@ function formatCell(value: TableCell) {
   return String(value ?? "");
 }
 
+function VisualHeader({ title, meta }: { title: string; meta?: string }) {
+  return (
+    <div className="visual-header">
+      <h3>{title}</h3>
+      {meta ? <span>{meta}</span> : null}
+    </div>
+  );
+}
+
 function InvalidVisualData({ visual, message }: { visual: PosterVisual; message: string }) {
   return (
     <div className="visual-box visual-data-error">
@@ -266,11 +290,12 @@ function InvalidVisualData({ visual, message }: { visual: PosterVisual; message:
   );
 }
 
-function MatrixCell({ label, value, error = false }: { label: string; value: number; error?: boolean }) {
+function MatrixCell({ label, value, percent, error = false }: { label: string; value: number; percent: number; error?: boolean }) {
   return (
     <div className={`matrix-cell ${error ? "error" : ""}`}>
       <span>{label}</span>
       <strong>{value.toLocaleString()}</strong>
+      <em>{formatPercent(percent)}</em>
     </div>
   );
 }
