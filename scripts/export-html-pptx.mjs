@@ -28,27 +28,6 @@ const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: a0.pixelWidth, height: a0.pixelHeight }, deviceScaleFactor: 1 });
 await page.goto(pathToFileURL(path.resolve(htmlPath)).href, { waitUntil: "networkidle" });
 await page.locator(".poster").waitFor();
-await page.evaluate(() => {
-  const canvas = document.querySelector(".posterforge-a0-canvas");
-  const posterElement = document.querySelector(".poster");
-  if (!(canvas instanceof HTMLElement) || !(posterElement instanceof HTMLElement)) {
-    return;
-  }
-
-  posterElement.style.transform = "none";
-  posterElement.style.left = "0px";
-  posterElement.style.top = "0px";
-
-  const natural = posterElement.getBoundingClientRect();
-  const scale = Math.min(canvas.clientWidth / natural.width, canvas.clientHeight / natural.height);
-  const fittedWidth = natural.width * scale;
-  const fittedHeight = natural.height * scale;
-
-  posterElement.style.transform = `scale(${scale})`;
-  posterElement.style.left = `${(canvas.clientWidth - fittedWidth) / 2}px`;
-  posterElement.style.top = `${(canvas.clientHeight - fittedHeight) / 2}px`;
-  canvas.dataset.posterScale = String(scale);
-});
 
 const measurements = await page.locator(".posterforge-a0-canvas").evaluate((canvasElement) => {
   const posterElement = canvasElement.querySelector(".poster");
@@ -75,7 +54,7 @@ const measurements = await page.locator(".posterforge-a0-canvas").evaluate((canv
     height: canvasRect.height,
     orientation: canvasElement.getAttribute("data-orientation"),
     aspectRatio: canvasRect.width / canvasRect.height,
-    posterScale: Number(canvasElement.dataset.posterScale ?? 1),
+    posterScale: 1,
     fittedPoster: {
       x: posterRect.left - canvasRect.left,
       y: posterRect.top - canvasRect.top,
@@ -145,7 +124,6 @@ function getA0Canvas(orientation) {
     mmHeight,
     pixelWidth,
     pixelHeight,
-    designWidth: isPortrait ? 1500 : 2400,
     slideWidth,
     slideHeight,
     aspectRatio: mmWidth / mmHeight,
@@ -177,10 +155,11 @@ body { display: grid; place-items: center; min-height: 100vh; background: #edf1f
 }
 .posterforge-static-export .poster {
   position: absolute;
-  overflow: visible;
+  inset: 0;
+  overflow: hidden;
   flex: none;
-  width: ${a0.designWidth}px;
-  transform-origin: top left;
+  width: 100%;
+  height: 100%;
 }
 svg.export-icon { width: 18px; height: 18px; }
     </style>
@@ -189,7 +168,7 @@ svg.export-icon { width: 18px; height: 18px; }
     <main class="posterforge-static-export">
       <div class="posterforge-a0-canvas" data-orientation="${escapeAttribute(project.format?.orientation ?? "landscape")}">
       <article
-        class="poster poster-${escapeAttribute(project.theme)} poster-layout-${escapeAttribute(layout.cssClass)}"
+        class="poster poster-output-frame poster-${escapeAttribute(project.theme)} poster-layout-${escapeAttribute(layout.cssClass)}"
         style="--theme-primary: ${escapeAttribute(palette.colors.primary)}; --theme-accent: ${escapeAttribute(palette.colors.accent)}; --theme-bg: ${escapeAttribute(palette.colors.background)}; --theme-panel: ${escapeAttribute(palette.colors.panel)}; --theme-ink: ${escapeAttribute(palette.colors.ink)};"
         data-poster-id="${escapeAttribute(project.id)}"
         data-poster-kind="poster"

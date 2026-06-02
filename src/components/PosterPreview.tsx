@@ -1,4 +1,4 @@
-import { type CSSProperties, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { type CSSProperties, useMemo, useState } from "react";
 import { FileCheck2, Image, Link2, Maximize2, ZoomIn, ZoomOut } from "lucide-react";
 import type { PosterBlock, PosterClaim, PosterProject, PosterSource } from "../domain/poster";
 import { isFeaturedSection, resolveLayoutTemplate } from "../layouts";
@@ -11,9 +11,6 @@ interface PosterPreviewProps {
 
 export function PosterPreview({ poster }: PosterPreviewProps) {
   const [zoom, setZoom] = useState(0.45);
-  const [fitScale, setFitScale] = useState(0.42);
-  const canvasRef = useRef<HTMLDivElement | null>(null);
-  const posterRef = useRef<HTMLElement | null>(null);
   const palette = resolvePalette(poster.theme, poster.palette);
   const layout = resolveLayoutTemplate(poster.layout);
   const visuals = new Map(poster.visuals.map((visual) => [visual.id, visual]));
@@ -21,27 +18,6 @@ export function PosterPreview({ poster }: PosterPreviewProps) {
   const claims = new Map(poster.claims.map((claim) => [claim.id, claim]));
   const outputFrame = useMemo(() => getA0PreviewFrame(poster.format.orientation), [poster.format.orientation]);
 
-  useLayoutEffect(() => {
-    const canvas = canvasRef.current;
-    const posterElement = posterRef.current;
-    if (!canvas || !posterElement) {
-      return;
-    }
-
-    const frame = requestAnimationFrame(() => {
-      const posterWidth = posterElement.offsetWidth || outputFrame.designWidth;
-      const posterHeight = posterElement.scrollHeight || posterElement.offsetHeight || outputFrame.height;
-      const nextScale = Math.min(outputFrame.width / posterWidth, outputFrame.height / posterHeight);
-      setFitScale(Number.isFinite(nextScale) && nextScale > 0 ? nextScale : 1);
-    });
-
-    return () => cancelAnimationFrame(frame);
-  }, [poster, outputFrame]);
-
-  const fittedWidth = outputFrame.designWidth * fitScale;
-  const fittedHeight = outputFrame.height;
-  const posterLeft = Math.max(0, (outputFrame.width - fittedWidth) / 2);
-  const posterTop = Math.max(0, (outputFrame.height - fittedHeight) / 2);
   const zoomLabel = `${Math.round(zoom * 100)}%`;
 
   return (
@@ -67,7 +43,6 @@ export function PosterPreview({ poster }: PosterPreviewProps) {
         <div className="a0-preview-stage" style={{ width: outputFrame.width * zoom, height: outputFrame.height * zoom }}>
           <div
             className="a0-preview-canvas"
-            ref={canvasRef}
             style={
               {
                 width: outputFrame.width,
@@ -79,7 +54,6 @@ export function PosterPreview({ poster }: PosterPreviewProps) {
             }
           >
             <article
-              ref={posterRef}
               className={`poster poster-output-frame poster-${poster.theme} poster-layout-${layout.cssClass}`}
               style={
                 {
@@ -88,10 +62,6 @@ export function PosterPreview({ poster }: PosterPreviewProps) {
                   "--theme-bg": palette.colors.background,
                   "--theme-panel": palette.colors.panel,
                   "--theme-ink": palette.colors.ink,
-                  "--poster-fit-scale": fitScale,
-                  "--poster-design-width": `${outputFrame.designWidth}px`,
-                  "--poster-left": `${posterLeft}px`,
-                  "--poster-top": `${posterTop}px`,
                 } as CSSProperties
               }
             >
@@ -161,7 +131,6 @@ function getA0PreviewFrame(orientation: PosterProject["format"]["orientation"]) 
     mmHeight: isPortrait ? 1189 : 841,
     width: isPortrait ? 841 : 1189,
     height: isPortrait ? 1189 : 841,
-    designWidth: isPortrait ? 1500 : 2400,
   };
 }
 

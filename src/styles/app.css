@@ -1096,13 +1096,100 @@ textarea {
 
 .a0-preview-canvas .poster-output-frame {
   position: absolute;
-  top: var(--poster-top);
-  left: var(--poster-left);
-  overflow: visible;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   flex: none;
-  width: var(--poster-design-width);
-  transform: scale(var(--poster-fit-scale));
-  transform-origin: top left;
+  width: 100%;
+  height: 100%;
+  padding: 18px;
+}
+
+.poster-output-frame .poster-hero {
+  grid-template-columns: minmax(0, 1fr) 210px;
+  gap: 18px;
+  min-height: 168px;
+  padding: 22px;
+}
+
+.poster-output-frame .poster-hero h2 {
+  font-size: 36px;
+}
+
+.poster-output-frame .poster-hero p {
+  font-size: 14px;
+}
+
+.poster-output-frame .hero-asset {
+  min-height: 126px;
+}
+
+.poster-output-frame .poster-grid {
+  flex: 1;
+  min-height: 0;
+  gap: 12px;
+  margin-top: 12px;
+  overflow: hidden;
+}
+
+.poster-output-frame .poster-card {
+  min-height: 0;
+  overflow: hidden;
+  padding: 12px;
+}
+
+.poster-output-frame .poster-card h3 {
+  margin-bottom: 8px;
+  font-size: 18px;
+}
+
+.poster-output-frame .poster-card p,
+.poster-output-frame .poster-card li {
+  font-size: 12px;
+  line-height: 1.32;
+}
+
+.poster-output-frame .visual-box {
+  padding: 8px;
+}
+
+.poster-output-frame .visual-box h3 {
+  font-size: 13px;
+}
+
+.poster-output-frame .matrix-cell {
+  min-height: 52px;
+  padding: 8px;
+}
+
+.poster-output-frame .matrix-cell strong {
+  font-size: 18px;
+}
+
+.poster-output-frame .flow-row {
+  grid-template-columns: minmax(80px, 1fr) minmax(80px, 1fr) 52px minmax(58px, auto);
+  gap: 6px;
+}
+
+.poster-output-frame .flow-row span,
+.poster-output-frame .gantt-row strong,
+.poster-output-frame .data-table {
+  font-size: 11px;
+}
+
+.poster-output-frame .diagram-source,
+.poster-output-frame .code-placeholder {
+  min-height: 92px;
+  font-size: 11px;
+}
+
+.poster-output-frame .metric-card {
+  padding: 12px;
+}
+
+.poster-output-frame .metric-card strong {
+  font-size: 26px;
 }
 
 .poster-hero {
