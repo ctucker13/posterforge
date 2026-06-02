@@ -34,7 +34,7 @@ npm run export:pptx:html -- --poster public/generated-assets/poster_demo_fraud_m
 
 `npm run image:plan` writes prompt metadata without calling OpenAI. `npm run image:generate` calls the OpenAI Images API from Node, saves the PNG and metadata under `public/generated-assets/`, and writes an updated importable poster JSON. The sample spec keeps image asset model names configurable; the current OpenAI image-generation docs list `gpt-image-1.5`, `gpt-image-1`, and `gpt-image-1-mini`, so pass `--model gpt-image-1.5` if a future placeholder model name is rejected.
 
-`npm run export:pptx:html` renders poster JSON to static HTML, captures that HTML with Playwright, and writes a high-fidelity PPTX using the captured render. Run `npx playwright install chromium` once on a fresh machine before using this command. This is the recommended visual-fidelity path when the PPTX needs to match the HTML preview closely.
+`npm run export:pptx:html` renders poster JSON to static HTML, fits it into an A0 canvas using the poster orientation, captures that canvas with Playwright, and writes a high-fidelity PPTX at the actual A0 slide size. For landscape posters the PPTX slide is `1189mm x 841mm` (`46.811in x 33.110in`). Run `npx playwright install chromium` once on a fresh machine before using this command. This is the recommended visual-fidelity path when the PPTX needs to match the HTML preview closely.
 
 ## Current Stack
 

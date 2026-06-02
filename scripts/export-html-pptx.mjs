@@ -12,6 +12,7 @@ const outDir = String(args["out-dir"] ?? "exports");
 const baseName = String(args.name ?? path.basename(posterPath, path.extname(posterPath)));
 const poster = JSON.parse(await readFile(posterPath, "utf8"));
 const css = await readFile("src/styles/app.css", "utf8");
+const a0 = getA0Canvas(poster.format?.orientation ?? "landscape");
 
 await mkdir(outDir, { recursive: true });
 
@@ -24,54 +25,91 @@ const html = renderHtmlDocument(poster, css);
 await writeFile(htmlPath, html);
 
 const browser = await chromium.launch();
-const page = await browser.newPage({ viewport: { width: 1600, height: 1200 }, deviceScaleFactor: 1 });
+const page = await browser.newPage({ viewport: { width: a0.pixelWidth, height: a0.pixelHeight }, deviceScaleFactor: 1 });
 await page.goto(pathToFileURL(path.resolve(htmlPath)).href, { waitUntil: "networkidle" });
 await page.locator(".poster").waitFor();
+await page.evaluate(() => {
+  const canvas = document.querySelector(".posterforge-a0-canvas");
+  const posterElement = document.querySelector(".poster");
+  if (!(canvas instanceof HTMLElement) || !(posterElement instanceof HTMLElement)) {
+    return;
+  }
 
-const measurements = await page.locator(".poster").evaluate((posterElement) => {
+  posterElement.style.transform = "none";
+  posterElement.style.left = "0px";
+  posterElement.style.top = "0px";
+
+  const natural = posterElement.getBoundingClientRect();
+  const scale = Math.min(canvas.clientWidth / natural.width, canvas.clientHeight / natural.height);
+  const fittedWidth = natural.width * scale;
+  const fittedHeight = natural.height * scale;
+
+  posterElement.style.transform = `scale(${scale})`;
+  posterElement.style.left = `${(canvas.clientWidth - fittedWidth) / 2}px`;
+  posterElement.style.top = `${(canvas.clientHeight - fittedHeight) / 2}px`;
+  canvas.dataset.posterScale = String(scale);
+});
+
+const measurements = await page.locator(".posterforge-a0-canvas").evaluate((canvasElement) => {
+  const posterElement = canvasElement.querySelector(".poster");
+  if (!(posterElement instanceof HTMLElement)) {
+    throw new Error("Could not find rendered poster inside A0 canvas.");
+  }
+
+  const canvasRect = canvasElement.getBoundingClientRect();
   const posterRect = posterElement.getBoundingClientRect();
   const items = [...posterElement.querySelectorAll("[data-poster-id], [data-visual-id], [data-block-id]")].map((element) => {
     const rect = element.getBoundingClientRect();
     return {
       id: element.getAttribute("data-poster-id") ?? element.getAttribute("data-visual-id") ?? element.getAttribute("data-block-id"),
       kind: element.getAttribute("data-poster-kind") ?? element.getAttribute("data-visual-type") ?? element.tagName.toLowerCase(),
-      x: rect.left - posterRect.left,
-      y: rect.top - posterRect.top,
+      x: rect.left - canvasRect.left,
+      y: rect.top - canvasRect.top,
       width: rect.width,
       height: rect.height,
     };
   });
 
   return {
-    width: posterRect.width,
-    height: posterRect.height,
+    width: canvasRect.width,
+    height: canvasRect.height,
+    orientation: canvasElement.getAttribute("data-orientation"),
+    aspectRatio: canvasRect.width / canvasRect.height,
+    posterScale: Number(canvasElement.dataset.posterScale ?? 1),
+    fittedPoster: {
+      x: posterRect.left - canvasRect.left,
+      y: posterRect.top - canvasRect.top,
+      width: posterRect.width,
+      height: posterRect.height,
+    },
     items,
   };
 });
 
-await page.locator(".poster").screenshot({ path: pngPath, animations: "disabled" });
+await page.locator(".posterforge-a0-canvas").screenshot({ path: pngPath, animations: "disabled" });
 await browser.close();
 
-await writeFile(measurementPath, `${JSON.stringify({ posterId: poster.id, htmlPath, pngPath, pptxPath, ...measurements }, null, 2)}\n`);
+await writeFile(measurementPath, `${JSON.stringify({ posterId: poster.id, htmlPath, pngPath, pptxPath, a0, ...measurements }, null, 2)}\n`);
 
-const slideWidth = 16;
-const slideHeight = Math.max(4, (slideWidth * measurements.height) / measurements.width);
+const slideWidth = a0.slideWidth;
+const slideHeight = a0.slideHeight;
 const pptx = new pptxgen();
 pptx.defineLayout({ name: "POSTERFORGE_HTML", width: slideWidth, height: slideHeight });
 pptx.layout = "POSTERFORGE_HTML";
 pptx.author = "PosterForge";
-pptx.subject = "High-fidelity HTML poster render";
+pptx.subject = `High-fidelity HTML poster render, A0 ${a0.orientation}`;
 pptx.title = poster.title;
 const slide = pptx.addSlide();
 slide.background = { color: "FFFFFF" };
 slide.addImage({ path: pngPath, x: 0, y: 0, w: slideWidth, h: slideHeight });
-slide.addNotes(`PosterForge high-fidelity HTML render export.\nPoster ID: ${poster.id}\nSource JSON: ${posterPath}\nMeasurements: ${measurementPath}`);
+slide.addNotes(`PosterForge high-fidelity HTML render export.\nPoster ID: ${poster.id}\nFormat: A0 ${a0.orientation} (${a0.mmWidth}mm x ${a0.mmHeight}mm)\nSource JSON: ${posterPath}\nMeasurements: ${measurementPath}`);
 await pptx.writeFile({ fileName: pptxPath });
 
 console.log(`HTML render: ${htmlPath}`);
 console.log(`PNG capture: ${pngPath}`);
 console.log(`PPTX export: ${pptxPath}`);
 console.log(`Measurements: ${measurementPath}`);
+console.log(`A0 ${a0.orientation}: ${a0.mmWidth}mm x ${a0.mmHeight}mm, slide ${slideWidth.toFixed(3)}in x ${slideHeight.toFixed(3)}in`);
 
 function parseArgs(argv) {
   const parsed = {};
@@ -92,6 +130,28 @@ function parseArgs(argv) {
   return parsed;
 }
 
+function getA0Canvas(orientation) {
+  const isPortrait = orientation === "portrait";
+  const mmWidth = isPortrait ? 841 : 1189;
+  const mmHeight = isPortrait ? 1189 : 841;
+  const pixelWidth = isPortrait ? 1131 : 1600;
+  const pixelHeight = Math.round((pixelWidth * mmHeight) / mmWidth);
+  const slideWidth = mmWidth / 25.4;
+  const slideHeight = mmHeight / 25.4;
+
+  return {
+    orientation: isPortrait ? "portrait" : "landscape",
+    mmWidth,
+    mmHeight,
+    pixelWidth,
+    pixelHeight,
+    designWidth: isPortrait ? 1500 : 2400,
+    slideWidth,
+    slideHeight,
+    aspectRatio: mmWidth / mmHeight,
+  };
+}
+
 function renderHtmlDocument(project, appCss) {
   const palette = resolvePalette(project.theme, project.palette);
   const layout = resolveLayoutTemplate(project.layout);
@@ -106,14 +166,28 @@ function renderHtmlDocument(project, appCss) {
     <title>${escapeHtml(project.title)}</title>
     <style>
 ${appCss}
-body { background: #edf1f5; }
-.posterforge-static-export { width: 1600px; padding: 20px; }
-.posterforge-static-export .poster { overflow: visible; flex: none; }
+body { display: grid; place-items: center; min-height: 100vh; background: #edf1f5; }
+.posterforge-static-export { width: ${a0.pixelWidth}px; height: ${a0.pixelHeight}px; padding: 0; }
+.posterforge-a0-canvas {
+  position: relative;
+  overflow: hidden;
+  width: ${a0.pixelWidth}px;
+  height: ${a0.pixelHeight}px;
+  background: color-mix(in srgb, ${palette.colors.primary}, white 92%);
+}
+.posterforge-static-export .poster {
+  position: absolute;
+  overflow: visible;
+  flex: none;
+  width: ${a0.designWidth}px;
+  transform-origin: top left;
+}
 svg.export-icon { width: 18px; height: 18px; }
     </style>
   </head>
   <body>
     <main class="posterforge-static-export">
+      <div class="posterforge-a0-canvas" data-orientation="${escapeAttribute(project.format?.orientation ?? "landscape")}">
       <article
         class="poster poster-${escapeAttribute(project.theme)} poster-layout-${escapeAttribute(layout.cssClass)}"
         style="--theme-primary: ${escapeAttribute(palette.colors.primary)}; --theme-accent: ${escapeAttribute(palette.colors.accent)}; --theme-bg: ${escapeAttribute(palette.colors.background)}; --theme-panel: ${escapeAttribute(palette.colors.panel)}; --theme-ink: ${escapeAttribute(palette.colors.ink)};"
@@ -138,6 +212,7 @@ svg.export-icon { width: 18px; height: 18px; }
           ${renderSourceCard(project)}
         </div>
       </article>
+      </div>
     </main>
   </body>
 </html>`;
