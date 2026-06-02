@@ -1,59 +1,159 @@
 # PosterForge
 
-PosterForge is a source-grounded poster generation workspace for academic and data science posters.
+PosterForge is a source-grounded academic and data science poster generation workspace.
 
-The core idea is:
+The core product direction is a schema-driven poster compiler, not "LLM directly to PPTX":
 
 ```text
 user prompt + sources
   -> poster project spec
+  -> source documents and evidence
   -> visual assets
   -> HTML preview
+  -> QA loop
   -> editable PPTX
   -> print PDF
+  -> project bundle
 ```
 
-The poster spec is the source of truth. PPTX, PDF, HTML, images, and trace logs are generated outputs.
+The `PosterProject` / `poster.json` spec is the source of truth. HTML, PPTX, PDF, PNG, images, traces, QA results, and bundles are generated outputs.
 
-## Current Prototype
-
-PosterForge now uses a Vite, React, and TypeScript app for the demo UI.
+## Commands
 
 ```bash
 npm install
 npm run dev
+npm run build
 ```
 
-Then open the local Vite URL shown in the terminal.
+`npm run dev` starts Vite on `0.0.0.0`.
 
-## What It Demonstrates
+## Current Stack
 
-- prompt-driven poster generation flow
-- trace events showing generation progress
-- theme and palette selection
-- NatWest palette scoped as an optional palette/theme
-- mock source modes for Confluence, GitLab, web, papers, and local files
-- typed poster project model
-- visual registry for data science poster elements
-- basic QA checks for source grounding and poster quality
-- HTML poster preview
+- Vite
+- React
+- TypeScript
+- lucide-react
+- npm
 
-## Planned Stack
+Python is intentionally not the app core. It can be added later with `uv` for data science helpers such as Pandas summaries, sklearn metrics, SHAP, notebook processing, or statistical analysis.
 
-- TypeScript and React for the main app.
-- PptxGenJS for editable PowerPoint export.
-- Playwright for PDF/PNG render checks.
-- Plotly, Mermaid, KaTeX, and Shiki for deterministic visuals.
-- GPT Image 2 for generated visual assets.
-- Python with `uv` later for data science helpers only where useful.
-- Kiro skill wrapper for agent orchestration and MCP source access.
+## Current Features
+
+- Prompt-driven poster generation flow.
+- Typed `PosterProject` model with metadata, sources, source documents, evidence, claim map, sections, visuals, assets, traces, QA results, and references.
+- Mock source package for Confluence, GitLab, research paper, and web-page style sources.
+- Evidence panel showing source summaries and claim-map links.
+- Theme and palette separation.
+- NatWest Group theme and palette scoped to explicit selection.
+- Typed layout templates:
+  - three-column academic
+  - results-first
+  - timeline/process
+  - dashboard poster
+  - comic-strip narrative
+  - case-study poster
+- Visual registry grouped by purpose:
+  - model performance
+  - explainability
+  - flow/process
+  - scientific/technical
+  - data quality
+  - other/generated assets
+- Lightweight deterministic renderers/placeholders for confusion matrix, Sankey-style flow, table, timeline, Gantt, metric card, Mermaid source, math source, code block, and generated asset slots.
+- Structured trace UI showing observable work, not hidden reasoning.
+- QA panel with actionable issues and a simple safe auto-fix for generated references.
+- Poster JSON import, export, and reset.
+- Export capability panel with JSON available and PPTX/PDF/PNG/bundle marked as planned.
+- HTML poster preview.
+
+## Source-Grounding Rules
+
+- Every factual claim should link to at least one source.
+- Every factual visual should link to source data, code, paper, project notes, or equivalent evidence.
+- Literature claims and project/user results should remain separate in the data model.
+- AI-generated images must not be used as factual evidence.
+- Generated assets must preserve prompt/model/theme/palette/source relationship metadata.
+
+## Project Structure
+
+```text
+src/
+  app/          app-level re-exports
+  components/   React UI panels
+  data/         sample PosterProject data
+  domain/       poster types, generator, evidence helpers, compatibility re-exports
+  exports/      export capability registry and JSON download helper
+  layouts/      typed layout template registry
+  qa/           QA rules and safe fixes
+  renderers/    deterministic visual renderers and placeholders
+  sources/      source connector interfaces and mock connectors
+  themes/       theme and palette definitions
+  visuals/      visual registry definitions
+```
+
+Supporting files:
+
+```text
+spec/poster.schema.json
+spec/example-poster.json
+docs/architecture.md
+```
+
+## Near-Term Roadmap
+
+1. Add stronger source connector behavior:
+   - mock source search UI
+   - source document inspector
+   - local file ingestion placeholder
+   - web URL ingestion placeholder
+
+2. Strengthen evidence extraction:
+   - evidence graph UI
+   - claim location by poster section/block
+   - separate project results from literature claims
+   - citation quality checks
+
+3. Improve deterministic renderers:
+   - Plotly charts
+   - Mermaid SVG rendering
+   - KaTeX or MathJax math rendering
+   - Shiki code highlighting
+   - richer table/timeline/Gantt renderers
+
+4. Strengthen QA:
+   - text overflow
+   - colour contrast
+   - print readability
+   - chart clipping
+   - QR scanability
+   - poster density
+   - visual hierarchy
+
+5. Add export implementations:
+   - PptxGenJS editable PPTX export
+   - Playwright PDF export
+   - Playwright PNG preview export
+   - project bundle manifest and ZIP output
+
+## Long-Term Roadmap
+
+- GPT Image 2 generated image assets for backgrounds, panels, section art, comic-strip frames, and atmosphere.
+- PptxGenJS editable PowerPoint compiler.
+- Playwright PDF/PNG render checks.
+- Confluence and GitLab source access through Kiro MCP.
+- Thin Kiro skill wrapper that calls the PosterForge engine.
+- Judge/improve mode later, including rubric scoring and improvement suggestions.
+- Presenter notes and 60-second pitch generation.
+- Online and physical poster session support.
+- Human judging support, with humans as final decision-makers.
 
 ## Design Principles
 
-- Keep `poster.json` as the editable source of truth.
-- Use deterministic renderers for factual visuals such as charts, tables, math, code, and diagrams.
-- Use AI image generation for atmosphere, illustration, backgrounds, and themed assets.
-- Preserve source metadata for every claim, chart, visual, and generated image.
-- Make generation observable through structured trace events.
-- Run a QA loop before export.
-- Treat NatWest as an optional theme or palette, not a global visual requirement.
+- Keep TypeScript/React central for the main app, UI, poster engine, visual registry, trace UI, and orchestration.
+- Keep `poster.json` editable and importable.
+- Use deterministic renderers for factual tables, equations, charts, code, diagrams, and metrics.
+- Use generated images only for non-factual assets and atmosphere.
+- Preserve source and asset metadata.
+- Show structured traces for observable work.
+- Keep NatWest colours isolated to the NatWest theme/palette unless explicitly selected.
