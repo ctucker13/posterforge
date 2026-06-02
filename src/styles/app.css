@@ -464,6 +464,7 @@ textarea {
 }
 
 .project-editor,
+.source-search-panel,
 .evidence-panel,
 .qa-panel,
 .trace-panel,
@@ -473,6 +474,7 @@ textarea {
 }
 
 .project-editor-body,
+.source-search-body,
 .evidence-body,
 .qa-panel .qa-overview,
 .registry-groups {
@@ -480,9 +482,144 @@ textarea {
 }
 
 .project-editor-body,
+.source-search-body,
 .evidence-body {
   display: grid;
   gap: 14px;
+}
+
+.source-search-panel {
+  overflow: hidden;
+}
+
+.source-search-body {
+  max-height: 540px;
+  overflow: auto;
+}
+
+.source-search-controls {
+  display: grid;
+  gap: 10px;
+}
+
+.source-search-controls button,
+.source-document-header button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  border: 1px solid #cfd7e2;
+  border-radius: 6px;
+  color: #0f766e;
+  font-weight: 800;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.source-search-status {
+  border-radius: 6px;
+  padding: 8px 9px;
+  color: #526071;
+  font-size: 12px;
+  font-weight: 800;
+  background: #f6f8fa;
+}
+
+.source-results {
+  display: grid;
+  gap: 8px;
+}
+
+.source-results button {
+  display: grid;
+  gap: 5px;
+  border: 1px solid #e4e9ef;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: left;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.source-results button:hover {
+  border-color: #0f766e;
+  background: #f7fffb;
+}
+
+.source-results span,
+.source-document-header span {
+  color: #667085;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.source-results strong {
+  color: #101828;
+  font-size: 13px;
+}
+
+.source-results p {
+  margin: 0;
+  color: #526071;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.source-document-viewer {
+  display: grid;
+  gap: 10px;
+  border: 1px solid #d8dee6;
+  border-radius: 8px;
+  padding: 12px;
+  background: #ffffff;
+}
+
+.source-document-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: start;
+}
+
+.source-document-header h3 {
+  margin: 3px 0 0;
+  color: #101828;
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.source-document-viewer p {
+  margin: 0;
+  color: #526071;
+  font-size: 13px;
+  line-height: 1.38;
+}
+
+.source-document-viewer pre {
+  overflow: auto;
+  max-height: 150px;
+  margin: 0;
+  border-radius: 6px;
+  padding: 10px;
+  color: #344054;
+  font-size: 12px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  background: #f8fafc;
+}
+
+.source-document-empty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 7px;
+  padding: 10px;
+  color: #526071;
+  font-size: 13px;
+  font-weight: 800;
+  background: #f6f8fa;
 }
 
 .layout-note {

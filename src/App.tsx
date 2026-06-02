@@ -6,6 +6,7 @@ import { JsonProjectControls } from "./components/JsonProjectControls";
 import { PosterPreview } from "./components/PosterPreview";
 import { ProjectEditor } from "./components/ProjectEditor";
 import { QaPanel } from "./components/QaPanel";
+import { SourceSearchPanel } from "./components/SourceSearchPanel";
 import { TracePanel } from "./components/TracePanel";
 import { VisualRegistryPanel } from "./components/VisualRegistryPanel";
 import { generatePoster, generationTrace, type GenerationOptions } from "./domain/generator";
@@ -221,6 +222,14 @@ export default function App() {
 
       <section className="inspector-column" aria-label="Poster inspectors">
         <ProjectEditor
+          poster={poster}
+          onPosterChange={(nextPoster) => {
+            const nextQaIssues = runQa(nextPoster);
+            setPoster({ ...nextPoster, qaResults: nextQaIssues });
+            setQaIssues(nextQaIssues);
+          }}
+        />
+        <SourceSearchPanel
           poster={poster}
           onPosterChange={(nextPoster) => {
             const nextQaIssues = runQa(nextPoster);

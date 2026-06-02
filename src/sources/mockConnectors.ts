@@ -20,6 +20,13 @@ export interface MockSourcePackage {
   evidence: EvidenceItem[];
 }
 
+export interface MockSourceArtifacts {
+  source: PosterSource;
+  sourceDocument: SourceDocument;
+  sourceSummary: SourceSummary;
+  evidence: EvidenceItem[];
+}
+
 const mockDocumentSeeds: MockDocumentSeed[] = [
   {
     source: {
@@ -212,6 +219,30 @@ export function buildMockSourcePackage(sourceMode: "mock" | "web" | "local"): Mo
       figures: seed.metadata.figures,
     })),
     evidence,
+  };
+}
+
+export function getMockSourceArtifacts(sourceId: string): MockSourceArtifacts | undefined {
+  const seed = mockDocumentSeeds.find((candidate) => candidate.source.id === sourceId);
+  if (!seed) {
+    return undefined;
+  }
+
+  return {
+    source: seed.source,
+    sourceDocument: toSourceDocument(seed),
+    sourceSummary: {
+      source_id: seed.source.id,
+      summary: seed.metadata.summary,
+      methods: seed.metadata.methods,
+      metrics: seed.metadata.metrics,
+      figures: seed.metadata.figures,
+    },
+    evidence: seed.metadata.evidence.map((item, index) => ({
+      ...item,
+      id: `ev_${seed.source.id.replace(/^src_/, "")}_${index + 1}`,
+      source_id: seed.source.id,
+    })),
   };
 }
 
