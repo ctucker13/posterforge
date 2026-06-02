@@ -7,15 +7,27 @@ const factualVisualTypes = new Set([
   "roc_curve",
   "precision_recall_curve",
   "calibration_plot",
+  "lift_gains_chart",
   "feature_importance",
   "shap_summary",
+  "shap_waterfall",
+  "pdp_ice",
   "sankey",
+  "alluvial",
+  "funnel",
   "timeline",
   "gantt",
   "mermaid_flow",
   "math",
   "code_block",
+  "metric_card",
+  "missingness_matrix",
+  "null_heatmap",
+  "schema_drift",
+  "outlier_plot",
 ]);
+
+const generatedVisualTypes = new Set(["ai_image", "generated_background", "generated_comic_panel"]);
 
 export function runQa(poster: PosterProject): QaIssue[] {
   const issues: QaIssue[] = [];
@@ -108,7 +120,7 @@ export function runQa(poster: PosterProject): QaIssue[] {
       }
     }
 
-    if (visual.type === "ai_image" && sourceIdsForVisual.length > 0) {
+    if (generatedVisualTypes.has(visual.type) && sourceIdsForVisual.length > 0) {
       issues.push({
         id: "ai_images_not_factual",
         severity: "high",
@@ -120,7 +132,7 @@ export function runQa(poster: PosterProject): QaIssue[] {
 
     const width = Number(visual.asset?.width_px);
     const height = Number(visual.asset?.height_px);
-    if (visual.type === "ai_image" && Number.isFinite(width) && Number.isFinite(height) && (width < 1600 || height < 1000)) {
+    if (generatedVisualTypes.has(visual.type) && Number.isFinite(width) && Number.isFinite(height) && (width < 1600 || height < 1000)) {
       issues.push({
         id: "low_image_resolution",
         severity: "medium",
@@ -130,7 +142,7 @@ export function runQa(poster: PosterProject): QaIssue[] {
       });
     }
 
-    if (["sankey", "timeline", "gantt", "plotly_generic"].includes(visual.type)) {
+    if (["sankey", "alluvial", "funnel", "timeline", "gantt", "plotly_generic"].includes(visual.type)) {
       const hasLabelPlan = Boolean(visual.options?.label_strategy ?? visual.options?.labelStrategy);
       if (!hasLabelPlan) {
         issues.push({
