@@ -10,6 +10,7 @@
     "test:run": "vitest run",
     "image:plan": "node scripts/generate-image-asset.mjs --dry-run",
     "image:generate": "node scripts/generate-image-asset.mjs",
+    "export:pptx:html": "node scripts/export-html-pptx.mjs",
     "preview": "vite preview --host 127.0.0.1",
     "dev:local": "vite --host 127.0.0.1"
   },
@@ -24,6 +25,7 @@
   "devDependencies": {
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
+    "playwright": "^1.60.0",
     "typescript": "^5.6.3",
     "vitest": "^4.1.8"
   }

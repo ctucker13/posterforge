@@ -277,10 +277,17 @@ Current:
 - Current lightweight visual types export with native PowerPoint text/shapes for confusion matrix, metric card, table, Sankey-style flow, timeline, Gantt, Mermaid source, math source, and code source.
 - Generated image assets with `PosterVisual.asset.url` are embedded as images when the browser can fetch the URL.
 - PptxGenJS is loaded by dynamic import so the main app bundle does not pay the compiler cost until the user exports PPTX.
+- `scripts/export-html-pptx.mjs` provides the higher-fidelity path: render poster JSON to static HTML, capture the HTML poster with Playwright, write a PNG, write DOM measurements, and place the captured render into a custom-aspect PPTX slide.
+
+Export modes:
+
+- editable native PPTX: more editable, lower visual fidelity, available from the browser export panel
+- high-fidelity HTML PPTX: closer to the HTML preview, less editable, available from `npm run export:pptx:html`
+- future hybrid editable PPTX: use Playwright measurements to place editable text and screenshot fallbacks for complex regions
 
 Planned:
 
-- improve visual fidelity and layout matching between HTML preview and PPTX export
+- build the hybrid editable PPTX compiler from Playwright DOM measurements
 - add SVG/PNG fallbacks for charts, Mermaid, math, and code
 - add print-size layout constraints instead of the current scaled one-slide wide canvas
 - add export QA for text overflow, clipping, and missing image assets

@@ -26,11 +26,15 @@ npm run dev
 npm run build
 npm run image:plan -- --visual vis_generated_panel
 OPENAI_API_KEY=... npm run image:generate -- --visual vis_generated_panel --model gpt-image-1.5
+npx playwright install chromium
+npm run export:pptx:html -- --poster public/generated-assets/poster_demo_fraud_model.generated.json
 ```
 
 `npm run dev` starts Vite on `0.0.0.0`.
 
 `npm run image:plan` writes prompt metadata without calling OpenAI. `npm run image:generate` calls the OpenAI Images API from Node, saves the PNG and metadata under `public/generated-assets/`, and writes an updated importable poster JSON. The sample spec keeps image asset model names configurable; the current OpenAI image-generation docs list `gpt-image-1.5`, `gpt-image-1`, and `gpt-image-1-mini`, so pass `--model gpt-image-1.5` if a future placeholder model name is rejected.
+
+`npm run export:pptx:html` renders poster JSON to static HTML, captures that HTML with Playwright, and writes a high-fidelity PPTX using the captured render. Run `npx playwright install chromium` once on a fresh machine before using this command. This is the recommended visual-fidelity path when the PPTX needs to match the HTML preview closely.
 
 ## Current Stack
 
@@ -76,6 +80,7 @@ Python is intentionally not the app core. It can be added later with `uv` for da
 - Export job/artifact model with centralized readiness checks.
 - Export capability panel with JSON, editable PPTX, and project bundle manifest available; PDF/PNG marked as planned.
 - First-pass PptxGenJS compiler for one-slide editable poster export with native text, claim/source cards, lightweight native visual renderers, and generated image embedding when asset URLs are available.
+- Playwright-backed high-fidelity HTML render to PPTX export script with PNG capture and DOM measurement output.
 - HTML preview artifact descriptor for future Playwright PDF/PNG export.
 - HTML poster preview.
 
