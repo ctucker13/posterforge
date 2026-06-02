@@ -42,8 +42,10 @@ Python is intentionally not the app core. It can be added later with `uv` for da
 
 - Prompt-driven poster generation flow.
 - Typed `PosterProject` model with metadata, sources, source documents, evidence, claim map, sections, visuals, assets, traces, QA results, and references.
+- Runtime `PosterProject` validation for JSON import, including nested shape and cross-reference checks.
 - Mock source package for Confluence, GitLab, research paper, and web-page style sources.
-- Evidence panel showing source summaries and claim-map links.
+- Mock source connector capability metadata and a clear acquisition/interpretation boundary.
+- Evidence panel showing source summaries, source type/trust badges, claim confidence, poster locations, and linked evidence snippets.
 - Theme and palette separation.
 - NatWest Group theme and palette scoped to explicit selection.
 - Typed layout templates:
@@ -60,11 +62,13 @@ Python is intentionally not the app core. It can be added later with `uv` for da
   - scientific/technical
   - data quality
   - other/generated assets
+- Typed visual data parsers for deterministic renderer inputs.
 - Lightweight deterministic renderers/placeholders for confusion matrix, Sankey-style flow, table, timeline, Gantt, metric card, Mermaid source, math source, code block, and generated asset slots.
+- Derived renderer summaries for confusion matrix metrics, Sankey flow shares, and Gantt timeline segments.
 - Structured trace UI showing observable work, not hidden reasoning.
-- QA panel with actionable issues and a simple safe auto-fix for generated references.
+- QA panel with actionable issues, renderer data-shape checks, preview density risks, and a simple safe auto-fix for generated references.
 - Poster JSON import, export, and reset.
-- Export capability panel with JSON available and PPTX/PDF/PNG/bundle marked as planned.
+- Export capability panel with JSON and project bundle manifest available; PPTX/PDF/PNG marked as planned.
 - HTML poster preview.
 
 ## Source-Grounding Rules
@@ -103,14 +107,12 @@ docs/architecture.md
 ## Near-Term Roadmap
 
 1. Add stronger source connector behavior:
-   - mock source search UI
    - source document inspector
    - local file ingestion placeholder
    - web URL ingestion placeholder
 
 2. Strengthen evidence extraction:
    - evidence graph UI
-   - claim location by poster section/block
    - separate project results from literature claims
    - citation quality checks
 
@@ -122,7 +124,6 @@ docs/architecture.md
    - richer table/timeline/Gantt renderers
 
 4. Strengthen QA:
-   - text overflow
    - colour contrast
    - print readability
    - chart clipping
@@ -134,7 +135,7 @@ docs/architecture.md
    - PptxGenJS editable PPTX export
    - Playwright PDF export
    - Playwright PNG preview export
-   - project bundle manifest and ZIP output
+   - project bundle ZIP output
 
 ## Long-Term Roadmap
 

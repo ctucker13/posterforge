@@ -47,7 +47,7 @@ The `PosterProject` object is the source of truth. Outputs are derived artifacts
 - `PosterTraceEvent`
 - `PosterQaIssue`
 
-`spec/poster.schema.json` mirrors the current JSON shape for import/export.
+`spec/poster.schema.json` mirrors the current JSON shape for import/export. Runtime import validation lives in `src/domain/validation.ts` and checks both nested object shape and important cross-references such as claim, source, evidence, section, and visual IDs.
 
 ## Runtime Module Boundaries
 
@@ -99,15 +99,16 @@ The source layer separates acquisition from interpretation.
 Current:
 
 - connector interface
+- connector kind and acquisition capability metadata
 - mock Confluence source
 - mock GitLab sources
 - mock research paper source
 - mock web page source
 - generated source package for demo poster generation
+- mock source interpretation helper that converts fetched documents into summaries and evidence
 
 Planned:
 
-- source search UI
 - source document inspector
 - local file ingestion
 - web URL ingestion
@@ -122,12 +123,11 @@ Current:
 - deterministic mock evidence extraction from source seed data
 - source summaries
 - claim map entries linking claims to source IDs, evidence IDs, and section IDs
-- Evidence panel in the UI
+- Evidence panel showing source summaries, source type/trust badges, claim confidence, poster locations, and linked evidence snippets
 
 Planned:
 
 - evidence graph UI
-- claim-to-block location tracking
 - literature claim vs project result separation
 - citation quality checks
 - source confidence and source type scoring
@@ -155,6 +155,8 @@ Current lightweight renderers/placeholders:
 - math source placeholder
 - code block placeholder
 - generated asset placeholder
+- typed renderer data parsers in `src/visuals/data.ts`
+- derived renderer calculations for confusion matrix metrics, Sankey link shares, and Gantt layout segments
 
 Planned deterministic renderers:
 
@@ -235,13 +237,16 @@ Current QA checks:
 - text density risk
 - low generated image resolution risk
 - chart label readability strategy risk
+- renderer data shape checks for supported deterministic visuals
+- long visual label overflow risk
+- section density risk
+- table density risk
 - missing references
 - export completeness
 - explicit NatWest palette override notice
 
 Planned QA checks:
 
-- text overflow
 - colour contrast
 - print readability
 - chart clipping
@@ -256,8 +261,11 @@ Planned QA checks:
 Current:
 
 - browser JSON export for the current `PosterProject`
+- browser project bundle manifest export
 - export capability registry
-- UI showing PPTX/PDF/PNG/bundle as planned outputs with requirements
+- UI showing PPTX/PDF/PNG as planned outputs with requirements
+
+The project bundle manifest is a JSON placeholder for the future ZIP bundle. It records expected entries for poster spec, source documents, summaries, evidence, claim map, assets, traces, QA, references, and planned export outputs.
 
 Planned:
 

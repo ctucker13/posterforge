@@ -1,5 +1,5 @@
 import type { EvidenceItem, PosterProject, PosterSource, SourceDocument, SourceSummary } from "../domain/poster";
-import type { SourceConnector, SourceRef, SourceSearchResult } from "./index";
+import type { SourceConnector, SourceConnectorKind, SourceInterpretation, SourceRef, SourceSearchResult } from "./index";
 
 interface MockDocumentSeed {
   source: PosterSource;
@@ -20,12 +20,7 @@ export interface MockSourcePackage {
   evidence: EvidenceItem[];
 }
 
-export interface MockSourceArtifacts {
-  source: PosterSource;
-  sourceDocument: SourceDocument;
-  sourceSummary: SourceSummary;
-  evidence: EvidenceItem[];
-}
+export type MockSourceArtifacts = SourceInterpretation;
 
 const mockDocumentSeeds: MockDocumentSeed[] = [
   {
@@ -184,10 +179,10 @@ const connectorDocumentIds: Record<string, string[]> = {
 };
 
 export const mockSourceConnectors: SourceConnector[] = [
-  createMockConnector("mock_confluence", "Mock Confluence"),
-  createMockConnector("mock_gitlab", "Mock GitLab"),
-  createMockConnector("mock_research_paper", "Mock Research Paper"),
-  createMockConnector("mock_web", "Mock Web Page"),
+  createMockConnector("mock_confluence", "Mock Confluence", "confluence"),
+  createMockConnector("mock_gitlab", "Mock GitLab", "gitlab"),
+  createMockConnector("mock_research_paper", "Mock Research Paper", "research_paper"),
+  createMockConnector("mock_web", "Mock Web Page", "web"),
 ];
 
 export function buildMockSourcePackage(sourceMode: "mock" | "web" | "local"): MockSourcePackage {
@@ -228,28 +223,23 @@ export function getMockSourceArtifacts(sourceId: string): MockSourceArtifacts | 
     return undefined;
   }
 
-  return {
-    source: seed.source,
-    sourceDocument: toSourceDocument(seed),
-    sourceSummary: {
-      source_id: seed.source.id,
-      summary: seed.metadata.summary,
-      methods: seed.metadata.methods,
-      metrics: seed.metadata.metrics,
-      figures: seed.metadata.figures,
-    },
-    evidence: seed.metadata.evidence.map((item, index) => ({
-      ...item,
-      id: `ev_${seed.source.id.replace(/^src_/, "")}_${index + 1}`,
-      source_id: seed.source.id,
-    })),
-  };
+  return interpretMockSeed(seed);
 }
 
-function createMockConnector(id: string, name: string): SourceConnector {
+export function interpretMockSourceDocument(document: SourceDocument): SourceInterpretation | undefined {
+  const seed = mockDocumentSeeds.find((candidate) => candidate.source.id === document.source.id);
+  return seed ? interpretMockSeed(seed) : undefined;
+}
+
+function createMockConnector(id: string, name: string, kind: SourceConnectorKind): SourceConnector {
   return {
     id,
     name,
+    kind,
+    capabilities: [
+      { kind, acquisition: "search", status: "available" },
+      { kind, acquisition: "fetch", status: "available" },
+    ],
     async search(query: string) {
       const tokens = query.toLowerCase().split(/\W+/).filter(Boolean);
       return getConnectorSeeds(id)
@@ -272,6 +262,25 @@ function createMockConnector(id: string, name: string): SourceConnector {
 
       return toSourceDocument(seed);
     },
+  };
+}
+
+function interpretMockSeed(seed: MockDocumentSeed): SourceInterpretation {
+  return {
+    source: seed.source,
+    sourceDocument: toSourceDocument(seed),
+    sourceSummary: {
+      source_id: seed.source.id,
+      summary: seed.metadata.summary,
+      methods: seed.metadata.methods,
+      metrics: seed.metadata.metrics,
+      figures: seed.metadata.figures,
+    },
+    evidence: seed.metadata.evidence.map((item, index) => ({
+      ...item,
+      id: `ev_${seed.source.id.replace(/^src_/, "")}_${index + 1}`,
+      source_id: seed.source.id,
+    })),
   };
 }
 

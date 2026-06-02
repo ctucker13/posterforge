@@ -1,4 +1,14 @@
 import type { PosterAsset, PosterProject, QaIssue } from "../domain/poster";
+import {
+  parseCodeBlockData,
+  parseConfusionMatrixData,
+  parseGanttData,
+  parseMetricCardData,
+  parseSankeyData,
+  parseSourceTextData,
+  parseTableData,
+  parseTimelineData,
+} from "../visuals/data";
 
 const factualVisualTypes = new Set([
   "table",
@@ -29,6 +39,7 @@ const factualVisualTypes = new Set([
 
 const generatedVisualTypes = new Set(["ai_image", "generated_background", "generated_comic_panel"]);
 const generatedAssetTypes = new Set<PosterAsset["type"]>(["ai_image", "generated_background", "generated_panel"]);
+const supportedRendererTypes = new Set(["confusion_matrix", "table", "sankey", "timeline", "gantt", "mermaid_flow", "math", "code_block", "metric_card"]);
 
 function hasText(value: string | undefined): boolean {
   return Boolean(value?.trim());
@@ -213,6 +224,39 @@ export function runQa(poster: PosterProject): QaIssue[] {
         });
       }
     }
+
+    const rendererValidation = validateRendererData(visual);
+    if (rendererValidation) {
+      issues.push({
+        id: "renderer_data_shape",
+        severity: "medium",
+        location: `visuals.${visual.id}.data`,
+        message: "Visual data does not match its deterministic renderer contract.",
+        suggestedFix: rendererValidation,
+      });
+    }
+
+    const longLabel = findLongVisualLabel(visual);
+    if (longLabel) {
+      issues.push({
+        id: "visual_label_overflow_risk",
+        severity: "low",
+        location: `visuals.${visual.id}`,
+        message: "Visual contains a long label that may overflow in preview or export.",
+        suggestedFix: `Shorten or wrap '${longLabel}' before PDF/PPTX export.`,
+      });
+    }
+
+    const tableSize = getTableSize(visual);
+    if (tableSize && (tableSize.columns > 5 || tableSize.rows > 8)) {
+      issues.push({
+        id: "table_density_risk",
+        severity: "low",
+        location: `visuals.${visual.id}`,
+        message: "Table may be too dense for poster preview or print export.",
+        suggestedFix: "Reduce columns/rows, split into multiple tables, or convert to a chart summary.",
+      });
+    }
   }
 
   for (const { asset, location } of collectGeneratedAssets(poster)) {
@@ -238,6 +282,16 @@ export function runQa(poster: PosterProject): QaIssue[] {
   }
 
   for (const section of poster.sections) {
+    if (section.blocks.length > 4) {
+      issues.push({
+        id: "section_density_risk",
+        severity: "low",
+        location: `sections.${section.id}`,
+        message: "Section contains many blocks for a single poster panel.",
+        suggestedFix: "Split this section or move secondary content into a supporting panel.",
+      });
+    }
+
     for (const [index, block] of section.blocks.entries()) {
       if (block.type === "text" && block.text.length > 420) {
         issues.push({
@@ -377,6 +431,85 @@ export function runQa(poster: PosterProject): QaIssue[] {
   }
 
   return issues;
+}
+
+function validateRendererData(visual: PosterProject["visuals"][number]): string | undefined {
+  if (!supportedRendererTypes.has(visual.type)) {
+    return undefined;
+  }
+
+  const result =
+    visual.type === "confusion_matrix"
+      ? parseConfusionMatrixData(visual.data)
+      : visual.type === "table"
+        ? parseTableData(visual.data)
+        : visual.type === "sankey"
+          ? parseSankeyData(visual.data)
+          : visual.type === "timeline"
+            ? parseTimelineData(visual.data)
+            : visual.type === "gantt"
+              ? parseGanttData(visual.data)
+              : visual.type === "mermaid_flow"
+                ? parseSourceTextData(visual.data, "mermaid_flow")
+                : visual.type === "math"
+                  ? parseSourceTextData(visual.data, "math")
+                  : visual.type === "code_block"
+                    ? parseCodeBlockData(visual.data)
+                    : parseMetricCardData(visual.data);
+
+  return result.ok ? undefined : result.message;
+}
+
+function findLongVisualLabel(visual: PosterProject["visuals"][number]): string | undefined {
+  const labels: string[] = [];
+  const data = visual.data;
+
+  if (!data || typeof data !== "object" || Array.isArray(data)) {
+    return undefined;
+  }
+
+  if (Array.isArray(data.labels)) {
+    labels.push(...data.labels.filter((label): label is string => typeof label === "string"));
+  }
+
+  if (Array.isArray(data.columns)) {
+    labels.push(...data.columns.filter((label): label is string => typeof label === "string"));
+  }
+
+  if (Array.isArray(data.nodes)) {
+    labels.push(...data.nodes.filter((label): label is string => typeof label === "string"));
+  }
+
+  for (const collectionName of ["links", "events", "tasks"] as const) {
+    const collection = data[collectionName];
+    if (!Array.isArray(collection)) {
+      continue;
+    }
+
+    for (const item of collection) {
+      if (!item || typeof item !== "object" || Array.isArray(item)) {
+        continue;
+      }
+
+      for (const key of ["source", "target", "label"] as const) {
+        const value = item[key];
+        if (typeof value === "string") {
+          labels.push(value);
+        }
+      }
+    }
+  }
+
+  return labels.find((label) => label.length > 42);
+}
+
+function getTableSize(visual: PosterProject["visuals"][number]): { columns: number; rows: number } | undefined {
+  if (visual.type !== "table") {
+    return undefined;
+  }
+
+  const parsed = parseTableData(visual.data);
+  return parsed.ok ? { columns: parsed.data.columns.length, rows: parsed.data.rows.length } : undefined;
 }
 
 export function applyQaFix(poster: PosterProject, fixId: NonNullable<QaIssue["fixId"]>): PosterProject {

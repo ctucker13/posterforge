@@ -164,4 +164,73 @@ describe("runQa", () => {
     expect(exportIssues.map((issue) => issue.location)).toContain("exports.poster_json");
     expect(exportIssues.map((issue) => issue.location)).toContain("exports.project_bundle");
   });
+
+  it("flags visual renderer data shape problems", () => {
+    const poster: PosterProject = {
+      ...examplePoster,
+      visuals: [
+        {
+          id: "bad_matrix",
+          type: "confusion_matrix",
+          title: "Bad matrix",
+          source_ids: ["src_gitlab_001"],
+          data: { labels: ["A", "B"], matrix: [[1, 2, 3]] },
+        },
+      ],
+      sections: [
+        {
+          id: "results",
+          type: "results",
+          title: "Results",
+          blocks: [{ type: "visual_ref", visual_id: "bad_matrix" }],
+        },
+      ],
+    };
+
+    expect(runQa(poster).map((issue) => issue.id)).toContain("renderer_data_shape");
+  });
+
+  it("flags visual label and section density risks", () => {
+    const poster: PosterProject = {
+      ...examplePoster,
+      visuals: [
+        {
+          id: "long_timeline",
+          type: "timeline",
+          title: "Long timeline",
+          source_ids: ["src_confluence_001"],
+          data: {
+            events: [
+              {
+                date: "Week 1",
+                label: "A very long milestone label that will likely overflow a compact poster card",
+              },
+            ],
+          },
+          options: {
+            labelStrategy: "wrap long labels",
+          },
+        },
+      ],
+      sections: [
+        {
+          id: "results",
+          type: "results",
+          title: "Results",
+          blocks: [
+            { type: "visual_ref", visual_id: "long_timeline" },
+            { type: "visual_ref", visual_id: "long_timeline" },
+            { type: "visual_ref", visual_id: "long_timeline" },
+            { type: "visual_ref", visual_id: "long_timeline" },
+            { type: "visual_ref", visual_id: "long_timeline" },
+          ],
+        },
+      ],
+    };
+
+    const issueIds = runQa(poster).map((issue) => issue.id);
+
+    expect(issueIds).toContain("visual_label_overflow_risk");
+    expect(issueIds).toContain("section_density_risk");
+  });
 });

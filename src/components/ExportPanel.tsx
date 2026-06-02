@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { CheckCircle2, Clock3, Download, FileJson, FileText, Image, PackageCheck, Presentation } from "lucide-react";
 import type { PosterProject } from "../domain/poster";
-import { downloadPosterJson, exportCapabilities, type ExportTarget } from "../exports";
+import { downloadPosterJson, downloadProjectBundleManifest, exportCapabilities, type ExportTarget } from "../exports";
 
 interface ExportPanelProps {
   poster: PosterProject;
@@ -14,6 +14,12 @@ export function ExportPanel({ poster }: ExportPanelProps) {
     if (target === "poster_json") {
       downloadPosterJson(poster);
       setMessage("Exported poster JSON.");
+      return;
+    }
+
+    if (target === "project_bundle") {
+      downloadProjectBundleManifest(poster);
+      setMessage("Exported project bundle manifest.");
     }
   }
 

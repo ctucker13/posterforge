@@ -1,4 +1,12 @@
-import type { PosterSource, SourceDocument } from "../domain/poster";
+import type { EvidenceItem, PosterSource, SourceDocument, SourceSummary } from "../domain/poster";
+
+export type SourceConnectorKind = "mock" | "local_file" | "web" | "research_paper" | "confluence" | "gitlab";
+
+export interface SourceConnectorCapability {
+  kind: SourceConnectorKind;
+  acquisition: "search" | "fetch" | "upload" | "url";
+  status: "available" | "planned";
+}
 
 export interface SourceRef {
   connectorId: string;
@@ -15,6 +23,15 @@ export interface SourceSearchResult {
 export interface SourceConnector {
   id: string;
   name: string;
+  kind: SourceConnectorKind;
+  capabilities: SourceConnectorCapability[];
   search(query: string): Promise<SourceSearchResult[]>;
   fetch(ref: SourceRef): Promise<SourceDocument>;
+}
+
+export interface SourceInterpretation {
+  source: PosterSource;
+  sourceDocument: SourceDocument;
+  sourceSummary: SourceSummary;
+  evidence: EvidenceItem[];
 }
