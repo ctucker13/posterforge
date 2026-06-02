@@ -27,23 +27,34 @@ if (dryRun) {
   process.exit(0);
 }
 
-const image = await generateImage(request, process.env.OPENAI_API_KEY);
-await writeFile(request.outputPath, image.bytes);
+try {
+  const image = await generateImage(request, process.env.OPENAI_API_KEY);
+  await writeFile(request.outputPath, image.bytes);
 
-const metadata = buildMetadata(request, {
-  status: "complete",
-  revisedPrompt: image.revisedPrompt,
-});
-await writeJson(request.metadataPath, metadata);
+  const metadata = buildMetadata(request, {
+    status: "complete",
+    revisedPrompt: image.revisedPrompt,
+  });
+  await writeJson(request.metadataPath, metadata);
 
-const updatedPoster = attachGeneratedAsset(poster, candidate, metadata);
-const posterOutputPath = path.join(outDir, `${poster.id ?? "poster"}.generated.json`);
-await writeJson(posterOutputPath, updatedPoster);
+  const updatedPoster = attachGeneratedAsset(poster, candidate, metadata);
+  const posterOutputPath = path.join(outDir, `${poster.id ?? "poster"}.generated.json`);
+  await writeJson(posterOutputPath, updatedPoster);
 
-console.log(`Generated ${request.title}`);
-console.log(`Image: ${request.outputPath}`);
-console.log(`Metadata: ${request.metadataPath}`);
-console.log(`Updated poster JSON: ${posterOutputPath}`);
+  console.log(`Generated ${request.title}`);
+  console.log(`Image: ${request.outputPath}`);
+  console.log(`Metadata: ${request.metadataPath}`);
+  console.log(`Updated poster JSON: ${posterOutputPath}`);
+} catch (error) {
+  const metadata = buildMetadata(request, {
+    status: "failed",
+    note: formatGenerationError(error),
+    error: normalizeGenerationError(error),
+  });
+  await writeJson(request.metadataPath, metadata);
+  printFailure(request, metadata);
+  process.exit(1);
+}
 
 function parseArgs(argv) {
   const parsed = {};
@@ -187,7 +198,7 @@ async function generateImage(request, apiKey) {
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`OpenAI image generation failed (${response.status}): ${errorText}`);
+    throw new OpenAiImageError(response.status, errorText);
   }
 
   const payload = await response.json();
@@ -235,6 +246,7 @@ function buildMetadata(request, options) {
     publicUrl: request.publicUrl,
     status: options.status,
     note: options.note,
+    error: options.error,
     generatedAt: new Date().toISOString(),
     revisedPrompt: options.revisedPrompt,
   };
@@ -290,4 +302,67 @@ function printPlan(request, metadata) {
   console.log(request.prompt);
   console.log("");
   console.log("Run with OPENAI_API_KEY set to generate the PNG.");
+}
+
+class OpenAiImageError extends Error {
+  constructor(status, bodyText) {
+    const parsed = parseErrorBody(bodyText);
+    const message = parsed?.error?.message ?? bodyText;
+    super(`OpenAI image generation failed (${status}): ${message}`);
+    this.name = "OpenAiImageError";
+    this.status = status;
+    this.body = parsed ?? bodyText;
+  }
+}
+
+function parseErrorBody(bodyText) {
+  try {
+    return JSON.parse(bodyText);
+  } catch {
+    return undefined;
+  }
+}
+
+function normalizeGenerationError(error) {
+  if (error instanceof OpenAiImageError) {
+    return {
+      provider: "openai",
+      status: error.status,
+      type: error.body?.error?.type,
+      code: error.body?.error?.code,
+      message: error.body?.error?.message ?? error.message,
+    };
+  }
+
+  return {
+    message: error instanceof Error ? error.message : String(error),
+  };
+}
+
+function formatGenerationError(error) {
+  const normalized = normalizeGenerationError(error);
+  if (normalized.code === "billing_hard_limit_reached" || normalized.type === "billing_limit_user_error") {
+    return "OpenAI rejected the request because the account billing hard limit has been reached. Increase or reset the project/account billing limit, then rerun the same command.";
+  }
+
+  if (normalized.status === 401) {
+    return "OpenAI rejected the request because the API key is missing, invalid, or not authorized for this project.";
+  }
+
+  if (normalized.status === 429) {
+    return "OpenAI rate limits were reached. Wait and rerun the command, or lower request volume.";
+  }
+
+  if (normalized.status === 400 && normalized.message?.includes("model")) {
+    return "OpenAI rejected the request parameters. Check the model name and size, or pass a supported model with --model.";
+  }
+
+  return normalized.message ?? "Image generation failed.";
+}
+
+function printFailure(request, metadata) {
+  console.error(`Image generation failed for ${request.title}`);
+  console.error(`Status: ${metadata.status}`);
+  console.error(`Reason: ${metadata.note}`);
+  console.error(`Metadata: ${request.metadataPath}`);
 }
