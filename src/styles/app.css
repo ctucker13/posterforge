@@ -1015,6 +1015,72 @@ textarea {
   min-height: 680px;
 }
 
+.preview-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid #e4e9ef;
+  padding: 10px 14px;
+  background: #f8fafc;
+}
+
+.preview-toolbar button {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #d8dee6;
+  border-radius: 6px;
+  color: #344054;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.preview-toolbar button:hover {
+  border-color: #98a2b3;
+  color: #101828;
+}
+
+.preview-toolbar strong {
+  min-width: 48px;
+  color: #101828;
+  font-size: 12px;
+  text-align: center;
+}
+
+.preview-toolbar span {
+  margin-left: auto;
+  color: #667085;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.preview-viewport {
+  overflow: auto;
+  flex: 1;
+  min-height: 0;
+  padding: 18px;
+  background:
+    linear-gradient(90deg, rgba(16, 24, 40, 0.04) 1px, transparent 1px),
+    linear-gradient(rgba(16, 24, 40, 0.04) 1px, transparent 1px),
+    #e6ebf1;
+  background-size: 24px 24px;
+}
+
+.a0-preview-stage {
+  position: relative;
+}
+
+.a0-preview-canvas {
+  position: relative;
+  overflow: hidden;
+  transform-origin: top left;
+  border: 1px solid #98a2b3;
+  background: color-mix(in srgb, var(--theme-primary), white 92%);
+  box-shadow: 0 22px 60px rgba(16, 24, 40, 0.22);
+}
+
 .poster {
   --theme-primary: #17324d;
   --theme-accent: #2176ae;
@@ -1026,6 +1092,17 @@ textarea {
   padding: 22px;
   color: var(--theme-ink);
   background: color-mix(in srgb, var(--theme-primary), white 92%);
+}
+
+.a0-preview-canvas .poster-output-frame {
+  position: absolute;
+  top: var(--poster-top);
+  left: var(--poster-left);
+  overflow: visible;
+  flex: none;
+  width: var(--poster-design-width);
+  transform: scale(var(--poster-fit-scale));
+  transform-origin: top left;
 }
 
 .poster-hero {
