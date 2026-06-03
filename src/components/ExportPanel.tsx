@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CheckCircle2, Clock3, Download, FileJson, FileText, Image, PackageCheck, Presentation } from "lucide-react";
+import { CheckCircle2, Clock3, Code2, Download, FileJson, FileText, Image, PackageCheck, Presentation } from "lucide-react";
 import type { PosterProject } from "../domain/poster";
 import { downloadPosterJson, downloadPosterPptx, downloadProjectBundleManifest, type ExportTarget } from "../exports";
 import { getExportReadiness } from "../exports/readiness";
@@ -10,7 +10,7 @@ interface ExportPanelProps {
 
 export function ExportPanel({ poster }: ExportPanelProps) {
   const readiness = getExportReadiness(poster);
-  const [message, setMessage] = useState("JSON and bundle manifest exports are available when readiness checks pass.");
+  const [message, setMessage] = useState("Poster JSON and A0 PDF are the primary export path; PPTX is a compatibility snapshot.");
 
   async function handleExport(target: ExportTarget) {
     if (target === "poster_json") {
@@ -20,13 +20,18 @@ export function ExportPanel({ poster }: ExportPanelProps) {
     }
 
     if (target === "pptx") {
-      setMessage("Preparing editable PPTX export.");
+      setMessage("Preparing PPTX compatibility snapshot.");
       try {
         await downloadPosterPptx(poster);
-        setMessage("Exported editable PPTX.");
+        setMessage("Exported PPTX compatibility snapshot.");
       } catch (error) {
         setMessage(error instanceof Error ? `PPTX export failed: ${error.message}` : "PPTX export failed.");
       }
+      return;
+    }
+
+    if (target === "pdf") {
+      setMessage("A0 PDF export runs from the local CLI: npm run export:pdf -- --poster spec/example-poster.json");
       return;
     }
 
@@ -104,6 +109,10 @@ function renderExportIcon(target: ExportTarget) {
 
   if (target === "pdf") {
     return <FileText size={18} />;
+  }
+
+  if (target === "html_project") {
+    return <Code2 size={18} />;
   }
 
   if (target === "png") {

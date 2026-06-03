@@ -6,10 +6,19 @@ import { createExportJob } from "./model";
 import { getExportReadiness, getExportReadinessForTarget } from "./readiness";
 
 describe("exports", () => {
-  it("marks JSON, PPTX, and bundle manifest export as available", () => {
+  it("marks JSON, A0 PDF, PPTX compatibility, and bundle manifest export as available", () => {
     const availableIds = exportCapabilities.filter((capability) => capability.status === "available").map((capability) => capability.id);
 
-    expect(availableIds).toEqual(expect.arrayContaining(["poster_json", "pptx", "project_bundle"]));
+    expect(availableIds).toEqual(expect.arrayContaining(["poster_json", "pdf", "pptx", "project_bundle"]));
+  });
+
+  it("keeps browser-native HTML project export on the planned roadmap", () => {
+    expect(exportCapabilities.find((capability) => capability.id === "html_project")).toEqual(
+      expect.objectContaining({
+        label: "Export editable HTML project",
+        status: "planned",
+      }),
+    );
   });
 
   it("builds a project bundle manifest with current and planned entries", () => {
@@ -21,8 +30,9 @@ describe("exports", () => {
         expect.objectContaining({ id: "poster_json", status: "ready", path: "poster.json" }),
         expect.objectContaining({ id: "html_preview_descriptor", status: "ready", path: "preview/html-preview.json" }),
         expect.objectContaining({ id: "source_documents", count: examplePoster.sourceDocuments?.length }),
+        expect.objectContaining({ id: "pdf", status: "ready" }),
+        expect.objectContaining({ id: "html_project", status: "planned" }),
         expect.objectContaining({ id: "pptx", status: "ready" }),
-        expect.objectContaining({ id: "pdf", status: "planned" }),
       ]),
     );
   });
@@ -43,6 +53,8 @@ describe("exports", () => {
     const readiness = getExportReadiness(examplePoster);
 
     expect(readiness.find((target) => target.target === "poster_json")?.status).toBe("ready");
+    expect(readiness.find((target) => target.target === "pdf")?.status).toBe("ready");
+    expect(readiness.find((target) => target.target === "html_project")?.status).toBe("planned");
     expect(readiness.find((target) => target.target === "project_bundle")?.status).toBe("ready");
     expect(readiness.find((target) => target.target === "pptx")?.status).toBe("ready");
   });

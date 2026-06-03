@@ -290,6 +290,7 @@
       "id": "hero",
       "type": "hero",
       "title": "The poster tells the evidence trail, not just the result",
+      "layout": { "order": 5, "columnSpan": 1 },
       "blocks": [
         {
           "type": "text",
@@ -302,6 +303,7 @@
       "id": "methods",
       "type": "methods",
       "title": "Generation workflow",
+      "layout": { "order": 6, "columnSpan": 1 },
       "blocks": [
         {
           "type": "visual_ref",
@@ -313,6 +315,7 @@
       "id": "results",
       "type": "results",
       "title": "Model monitoring visuals",
+      "layout": { "order": 0, "columnSpan": 2, "emphasis": "featured" },
       "blocks": [
         {
           "type": "visual_ref",
@@ -328,6 +331,7 @@
       "id": "qa",
       "type": "discussion",
       "title": "Built-in quality control",
+      "layout": { "order": 1, "columnSpan": 1 },
       "blocks": [
         {
           "type": "text",
@@ -340,6 +344,7 @@
       "id": "evidence_summary",
       "type": "results",
       "title": "Evidence summary",
+      "layout": { "order": 2, "columnSpan": 2 },
       "blocks": [
         {
           "type": "visual_ref",
@@ -355,6 +360,7 @@
       "id": "delivery_plan",
       "type": "timeline",
       "title": "Monitoring delivery path",
+      "layout": { "order": 3, "columnSpan": 1 },
       "blocks": [
         {
           "type": "visual_ref",
@@ -370,6 +376,7 @@
       "id": "technical_note",
       "type": "methods",
       "title": "Technical trace",
+      "layout": { "order": 4, "columnSpan": 1 },
       "blocks": [
         {
           "type": "visual_ref",

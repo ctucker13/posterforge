@@ -311,11 +311,34 @@
         "title": {
           "type": "string"
         },
+        "layout": {
+          "$ref": "#/$defs/sectionLayout"
+        },
         "blocks": {
           "type": "array",
           "items": {
             "$ref": "#/$defs/block"
           }
+        }
+      }
+    },
+    "sectionLayout": {
+      "type": "object",
+      "properties": {
+        "order": {
+          "type": "number"
+        },
+        "columnSpan": {
+          "enum": [1, 2, 3, 4]
+        },
+        "rowSpan": {
+          "enum": [1, 2]
+        },
+        "emphasis": {
+          "enum": ["normal", "featured", "hero"]
+        },
+        "hidden": {
+          "type": "boolean"
         }
       }
     },

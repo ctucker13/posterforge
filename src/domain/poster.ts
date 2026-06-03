@@ -93,7 +93,16 @@ export interface PosterSection {
     | "references"
     | "custom";
   title: string;
+  layout?: PosterSectionLayout;
   blocks: PosterBlock[];
+}
+
+export interface PosterSectionLayout {
+  order?: number;
+  columnSpan?: 1 | 2 | 3 | 4;
+  rowSpan?: 1 | 2;
+  emphasis?: "normal" | "featured" | "hero";
+  hidden?: boolean;
 }
 
 export type PosterBlock =

@@ -77,6 +77,7 @@ export const examplePoster: PosterProject = {
       id: "hero",
       type: "hero",
       title: "The poster tells the evidence trail, not just the result",
+      layout: { order: 5, columnSpan: 1 },
       blocks: [
         {
           type: "text",
@@ -89,12 +90,14 @@ export const examplePoster: PosterProject = {
       id: "methods",
       type: "methods",
       title: "Generation workflow",
+      layout: { order: 6, columnSpan: 1 },
       blocks: [{ type: "visual_ref", visual_id: "vis_mermaid_workflow" }],
     },
     {
       id: "results",
       type: "results",
       title: "Model monitoring visuals",
+      layout: { order: 0, columnSpan: 2, emphasis: "featured" },
       blocks: [
         { type: "visual_ref", visual_id: "vis_confusion_matrix" },
         { type: "visual_ref", visual_id: "vis_sankey" },
@@ -104,6 +107,7 @@ export const examplePoster: PosterProject = {
       id: "qa",
       type: "discussion",
       title: "Built-in quality control",
+      layout: { order: 1, columnSpan: 1 },
       blocks: [
         {
           type: "text",
@@ -116,6 +120,7 @@ export const examplePoster: PosterProject = {
       id: "evidence_summary",
       type: "results",
       title: "Evidence summary",
+      layout: { order: 2, columnSpan: 2 },
       blocks: [
         { type: "visual_ref", visual_id: "vis_metric_card" },
         { type: "visual_ref", visual_id: "vis_metrics_table" },
@@ -125,6 +130,7 @@ export const examplePoster: PosterProject = {
       id: "delivery_plan",
       type: "timeline",
       title: "Monitoring delivery path",
+      layout: { order: 3, columnSpan: 1 },
       blocks: [
         { type: "visual_ref", visual_id: "vis_monitoring_timeline" },
         { type: "visual_ref", visual_id: "vis_delivery_gantt" },
@@ -134,6 +140,7 @@ export const examplePoster: PosterProject = {
       id: "technical_note",
       type: "methods",
       title: "Technical trace",
+      layout: { order: 4, columnSpan: 1 },
       blocks: [
         { type: "visual_ref", visual_id: "vis_calibration_formula" },
         { type: "visual_ref", visual_id: "vis_code_block" },

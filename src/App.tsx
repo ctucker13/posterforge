@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Database, FolderOpen, Globe2, Palette, Play, Sparkles } from "lucide-react";
+import { EditablePosterCanvas } from "./components/EditablePosterCanvas";
 import { EvidencePanel } from "./components/EvidencePanel";
 import { ExportPanel } from "./components/ExportPanel";
 import { JsonProjectControls } from "./components/JsonProjectControls";
+import { PosterInspector } from "./components/PosterInspector";
 import { PosterPreview } from "./components/PosterPreview";
 import { ProjectEditor } from "./components/ProjectEditor";
 import { QaPanel } from "./components/QaPanel";
@@ -11,6 +13,7 @@ import { TracePanel } from "./components/TracePanel";
 import { VisualRegistryPanel } from "./components/VisualRegistryPanel";
 import { generatePoster, generationTrace, type GenerationOptions } from "./domain/generator";
 import type { PosterProject, QaIssue, TraceEvent } from "./domain/poster";
+import type { PosterCanvasItemKind } from "./components/PosterCanvas";
 import { applyQaFix, runQa } from "./qa";
 import { palettes, themes } from "./themes";
 import "./styles/app.css";
@@ -40,6 +43,7 @@ export default function App() {
   const [poster, setPoster] = useState<PosterProject>({ ...initialPoster, qaResults: initialQaIssues });
   const [qaIssues, setQaIssues] = useState<QaIssue[]>(initialQaIssues);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [selectedCanvasItem, setSelectedCanvasItem] = useState<{ id: string; kind: PosterCanvasItemKind } | undefined>();
 
   const selectedTheme = themes[theme];
   const selectedPalette = palettes[palette];
@@ -111,6 +115,12 @@ export default function App() {
     const nextQaIssues = runQa(poster);
     setQaIssues(nextQaIssues);
     setPoster((current) => ({ ...current, qaResults: nextQaIssues }));
+  }
+
+  function handlePosterStateChange(nextPoster: PosterProject) {
+    const nextQaIssues = runQa(nextPoster);
+    setPoster({ ...nextPoster, qaResults: nextQaIssues });
+    setQaIssues(nextQaIssues);
   }
 
   function handleQaFix(fixId: NonNullable<QaIssue["fixId"]>) {
@@ -223,19 +233,17 @@ export default function App() {
       <section className="inspector-column" aria-label="Poster inspectors">
         <ProjectEditor
           poster={poster}
-          onPosterChange={(nextPoster) => {
-            const nextQaIssues = runQa(nextPoster);
-            setPoster({ ...nextPoster, qaResults: nextQaIssues });
-            setQaIssues(nextQaIssues);
-          }}
+          onPosterChange={handlePosterStateChange}
+        />
+        <PosterInspector
+          poster={poster}
+          selectedId={selectedCanvasItem?.id}
+          selectedKind={selectedCanvasItem?.kind}
+          onPosterChange={handlePosterStateChange}
         />
         <SourceSearchPanel
           poster={poster}
-          onPosterChange={(nextPoster) => {
-            const nextQaIssues = runQa(nextPoster);
-            setPoster({ ...nextPoster, qaResults: nextQaIssues });
-            setQaIssues(nextQaIssues);
-          }}
+          onPosterChange={handlePosterStateChange}
         />
         <EvidencePanel poster={poster} />
         <QaPanel issues={qaIssues} onRunQa={handleRunQa} onApplyFix={handleQaFix} />
@@ -243,6 +251,11 @@ export default function App() {
       </section>
 
       <section className="preview-column" aria-label="Poster workspace">
+        <EditablePosterCanvas
+          poster={poster}
+          selectedId={selectedCanvasItem?.id}
+          onSelectItem={(id, kind) => setSelectedCanvasItem({ id, kind })}
+        />
         <PosterPreview poster={poster} />
         <VisualRegistryPanel poster={poster} />
       </section>

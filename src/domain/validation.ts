@@ -23,6 +23,7 @@ const layoutIds = [
   "case-study-poster",
 ] as const;
 const sectionTypes = ["hero", "background", "methods", "results", "key_findings", "discussion", "timeline", "references", "custom"] as const;
+const sectionEmphasis = ["normal", "featured", "hero"] as const;
 const assetTypes = ["ai_image", "generated_background", "generated_panel", "uploaded_image"] as const;
 const assetRoles = ["atmosphere", "section_art", "background", "comic_panel", "reference"] as const;
 const traceStatuses = ["queued", "running", "complete"] as const;
@@ -232,6 +233,13 @@ function validateSection(value: unknown, path: string, issues: PosterValidationI
   requireString(value, "id", `${path}.id`, issues);
   requireEnum(value.type, `${path}.type`, sectionTypes, issues);
   requireString(value, "title", `${path}.title`, issues);
+  optionalRecord(value.layout, `${path}.layout`, issues, (layout) => {
+    optionalNumber(layout.order, `${path}.layout.order`, issues);
+    optionalNumberEnum(layout.columnSpan, `${path}.layout.columnSpan`, [1, 2, 3, 4] as const, issues);
+    optionalNumberEnum(layout.rowSpan, `${path}.layout.rowSpan`, [1, 2] as const, issues);
+    optionalEnum(layout.emphasis, `${path}.layout.emphasis`, sectionEmphasis, issues);
+    optionalBoolean(layout.hidden, `${path}.layout.hidden`, issues);
+  });
   validateArray(value.blocks, `${path}.blocks`, issues, validateBlock);
 }
 
@@ -637,6 +645,12 @@ function requireEnum(value: unknown, path: string, allowedValues: readonly strin
 function optionalEnum(value: unknown, path: string, allowedValues: readonly string[], issues: PosterValidationIssue[]) {
   if (value !== undefined) {
     requireEnum(value, path, allowedValues, issues);
+  }
+}
+
+function optionalNumberEnum(value: unknown, path: string, allowedValues: readonly number[], issues: PosterValidationIssue[]) {
+  if (value !== undefined && (typeof value !== "number" || !allowedValues.includes(value))) {
+    addIssue(issues, path, `must be one of: ${allowedValues.join(", ")}.`);
   }
 }
 

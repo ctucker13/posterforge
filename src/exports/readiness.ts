@@ -16,7 +16,7 @@ export interface ExportReadiness {
 export function getExportReadiness(poster: PosterProject): ExportReadiness[] {
   return exportCapabilities.map((capability) => {
     const blockers = getTargetBlockers(poster, capability.id);
-    const status = capability.id === "pdf" || capability.id === "png" ? "planned" : blockers.length > 0 ? "blocked" : "ready";
+    const status = capability.id === "html_project" || capability.id === "png" ? "planned" : blockers.length > 0 ? "blocked" : "ready";
 
     return {
       target: capability.id,
@@ -24,7 +24,7 @@ export function getExportReadiness(poster: PosterProject): ExportReadiness[] {
       output: capability.output,
       status,
       requirements: capability.requirements,
-      blockers: capability.id === "pdf" || capability.id === "png" ? [...blockers, getPlannedBlocker(capability.id)] : blockers,
+      blockers: capability.id === "html_project" || capability.id === "png" ? [...blockers, getPlannedBlocker(capability.id)] : blockers,
     };
   });
 }
@@ -48,8 +48,16 @@ function getTargetBlockers(poster: PosterProject, target: ExportTarget): string[
     return [...baseBlockers, ...getRendererBlockers(poster)];
   }
 
-  if (target === "pdf" || target === "png") {
-    return [...baseBlockers, ...getRendererBlockers(poster), "Playwright render/export pipeline is not implemented."];
+  if (target === "pdf") {
+    return [...baseBlockers, ...getRendererBlockers(poster), poster.format.size !== "A0" ? "A0 PDF export requires poster format size A0." : ""].filter(Boolean);
+  }
+
+  if (target === "html_project") {
+    return [...baseBlockers, ...getRendererBlockers(poster), "Editable HTML project package is not implemented."];
+  }
+
+  if (target === "png") {
+    return [...baseBlockers, ...getRendererBlockers(poster), "Preview PNG export is not implemented."];
   }
 
   return baseBlockers;
@@ -110,8 +118,8 @@ function validateRendererData(visual: PosterProject["visuals"][number]): string 
 }
 
 function getPlannedBlocker(target: ExportTarget): string {
-  if (target === "pdf") {
-    return "Print PDF export is planned for the Playwright export layer.";
+  if (target === "html_project") {
+    return "Editable HTML project export is planned for the browser-native editor layer.";
   }
 
   if (target === "png") {

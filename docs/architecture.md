@@ -12,20 +12,20 @@ prompt + source selections
   -> ClaimMap
   -> PosterProject / poster.json
   -> visual renderer plan
-  -> HTML preview
+  -> browser-native HTML poster canvas
   -> QA results and safe fixes
   -> exports
 ```
 
 The `PosterProject` object is the source of truth. Outputs are derived artifacts:
 
-- HTML preview
+- HTML preview/editor canvas
 - deterministic visual renders
 - generated image assets
 - trace logs
 - QA reports
-- PPTX
 - PDF
+- PPTX compatibility snapshot
 - PNG
 - project bundle
 
@@ -92,7 +92,8 @@ src/
     export capability registry
     target readiness service
     browser JSON and bundle-manifest downloads
-    first-pass editable PPTX compiler
+    A0 PDF export document renderer
+    first-pass PPTX compatibility compiler
     HTML preview artifact descriptor
 ```
 
@@ -268,21 +269,46 @@ Planned QA checks:
 - poster density
 - visual hierarchy
 
-## PPTX Export
+## Browser Canvas And A0 PDF Export
 
 Current:
 
-- `src/exports/pptx.ts` compiles the current `PosterProject` into a one-slide editable PowerPoint poster using PptxGenJS.
+- `src/components/PosterCanvas.tsx` is the shared React renderer for preview, editing, and export.
+- The canvas uses the poster format orientation to enforce A0 dimensions: landscape `1189mm x 841mm`, portrait `841mm x 1189mm`.
+- `src/components/PosterPreview.tsx` wraps the canvas in zoom controls so users can inspect the output frame without changing the source layout.
+- `src/components/EditablePosterCanvas.tsx` and `src/components/PosterInspector.tsx` provide structured browser editing that updates `PosterProject` JSON rather than editing an exported file.
+- `src/exports/renderPosterHtml.tsx` renders the shared canvas to a static HTML export document.
+- `scripts/export-pdf.ts` uses Playwright to produce a print-ready A0 PDF and a clipping QA report from that static HTML document.
+
+The current primary fidelity path is:
+
+```text
+PosterProject JSON -> React PosterCanvas -> static export HTML -> Playwright A0 PDF
+```
+
+Planned:
+
+- editable HTML project package containing `poster.json`, HTML/CSS assets, generated assets, and editor state
+- Playwright PNG preview export
+- stronger print QA for text overflow, contrast, image resolution, and chart clipping
+
+## PPTX Compatibility Export
+
+Current:
+
+- `src/exports/pptx.ts` compiles the current `PosterProject` into a one-slide PowerPoint poster using PptxGenJS.
 - The compiler preserves native title, subtitle, section headings, text blocks, Claim map, and Source bundle content as editable PowerPoint text.
 - Current lightweight visual types export with native PowerPoint text/shapes for confusion matrix, metric card, table, Sankey-style flow, timeline, Gantt, Mermaid source, math source, and code source.
 - Generated image assets with `PosterVisual.asset.url` are embedded as images when the browser can fetch the URL.
 - PptxGenJS is loaded by dynamic import so the main app bundle does not pay the compiler cost until the user exports PPTX.
 - `scripts/export-html-pptx.mjs` provides the higher-fidelity path: render poster JSON to static HTML, fit it into an A0 canvas using poster orientation, capture the canvas with Playwright, write a PNG, write DOM measurements, and place the captured render into an actual A0-sized PPTX slide.
 
-Export modes:
+PPTX is a compatibility output, not the canonical editing surface. The browser-native canvas and A0 PDF are the fidelity targets.
 
-- editable native PPTX: more editable, lower visual fidelity, available from the browser export panel
-- high-fidelity HTML PPTX: closer to the HTML preview, less editable, available from `npm run export:pptx:html`
+PPTX modes:
+
+- native PPTX: more editable, lower visual fidelity, available from the browser export panel
+- HTML-capture PPTX: closer to the HTML preview, less editable, available from `npm run export:pptx:html`
 - future hybrid editable PPTX: use Playwright measurements to place editable text and screenshot fallbacks for complex regions
 
 A0 sizing is mandatory for poster exports. Landscape PPTX output uses `1189mm x 841mm` (`46.811in x 33.110in`); portrait output uses `841mm x 1189mm`.
@@ -291,7 +317,6 @@ Planned:
 
 - build the hybrid editable PPTX compiler from Playwright DOM measurements
 - add SVG/PNG fallbacks for charts, Mermaid, math, and code
-- add print-size layout constraints instead of the current scaled one-slide wide canvas
 - add export QA for text overflow, clipping, and missing image assets
 
 ## Exports
@@ -302,22 +327,23 @@ Current:
 - centralized readiness service for JSON, PPTX, PDF, PNG, and bundle targets
 - browser JSON export for the current `PosterProject`
 - browser project bundle manifest export
-- browser editable PPTX export
+- browser PPTX compatibility export
+- CLI A0 PDF export through Playwright
 - export capability registry
-- UI showing PPTX as available and PDF/PNG as planned outputs with requirements
-- HTML preview descriptor artifact for future Playwright export
+- UI showing JSON, A0 PDF, PPTX compatibility snapshot, and bundle manifest as available outputs
+- UI showing editable HTML project and PNG as planned outputs
+- HTML preview descriptor artifact for project bundles
 
 The project bundle manifest is a JSON placeholder for the future ZIP bundle. It records expected entries for poster spec, source documents, summaries, evidence, claim map, assets, traces, QA, references, and planned export outputs.
 
-The readiness service is shared by the export UI and QA layer so target requirements are not duplicated. JSON, editable PPTX, and bundle manifest exports can be ready now; PDF and PNG remain planned until the Playwright layer exists.
+The readiness service is shared by the export UI and QA layer so target requirements are not duplicated. JSON, A0 PDF, PPTX compatibility snapshot, and bundle manifest exports can be ready now; editable HTML project and PNG remain planned.
 
 Planned:
 
-- higher-fidelity editable PPTX export with PptxGenJS
-- print PDF export with Playwright
+- editable HTML project package
 - preview PNG export with Playwright
 - project bundle containing spec, sources, assets, renders, traces, QA, and exports
-- SVG/PNG fallbacks for complex visuals
+- optional richer PPTX compatibility export with SVG/PNG fallbacks for complex visuals
 
 ## Future Kiro Skill
 

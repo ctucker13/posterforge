@@ -5,4 +5,4 @@ build/
 .DS_Store
 public/generated-assets/*
 !public/generated-assets/.gitkeep
-exports/
+/exports/

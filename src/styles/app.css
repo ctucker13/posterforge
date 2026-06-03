@@ -1015,6 +1015,10 @@ textarea {
   min-height: 680px;
 }
 
+.editable-poster-panel {
+  min-height: 760px;
+}
+
 .preview-toolbar {
   display: flex;
   align-items: center;
@@ -1131,12 +1135,34 @@ textarea {
   gap: 12px;
   margin-top: 12px;
   overflow: hidden;
+  grid-auto-flow: dense;
+  grid-auto-rows: minmax(0, 1fr);
+  align-items: stretch;
 }
 
 .poster-output-frame .poster-card {
+  display: flex;
+  flex-direction: column;
   min-height: 0;
   overflow: hidden;
   padding: 12px;
+}
+
+.poster-output-frame .poster-card > [data-visual-id],
+.poster-output-frame .visual-box {
+  flex: 1;
+  min-height: 0;
+}
+
+.poster-output-frame .generated-asset,
+.poster-output-frame .generated-asset-frame {
+  display: flex;
+  flex-direction: column;
+}
+
+.poster-output-frame .generated-asset-frame {
+  flex: 1;
+  min-height: 0;
 }
 
 .poster-output-frame .poster-card h3 {
@@ -1262,6 +1288,26 @@ textarea {
   grid-column: span 2;
 }
 
+.poster-grid > .poster-card.span-1 {
+  grid-column: span 1;
+}
+
+.poster-grid > .poster-card.span-2 {
+  grid-column: span 2;
+}
+
+.poster-grid > .poster-card.span-3 {
+  grid-column: span 3;
+}
+
+.poster-grid > .poster-card.span-4 {
+  grid-column: span 4;
+}
+
+.poster-grid > .poster-card.row-span-2 {
+  grid-row: span 2;
+}
+
 .poster-layout-timeline-process .poster-card.section-timeline,
 .poster-layout-timeline-process .poster-card.section-methods {
   grid-column: span 2;
@@ -1314,6 +1360,24 @@ textarea {
   border-radius: 8px;
   padding: 18px;
   background: var(--theme-bg);
+}
+
+.poster-canvas-mode-edit .poster-card,
+.poster-canvas-mode-edit .poster-text-block,
+.poster-canvas-mode-edit [data-visual-id] {
+  cursor: pointer;
+}
+
+.poster-canvas-mode-edit .poster-card:hover,
+.poster-canvas-mode-edit .poster-text-block:hover,
+.poster-canvas-mode-edit [data-visual-id]:hover {
+  outline: 2px solid color-mix(in srgb, var(--theme-accent), white 18%);
+  outline-offset: 2px;
+}
+
+.selected-canvas-item {
+  outline: 3px solid #f79009 !important;
+  outline-offset: 3px;
 }
 
 .poster-card h3 {
@@ -1796,6 +1860,45 @@ textarea {
   align-items: center;
   color: #344054;
   font-weight: 700;
+}
+
+.poster-inspector .project-editor-body {
+  display: grid;
+  gap: 14px;
+  padding: 14px;
+}
+
+.empty-inspector {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  color: #667085;
+  font-size: 13px;
+}
+
+.empty-inspector p {
+  margin: 0;
+}
+
+.inspector-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.inspector-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 34px;
+  border: 1px solid #d8dee6;
+  border-radius: 6px;
+  color: #344054;
+  background: #ffffff;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .poster-retro-time-lab .poster-hero {
