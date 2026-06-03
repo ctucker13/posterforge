@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Database, FolderOpen, Globe2, Palette, Play, Sparkles } from "lucide-react";
+import type { ReactNode } from "react";
+import { ClipboardCheck, Database, FileSearch, FolderOpen, Globe2, Layers3, Palette, Play, Route, Settings2, Sparkles } from "lucide-react";
 import { EditablePosterCanvas } from "./components/EditablePosterCanvas";
 import { EvidencePanel } from "./components/EvidencePanel";
 import { ExportPanel } from "./components/ExportPanel";
 import { JsonProjectControls } from "./components/JsonProjectControls";
 import { PosterInspector } from "./components/PosterInspector";
-import { PosterPreview } from "./components/PosterPreview";
 import { ProjectEditor } from "./components/ProjectEditor";
 import { QaPanel } from "./components/QaPanel";
 import { SourceSearchPanel } from "./components/SourceSearchPanel";
@@ -33,6 +33,7 @@ const initialPoster = generatePoster({
   sourceMode: "mock",
 });
 const initialQaIssues = runQa(initialPoster);
+type WorkspaceTab = "edit" | "sources" | "qa" | "trace" | "visuals";
 
 export default function App() {
   const [prompt, setPrompt] = useState(defaultPrompt);
@@ -44,6 +45,7 @@ export default function App() {
   const [qaIssues, setQaIssues] = useState<QaIssue[]>(initialQaIssues);
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedCanvasItem, setSelectedCanvasItem] = useState<{ id: string; kind: PosterCanvasItemKind } | undefined>();
+  const [activeTab, setActiveTab] = useState<WorkspaceTab>("edit");
 
   const selectedTheme = themes[theme];
   const selectedPalette = palettes[palette];
@@ -231,23 +233,38 @@ export default function App() {
       </section>
 
       <section className="inspector-column" aria-label="Poster inspectors">
-        <ProjectEditor
-          poster={poster}
-          onPosterChange={handlePosterStateChange}
-        />
-        <PosterInspector
-          poster={poster}
-          selectedId={selectedCanvasItem?.id}
-          selectedKind={selectedCanvasItem?.kind}
-          onPosterChange={handlePosterStateChange}
-        />
-        <SourceSearchPanel
-          poster={poster}
-          onPosterChange={handlePosterStateChange}
-        />
-        <EvidencePanel poster={poster} />
-        <QaPanel issues={qaIssues} onRunQa={handleRunQa} onApplyFix={handleQaFix} />
-        <TracePanel events={trace} />
+        <div className="workspace-tabs" role="tablist" aria-label="Workspace panels">
+          <WorkspaceTabButton active={activeTab === "edit"} icon={<Settings2 size={15} />} label="Edit" onClick={() => setActiveTab("edit")} />
+          <WorkspaceTabButton active={activeTab === "sources"} icon={<FileSearch size={15} />} label="Sources" onClick={() => setActiveTab("sources")} />
+          <WorkspaceTabButton active={activeTab === "qa"} icon={<ClipboardCheck size={15} />} label="QA" onClick={() => setActiveTab("qa")} />
+          <WorkspaceTabButton active={activeTab === "trace"} icon={<Route size={15} />} label="Trace" onClick={() => setActiveTab("trace")} />
+          <WorkspaceTabButton active={activeTab === "visuals"} icon={<Layers3 size={15} />} label="Visuals" onClick={() => setActiveTab("visuals")} />
+        </div>
+
+        <div className="workspace-tab-panel">
+          {activeTab === "edit" ? (
+            <>
+              <ProjectEditor poster={poster} onPosterChange={handlePosterStateChange} />
+              <PosterInspector
+                poster={poster}
+                selectedId={selectedCanvasItem?.id}
+                selectedKind={selectedCanvasItem?.kind}
+                onPosterChange={handlePosterStateChange}
+              />
+            </>
+          ) : null}
+
+          {activeTab === "sources" ? (
+            <>
+              <SourceSearchPanel poster={poster} onPosterChange={handlePosterStateChange} />
+              <EvidencePanel poster={poster} />
+            </>
+          ) : null}
+
+          {activeTab === "qa" ? <QaPanel issues={qaIssues} onRunQa={handleRunQa} onApplyFix={handleQaFix} /> : null}
+          {activeTab === "trace" ? <TracePanel events={trace} /> : null}
+          {activeTab === "visuals" ? <VisualRegistryPanel poster={poster} /> : null}
+        </div>
       </section>
 
       <section className="preview-column" aria-label="Poster workspace">
@@ -257,9 +274,16 @@ export default function App() {
           onPosterChange={handlePosterStateChange}
           onSelectItem={(id, kind) => setSelectedCanvasItem({ id, kind })}
         />
-        <PosterPreview poster={poster} />
-        <VisualRegistryPanel poster={poster} />
       </section>
     </main>
+  );
+}
+
+function WorkspaceTabButton({ active, icon, label, onClick }: { active: boolean; icon: ReactNode; label: string; onClick: () => void }) {
+  return (
+    <button className={active ? "active" : ""} type="button" role="tab" aria-selected={active} onClick={onClick}>
+      {icon}
+      {label}
+    </button>
   );
 }

@@ -8,7 +8,7 @@ interface PosterPreviewProps {
 }
 
 export function PosterPreview({ poster }: PosterPreviewProps) {
-  const [zoom, setZoom] = useState(0.22);
+  const [zoom, setZoom] = useState(0.16);
   const outputFrame = useMemo(() => getA0PreviewFrame(poster.format.orientation), [poster.format.orientation]);
   const zoomLabel = `${Math.round(zoom * 100)}%`;
 
@@ -19,14 +19,14 @@ export function PosterPreview({ poster }: PosterPreviewProps) {
         <span>{`A0 ${outputFrame.orientation} · ${zoomLabel}`}</span>
       </div>
       <div className="preview-toolbar" aria-label="Preview zoom controls">
-        <button type="button" onClick={() => setZoom((value) => Math.max(0.1, Number((value - 0.04).toFixed(2))))} title="Zoom out">
+        <button type="button" onClick={() => setZoom((value) => Math.max(0.1, Number((value - 0.03).toFixed(2))))} title="Zoom out">
           <ZoomOut size={15} />
         </button>
         <strong>{zoomLabel}</strong>
-        <button type="button" onClick={() => setZoom((value) => Math.min(0.5, Number((value + 0.04).toFixed(2))))} title="Zoom in">
+        <button type="button" onClick={() => setZoom((value) => Math.min(0.5, Number((value + 0.03).toFixed(2))))} title="Zoom in">
           <ZoomIn size={15} />
         </button>
-        <button type="button" onClick={() => setZoom(0.22)} title="Reset zoom">
+        <button type="button" onClick={() => setZoom(0.16)} title="Reset zoom">
           <Maximize2 size={15} />
         </button>
         <span>{`${outputFrame.mmWidth}mm x ${outputFrame.mmHeight}mm`}</span>
