@@ -81,9 +81,15 @@ export function PosterCanvas({
               {poster.subtitle}
             </p>
           </div>
-          <div className="hero-asset" aria-label="Generated image asset placeholder">
-            <Image size={42} />
-            <span>GPT Image asset slot</span>
+          <div className={`hero-asset${poster.logo ? " hero-asset-logo" : ""}`} aria-label={poster.logo ? "Organisation logo" : "Generated image asset placeholder"}>
+            {poster.logo ? (
+              <img className="hero-logo" src={poster.logo} alt="Organisation logo" />
+            ) : (
+              <>
+                <Image size={42} />
+                <span>GPT Image asset slot</span>
+              </>
+            )}
           </div>
         </header>
 

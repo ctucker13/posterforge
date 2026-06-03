@@ -4,7 +4,8 @@ export type SourceType =
   | "web"
   | "research_paper"
   | "confluence"
-  | "gitlab";
+  | "gitlab"
+  | "github";
 
 export type TrustLevel = "low" | "medium" | "high";
 export type TraceStatus = "queued" | "running" | "complete";
@@ -140,6 +141,7 @@ export interface PosterProject {
   metadata?: PosterMetadata;
   title: string;
   subtitle?: string;
+  logo?: string;
   format: {
     size: "A0" | "A1" | "A2" | "custom";
     orientation: "portrait" | "landscape";

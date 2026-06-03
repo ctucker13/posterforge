@@ -572,6 +572,19 @@ textarea {
   overflow: auto;
 }
 
+.source-mode-toggle {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.source-mode-toggle button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
 .source-search-controls {
   display: grid;
   gap: 10px;
@@ -1373,6 +1386,10 @@ textarea {
   font-size: 86px;
 }
 
+.poster-output-frame .text-claim-badges {
+  display: none;
+}
+
 .poster-output-frame .matrix-summary {
   gap: 14px;
   margin-top: 18px;
@@ -1483,6 +1500,71 @@ textarea {
   min-height: 0;
 }
 
+/* Featured sections that span 2+ columns: lay visuals side-by-side */
+.poster-output-frame .poster-card.featured-section.span-2,
+.poster-output-frame .poster-card.featured-section.span-3 {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: stretch;
+}
+
+.poster-output-frame .poster-card.featured-section.span-2 > h3,
+.poster-output-frame .poster-card.featured-section.span-3 > h3 {
+  grid-column: 1 / -1;
+}
+
+.poster-output-frame .poster-card.featured-section.span-2 > [data-visual-id],
+.poster-output-frame .poster-card.featured-section.span-3 > [data-visual-id] {
+  min-width: 0;
+  min-height: 0;
+}
+
+/* ── three-column-academic ──────────────────────────────────────────────── */
+
+.poster-output-frame.poster-layout-three-column-academic .poster-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.poster-output-frame.poster-layout-three-column-academic .poster-card.claim-card,
+.poster-output-frame.poster-layout-three-column-academic .poster-card.source-card {
+  display: none;
+}
+
+/* ── timeline-process ───────────────────────────────────────────────────── */
+
+.poster-output-frame.poster-layout-timeline-process .poster-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* ── dashboard-poster ───────────────────────────────────────────────────── */
+
+.poster-output-frame.poster-layout-dashboard-poster .poster-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+/* ── comic-strip-narrative ──────────────────────────────────────────────── */
+
+.poster-output-frame.poster-layout-comic-strip-narrative .poster-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.poster-output-frame.poster-layout-comic-strip-narrative .poster-card {
+  border: 3px solid #171717;
+  box-shadow: 8px 8px 0 rgba(23, 23, 23, 0.7);
+}
+
+/* ── case-study-poster ──────────────────────────────────────────────────── */
+
+.poster-output-frame.poster-layout-case-study-poster .poster-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.poster-output-frame.poster-layout-case-study-poster .poster-card.section-results {
+  grid-column: 1 / -1;
+}
+
 .poster-hero {
   display: grid;
   grid-template-columns: minmax(360px, 1fr) 260px;
@@ -1535,6 +1617,20 @@ textarea {
   max-width: 140px;
   font-size: 13px;
   font-weight: 800;
+}
+
+.hero-asset-logo {
+  background: #ffffff;
+  border: none;
+  padding: 18px 24px;
+}
+
+.hero-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
 }
 
 .poster-grid {

@@ -1,0 +1,463 @@
+{
+  "id": "poster_gabechoice",
+  "metadata": {
+    "prompt": "Create a three-column academic poster about GabeChoice, a personal agentic Steam game recommender built with LangGraph and Claude.",
+    "created_at": "2026-06-03T00:00:00.000Z",
+    "generator": "posterforge-sample"
+  },
+  "title": "GabeChoice: Agentic Steam Recommendations with LangGraph + Claude",
+  "subtitle": "A personal tool that builds a taste profile from play history and ranks wishlist picks with blended LLM and Metacritic scoring",
+  "format": {
+    "size": "A0",
+    "orientation": "landscape"
+  },
+  "theme": "retro-time-lab",
+  "palette": "retro-lab",
+  "layout": "three-column-academic",
+  "audience": "software engineering / ML poster session",
+  "sources": [
+    {
+      "id": "src_readme",
+      "type": "web",
+      "title": "GabeChoice README",
+      "url": "https://github.com/ctucker13/gabechoice/blob/main/README.md",
+      "accessed_at": "2026-06-03T00:00:00.000Z",
+      "trust_level": "high"
+    },
+    {
+      "id": "src_spec",
+      "type": "web",
+      "title": "GabeChoice Build Spec (SPEC.md)",
+      "url": "https://github.com/ctucker13/gabechoice/blob/main/SPEC.md",
+      "accessed_at": "2026-06-03T00:00:00.000Z",
+      "trust_level": "high"
+    }
+  ],
+  "sourceDocuments": [
+    {
+      "id": "doc_readme",
+      "source": {
+        "id": "src_readme",
+        "type": "web",
+        "title": "GabeChoice README",
+        "url": "https://github.com/ctucker13/gabechoice/blob/main/README.md",
+        "accessed_at": "2026-06-03T00:00:00.000Z",
+        "trust_level": "high"
+      },
+      "title": "GabeChoice README",
+      "body": "GabeChoice is a personal agentic Steam recommendation tool. It reads your library and wishlist, builds a taste profile from your play history, and produces ranked recommendations with LLM-generated reasoning. Features: parallel Steam fetching (library and wishlist concurrently), SQLite enrichment cache with genres, tags, Metacritic scores cached per-appid, 5-signal taste profile (recently played, top played, owned unplayed, wishlisted, trending), blended scoring (70% LLM taste-fit + 30% Metacritic quality), recent-play awareness (games in last 2 weeks are strongest signal), provider-agnostic LLM (Anthropic default or OpenAI), CLI and web frontend. Known limitations: Metacritic coverage ~60-75%, cold cache takes ~15 min for 400+ games, LLM latency 20-60s depending on library size.",
+      "metadata": {
+        "summary": "Project README describing features, architecture, setup, and known limitations of GabeChoice."
+      }
+    },
+    {
+      "id": "doc_spec",
+      "source": {
+        "id": "src_spec",
+        "type": "web",
+        "title": "GabeChoice Build Spec (SPEC.md)",
+        "url": "https://github.com/ctucker13/gabechoice/blob/main/SPEC.md",
+        "accessed_at": "2026-06-03T00:00:00.000Z",
+        "trust_level": "high"
+      },
+      "title": "GabeChoice Build Spec (SPEC.md)",
+      "body": "LangGraph pipeline: fetch_library and fetch_wishlist run in parallel. enrich_games hits Steam appdetails API with SQLite cache (30-day TTL, token-bucket rate limiter at 0.5 req/s). build_taste_profile is an LLM node taking top 20 most-played games and returning a structured TasteProfile with preferred genres, mechanics, vibes, and anti-patterns. rank_and_explain is an LLM node that blends LLM taste-fit (70%) with Metacritic (30%) and writes a 1-2 sentence rationale per game. Tech stack: Python 3.12, uv, Pydantic v2, LangGraph, httpx (async), FastAPI, SQLite, Anthropic SDK and OpenAI SDK behind a thin provider abstraction, vanilla JS frontend. 24 tests covering cache, Steam client, and full pipeline with mocked clients.",
+      "metadata": {
+        "summary": "Full build spec describing architecture, data models, LLM prompting strategy, node behaviours, and tech stack."
+      }
+    }
+  ],
+  "sourceSummaries": [
+    {
+      "source_id": "src_readme",
+      "summary": "Project README describing features, architecture, setup, and known limitations.",
+      "metrics": ["70/30 blended score", "5-signal taste profile", "60-75% Metacritic coverage", "20-60s LLM latency", "~15 min cold cache for 400+ games"],
+      "figures": ["LangGraph pipeline diagram", "configuration table"]
+    },
+    {
+      "source_id": "src_spec",
+      "summary": "Complete build spec with node behaviours, data models, LLM prompts, and tech stack.",
+      "methods": ["parallel LangGraph edges", "SQLite enrichment cache", "token-bucket rate limiter", "provider-agnostic LLM abstraction", "structured JSON output via tool use"],
+      "metrics": ["24 tests", "0.5 req/s Steam rate limit", "30-day cache TTL", "top 20 most-played for taste profile"]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev_readme_parallel",
+      "source_id": "src_readme",
+      "kind": "claim",
+      "text": "Library and wishlist are fetched concurrently via parallel Steam API calls.",
+      "location": "README / Features",
+      "confidence": "high"
+    },
+    {
+      "id": "ev_readme_scoring",
+      "source_id": "src_readme",
+      "kind": "metric",
+      "text": "Scoring blends 70% LLM taste-fit with 30% Metacritic quality signal.",
+      "location": "README / Features",
+      "confidence": "high"
+    },
+    {
+      "id": "ev_readme_coverage",
+      "source_id": "src_readme",
+      "kind": "metric",
+      "text": "Metacritic coverage is approximately 60-75% on a typical wishlist.",
+      "location": "README / Known limitations",
+      "confidence": "high"
+    },
+    {
+      "id": "ev_readme_latency",
+      "source_id": "src_readme",
+      "kind": "metric",
+      "text": "LLM calls add 20-60 seconds depending on library size.",
+      "location": "README / Known limitations",
+      "confidence": "high"
+    },
+    {
+      "id": "ev_spec_pipeline",
+      "source_id": "src_spec",
+      "kind": "method",
+      "text": "Five LangGraph nodes form the pipeline: fetch_library, fetch_wishlist (parallel), enrich_games, build_taste_profile, rank_and_explain.",
+      "location": "SPEC / Architecture overview",
+      "confidence": "high"
+    },
+    {
+      "id": "ev_spec_taste",
+      "source_id": "src_spec",
+      "kind": "method",
+      "text": "Taste profile is built from the top 20 most-played games using structured LLM output (preferred genres, mechanics, vibes, anti-patterns).",
+      "location": "SPEC / Graph nodes / build_taste_profile",
+      "confidence": "high"
+    },
+    {
+      "id": "ev_spec_cache",
+      "source_id": "src_spec",
+      "kind": "method",
+      "text": "SQLite cache stores enrichment (genres, Metacritic, description) keyed by appid with 30-day TTL and token-bucket rate limiter at 0.5 req/s.",
+      "location": "SPEC / SQLite cache",
+      "confidence": "high"
+    },
+    {
+      "id": "ev_spec_tests",
+      "source_id": "src_spec",
+      "kind": "metric",
+      "text": "24 tests cover cache behaviour, Steam client, and the full LangGraph pipeline with mocked clients.",
+      "location": "SPEC / Tech stack / tests",
+      "confidence": "high"
+    },
+    {
+      "id": "ev_spec_provider",
+      "source_id": "src_spec",
+      "kind": "method",
+      "text": "LLM provider is abstracted behind a Protocol so Anthropic and OpenAI are swappable without changing graph nodes.",
+      "location": "SPEC / LLM provider abstraction",
+      "confidence": "high"
+    },
+    {
+      "id": "ev_readme_signals",
+      "source_id": "src_readme",
+      "kind": "claim",
+      "text": "Five signals inform the taste profile: recently played, top played, owned unplayed, wishlisted, and trending games.",
+      "location": "README / Features",
+      "confidence": "high"
+    }
+  ],
+  "claims": [
+    {
+      "id": "claim_pipeline",
+      "text": "A five-node LangGraph pipeline with parallel fetching transforms raw Steam data into ranked, reasoned recommendations.",
+      "source_ids": ["src_spec", "src_readme"],
+      "confidence": "high"
+    },
+    {
+      "id": "claim_scoring",
+      "text": "Blending 70% LLM taste-fit with 30% Metacritic score surfaces games that match the user's taste even when critical consensus differs.",
+      "source_ids": ["src_readme"],
+      "confidence": "high"
+    },
+    {
+      "id": "claim_cache",
+      "text": "SQLite enrichment cache with a 30-day TTL means subsequent runs are fast even for large libraries.",
+      "source_ids": ["src_spec"],
+      "confidence": "high"
+    },
+    {
+      "id": "claim_taste",
+      "text": "Structured LLM output produces an inspectable taste profile capturing preferred genres, mechanics, vibes, and anti-patterns.",
+      "source_ids": ["src_spec"],
+      "confidence": "high"
+    },
+    {
+      "id": "claim_provider",
+      "text": "A thin provider abstraction keeps graph nodes decoupled from the underlying LLM, making Anthropic and OpenAI interchangeable.",
+      "source_ids": ["src_spec"],
+      "confidence": "high"
+    }
+  ],
+  "claimMap": {
+    "entries": [
+      {
+        "claim_id": "claim_pipeline",
+        "claim_text": "A five-node LangGraph pipeline with parallel fetching transforms raw Steam data into ranked, reasoned recommendations.",
+        "source_ids": ["src_spec", "src_readme"],
+        "evidence_ids": ["ev_spec_pipeline", "ev_readme_parallel"],
+        "section_ids": ["methods"],
+        "confidence": "high"
+      },
+      {
+        "claim_id": "claim_scoring",
+        "claim_text": "Blending 70% LLM taste-fit with 30% Metacritic score surfaces games that match the user's taste even when critical consensus differs.",
+        "source_ids": ["src_readme"],
+        "evidence_ids": ["ev_readme_scoring", "ev_readme_coverage"],
+        "section_ids": ["results"],
+        "confidence": "high"
+      },
+      {
+        "claim_id": "claim_cache",
+        "claim_text": "SQLite enrichment cache with a 30-day TTL means subsequent runs are fast even for large libraries.",
+        "source_ids": ["src_spec"],
+        "evidence_ids": ["ev_spec_cache", "ev_readme_latency"],
+        "section_ids": ["background"],
+        "confidence": "high"
+      },
+      {
+        "claim_id": "claim_taste",
+        "claim_text": "Structured LLM output produces an inspectable taste profile capturing preferred genres, mechanics, vibes, and anti-patterns.",
+        "source_ids": ["src_spec"],
+        "evidence_ids": ["ev_spec_taste", "ev_readme_signals"],
+        "section_ids": ["key_findings"],
+        "confidence": "high"
+      },
+      {
+        "claim_id": "claim_provider",
+        "claim_text": "A thin provider abstraction keeps graph nodes decoupled from the underlying LLM, making Anthropic and OpenAI interchangeable.",
+        "source_ids": ["src_spec"],
+        "evidence_ids": ["ev_spec_provider", "ev_spec_tests"],
+        "section_ids": ["discussion"],
+        "confidence": "high"
+      }
+    ]
+  },
+  "sections": [
+    {
+      "id": "hero",
+      "type": "hero",
+      "title": "Your library. Your taste. GabeN's blessing.",
+      "layout": { "order": 0, "columnSpan": 1 },
+      "blocks": [
+        {
+          "type": "text",
+          "claim_ids": ["claim_pipeline", "claim_scoring"],
+          "text": "GabeChoice is a personal agentic recommender that reads your Steam library and wishlist, builds a taste fingerprint from your play history, and ranks your wishlist with LLM reasoning blended with Metacritic scores — all running locally against your own API keys."
+        }
+      ]
+    },
+    {
+      "id": "background",
+      "type": "background",
+      "title": "Problem",
+      "layout": { "order": 1, "columnSpan": 1 },
+      "blocks": [
+        {
+          "type": "text",
+          "claim_ids": ["claim_cache"],
+          "text": "Steam wishlists grow faster than they shrink. Generic store recommendations ignore playtime patterns. GabeChoice turns your own play history into a taste profile, then applies it to your wishlist — no external service, no account creation, no sharing your data."
+        },
+        {
+          "type": "visual_ref",
+          "visual_id": "vis_performance_table"
+        }
+      ]
+    },
+    {
+      "id": "methods",
+      "type": "methods",
+      "title": "LangGraph pipeline",
+      "layout": { "order": 2, "columnSpan": 1 },
+      "blocks": [
+        {
+          "type": "text",
+          "claim_ids": ["claim_pipeline"],
+          "text": "Five nodes orchestrated by LangGraph. Library and wishlist fetches run in parallel. Enrichment uses a SQLite cache so reruns skip the slow Steam API calls."
+        },
+        {
+          "type": "visual_ref",
+          "visual_id": "vis_pipeline_flow"
+        }
+      ]
+    },
+    {
+      "id": "results",
+      "type": "results",
+      "title": "Scoring and ranking",
+      "layout": { "order": 3, "columnSpan": 2, "emphasis": "featured" },
+      "blocks": [
+        {
+          "type": "visual_ref",
+          "visual_id": "vis_score_breakdown"
+        },
+        {
+          "type": "visual_ref",
+          "visual_id": "vis_metacritic_coverage"
+        }
+      ]
+    },
+    {
+      "id": "key_findings",
+      "type": "key_findings",
+      "title": "Taste profile",
+      "layout": { "order": 4, "columnSpan": 1 },
+      "blocks": [
+        {
+          "type": "text",
+          "claim_ids": ["claim_taste"],
+          "text": "The LLM analyses the top 20 most-played games and returns a structured taste profile: preferred genres, mechanics, vibes (e.g. atmospheric, competitive, cozy), and anti-patterns. The profile is shown in the UI so the user can see and validate what the system thinks of their taste."
+        },
+        {
+          "type": "visual_ref",
+          "visual_id": "vis_taste_signals"
+        }
+      ]
+    },
+    {
+      "id": "discussion",
+      "type": "discussion",
+      "title": "Design decisions and limitations",
+      "layout": { "order": 5, "columnSpan": 1 },
+      "blocks": [
+        {
+          "type": "text",
+          "claim_ids": ["claim_provider"],
+          "text": "Provider abstraction makes Anthropic and OpenAI interchangeable with no changes to graph logic. Metacritic coverage is ~60–75% — games without scores are still ranked on taste fit alone. Cold-cache first run can take ~15 min for 400+ game libraries."
+        },
+        {
+          "type": "visual_ref",
+          "visual_id": "vis_build_timeline"
+        }
+      ]
+    }
+  ],
+  "visuals": [
+    {
+      "id": "vis_pipeline_flow",
+      "type": "mermaid_flow",
+      "title": "GabeChoice LangGraph pipeline",
+      "source_ids": ["src_spec"],
+      "data": {
+        "source": "flowchart LR\nA[Steam API] --> B[fetch_library]\nA --> C[fetch_wishlist]\nB --> D[enrich_games]\nC --> D\nD --> E[build_taste_profile]\nE --> F[rank_and_explain]\nF --> G[RunResult]"
+      }
+    },
+    {
+      "id": "vis_score_breakdown",
+      "type": "matrix",
+      "title": "Blended scoring weights",
+      "source_ids": ["src_readme"],
+      "data": {
+        "cells": [
+          {
+            "label": "LLM taste-fit",
+            "value": "70%",
+            "note": "Alignment with preferred genres, mechanics, and vibes",
+            "variant": "primary"
+          },
+          {
+            "label": "Metacritic quality",
+            "value": "30%",
+            "note": "Critical quality signal; missing scores are not penalised",
+            "variant": "accent"
+          }
+        ],
+        "summary": [
+          { "label": "Top-N output", "value": "10 games" },
+          { "label": "Rationale per game", "value": "1–2 sentences" },
+          { "label": "Candidate pool", "value": "Wishlist + library sample" }
+        ]
+      }
+    },
+    {
+      "id": "vis_metacritic_coverage",
+      "type": "metric_card",
+      "title": "Metacritic coverage on a typical wishlist",
+      "source_ids": ["src_readme"],
+      "data": {
+        "label": "Games with a Metacritic score",
+        "value": "60–75%",
+        "note": "Unscored games are ranked on LLM taste-fit alone."
+      }
+    },
+    {
+      "id": "vis_taste_signals",
+      "type": "flow",
+      "title": "5-signal taste inputs",
+      "source_ids": ["src_readme"],
+      "data": {
+        "rows": [
+          { "label": "Recently played", "detail": "Last 2 weeks", "weight": 100, "note": "Strongest current-intent signal" },
+          { "label": "Top played", "detail": "All-time", "weight": 85, "note": "Core taste foundation" },
+          { "label": "Wishlisted", "detail": "Saved by user", "weight": 65, "note": "Declared interest" },
+          { "label": "Owned unplayed", "detail": "Backlog", "weight": 45, "note": "Latent interest" },
+          { "label": "Trending", "detail": "Not in library", "weight": 30, "note": "Discovery signal" }
+        ]
+      }
+    },
+    {
+      "id": "vis_performance_table",
+      "type": "table",
+      "title": "Observed performance characteristics",
+      "source_ids": ["src_readme", "src_spec"],
+      "data": {
+        "columns": ["Characteristic", "Value", "Context"],
+        "rows": [
+          { "Characteristic": "Cold cache (400+ games)", "Value": "~15 min", "Context": "Steam rate limit: 0.5 req/s" },
+          { "Characteristic": "Warm cache rerun", "Value": "Fast", "Context": "SQLite lookup only" },
+          { "Characteristic": "LLM latency", "Value": "20–60 s", "Context": "2 LLM calls per run" },
+          { "Characteristic": "Test suite", "Value": "24 tests", "Context": "Cache, Steam client, pipeline" }
+        ]
+      }
+    },
+    {
+      "id": "vis_build_timeline",
+      "type": "timeline",
+      "title": "Suggested build order",
+      "source_ids": ["src_spec"],
+      "data": {
+        "events": [
+          { "date": "Step 1–2", "label": "Scaffolding + models", "detail": "uv init, Pydantic models, SQLite cache with unit tests." },
+          { "date": "Step 3", "label": "Steam client", "detail": "Async httpx client; verify wishlist endpoint shape." },
+          { "date": "Step 4–5", "label": "LLM abstraction + fetch+enrich", "detail": "Anthropic provider first; confirm cache fills cleanly." },
+          { "date": "Step 6–7", "label": "Taste profile + ranking", "detail": "Add LLM nodes; tune prompts against real library." },
+          { "date": "Step 8–9", "label": "FastAPI + frontend + polish", "detail": "Wrap in API; render recommendation cards in browser." }
+        ]
+      }
+    }
+  ],
+  "assets": [],
+  "traces": [
+    {
+      "id": "trace_plan",
+      "label": "Planned poster from GitHub repo",
+      "detail": "Read README.md and SPEC.md from ctucker13/gabechoice and constructed a three-column academic poster spec.",
+      "status": "complete",
+      "timestamp": "2026-06-03T00:00:00.000Z",
+      "artifactRefs": [{ "kind": "poster_spec", "label": "gabechoice poster spec" }]
+    }
+  ],
+  "qaResults": [],
+  "references": [
+    {
+      "id": "src_readme",
+      "title": "GabeChoice README",
+      "type": "web",
+      "url": "https://github.com/ctucker13/gabechoice/blob/main/README.md",
+      "accessed_at": "2026-06-03T00:00:00.000Z"
+    },
+    {
+      "id": "src_spec",
+      "title": "GabeChoice Build Spec (SPEC.md)",
+      "type": "web",
+      "url": "https://github.com/ctucker13/gabechoice/blob/main/SPEC.md",
+      "accessed_at": "2026-06-03T00:00:00.000Z"
+    }
+  ]
+}

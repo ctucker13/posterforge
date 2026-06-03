@@ -50,6 +50,7 @@ export default function App() {
   const selectedTheme = themes[theme];
   const selectedPalette = palettes[palette];
   const highQaCount = qaIssues.filter((issue) => issue.severity === "high").length;
+  const realSourceCount = poster.sources.filter((s) => !s.url?.startsWith("mock://")).length;
 
   async function handleGenerate() {
     setIsGenerating(true);
@@ -68,7 +69,21 @@ export default function App() {
       setTrace((events) => events.map((event) => (event.id === step.id ? completedEvent : event)));
     }
 
-    const nextPoster = { ...generatePoster({ prompt, theme, palette, sourceMode }), traces: completedTrace };
+    const nextPoster = {
+      ...generatePoster({
+        prompt,
+        theme,
+        palette,
+        sourceMode,
+        currentSources: {
+          sources: poster.sources,
+          sourceDocuments: poster.sourceDocuments ?? [],
+          sourceSummaries: poster.sourceSummaries ?? [],
+          evidence: poster.evidence ?? [],
+        },
+      }),
+      traces: completedTrace,
+    };
     const nextQaIssues = runQa(nextPoster);
     setPoster({ ...nextPoster, qaResults: nextQaIssues });
     setQaIssues(nextQaIssues);
@@ -76,7 +91,7 @@ export default function App() {
   }
 
   function handleThemeChange(nextTheme: string) {
-    const nextPoster = { ...poster, theme: nextTheme };
+    const nextPoster = { ...poster, theme: nextTheme, logo: themes[nextTheme]?.logoUrl };
     setTheme(nextTheme);
     setPoster(nextPoster);
     setQaIssues(runQa(nextPoster));
@@ -96,6 +111,7 @@ export default function App() {
     const nextQaIssues = runQa(normalizedPoster);
     setTheme(nextTheme);
     setPalette(nextPalette);
+    if (nextPoster.metadata?.prompt) setPrompt(nextPoster.metadata.prompt);
     setPoster({ ...normalizedPoster, qaResults: nextQaIssues });
     setQaIssues(nextQaIssues);
     setTrace(nextPoster.traces?.length ? nextPoster.traces : createQueuedTrace());
@@ -164,7 +180,7 @@ export default function App() {
       <section className="control-panel tool-panel" aria-label="Generation controls">
         <div className="panel-header">
           <h2>Generate</h2>
-          <span>{sourceMode}</span>
+          <span>{realSourceCount > 0 ? `${realSourceCount} real source${realSourceCount !== 1 ? "s" : ""}` : sourceMode}</span>
         </div>
 
         <label className="field">
@@ -214,7 +230,7 @@ export default function App() {
 
         <button className="primary-action" type="button" onClick={handleGenerate} disabled={isGenerating}>
           <Play size={18} />
-          {isGenerating ? "Generating" : "Generate poster"}
+          {isGenerating ? "Generating…" : realSourceCount > 0 ? `Generate from ${realSourceCount} source${realSourceCount !== 1 ? "s" : ""}` : "Generate poster"}
         </button>
 
         <aside className="theme-note">

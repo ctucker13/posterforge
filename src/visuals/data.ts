@@ -45,6 +45,17 @@ export interface GanttData {
   tasks: GanttTaskData[];
 }
 
+export interface FlowRow {
+  label: string;
+  detail?: string;
+  weight: number;
+  note?: string;
+}
+
+export interface FlowData {
+  rows: FlowRow[];
+}
+
 export interface SourceTextData {
   source: string;
 }
@@ -65,6 +76,7 @@ export interface GeneratedVisualData {
 }
 
 export type SupportedRendererData =
+  | FlowData
   | ConfusionMatrixData
   | TableData
   | SankeyData
@@ -163,6 +175,18 @@ export function parseGanttData(data: unknown): VisualDataResult<GanttData> {
   }
 
   return { ok: true, data: { tasks: data.tasks } };
+}
+
+export function parseFlowData(data: unknown): VisualDataResult<FlowData> {
+  if (!isRecord(data)) {
+    return invalid("flow data must be an object.");
+  }
+
+  if (!Array.isArray(data.rows) || !data.rows.every(isFlowRow)) {
+    return invalid("flow requires rows with a label string and numeric weight.");
+  }
+
+  return { ok: true, data: { rows: data.rows } };
 }
 
 export function parseSourceTextData(data: unknown, visualType: "mermaid_flow" | "math"): VisualDataResult<SourceTextData> {
@@ -299,6 +323,17 @@ function isTimelineEvent(value: unknown): value is TimelineEventData {
     typeof value.date === "string" &&
     typeof value.label === "string" &&
     (value.detail === undefined || typeof value.detail === "string")
+  );
+}
+
+function isFlowRow(value: unknown): value is FlowRow {
+  return (
+    isRecord(value) &&
+    typeof value.label === "string" &&
+    typeof value.weight === "number" &&
+    Number.isFinite(value.weight) &&
+    (value.detail === undefined || typeof value.detail === "string") &&
+    (value.note === undefined || typeof value.note === "string")
   );
 }
 

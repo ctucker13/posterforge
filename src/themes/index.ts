@@ -20,6 +20,7 @@ export interface PosterTheme {
   palette?: string;
   motifs: string[];
   imagePromptPrefix: string;
+  logoUrl?: string;
 }
 
 export type Palette = PosterPalette;
@@ -84,6 +85,7 @@ export const themes: Record<string, PosterTheme> = {
     motifs: ["angular panels", "cube geometry", "crisp section dividers"],
     imagePromptPrefix:
       "Polished academic data science poster visual, NatWest-inspired purple and red colour palette, crisp geometric panels",
+    logoUrl: "/assets/nwg-logo.png",
   },
   "comic-strip": {
     id: "comic-strip",

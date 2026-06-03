@@ -18,6 +18,7 @@ export const examplePoster: PosterProject = {
   },
   theme: "natwest-group",
   palette: "natwest-group",
+  logo: "/assets/nwg-logo.png",
   layout: "results-first",
   audience: "internal data science poster session",
   sources: mockSourcePackage.sources,

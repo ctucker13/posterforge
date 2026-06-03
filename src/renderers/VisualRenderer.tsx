@@ -3,6 +3,7 @@ import { buildGanttSegments, formatPercent, summarizeConfusionMatrix, summarizeS
 import {
   parseCodeBlockData,
   parseConfusionMatrixData,
+  parseFlowData,
   parseGanttData,
   parseGeneratedVisualData,
   parseMetricCardData,
@@ -174,12 +175,42 @@ export function VisualRenderer({ visual }: { visual: PosterVisual }) {
     );
   }
 
+  if (visual.type === "flow") {
+    const parsed = parseFlowData(visual.data);
+    if (!parsed.ok) {
+      return <InvalidVisualData visual={visual} message={parsed.message} />;
+    }
+
+    const { rows } = parsed.data;
+    const maxWeight = Math.max(...rows.map((r) => r.weight), 1);
+
+    return (
+      <div className="visual-box">
+        <VisualHeader title={visual.title} meta={`${rows.length} item${rows.length === 1 ? "" : "s"}`} />
+        <div className="flow-list">
+          {rows.map((row) => (
+            <div className="flow-row" key={row.label}>
+              <span>{row.label}</span>
+              <div className="flow-track">
+                <div className="flow-bar" style={{ width: `${Math.max(7, (row.weight / maxWeight) * 100)}%` }} />
+              </div>
+              <strong>{row.weight}%</strong>
+              <em>{row.note ?? row.detail ?? ""}</em>
+            </div>
+          ))}
+        </div>
+        {rows.length === 0 ? <p className="visual-empty">No flow rows supplied.</p> : null}
+      </div>
+    );
+  }
+
   if (visual.type === "mermaid_flow") {
     const parsed = parseSourceTextData(visual.data, "mermaid_flow");
     if (!parsed.ok) {
       return <InvalidVisualData visual={visual} message={parsed.message} />;
     }
 
+    // Render as a styled code block — Mermaid rendering requires a browser plugin
     return (
       <div className="visual-box">
         <h3>{visual.title}</h3>
