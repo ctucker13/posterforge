@@ -136,7 +136,7 @@ export default function App() {
 
   function handleProjectImport(nextPoster: PosterProject) {
     const nextTheme = themes[nextPoster.theme] ? nextPoster.theme : "clean-academic";
-    const nextPalette = nextPoster.palette && palettes[nextPoster.palette] ? nextPoster.palette : themes[nextTheme].palette ?? "clean-blue";
+    const nextPalette = nextPoster.palette && palettes[nextPoster.palette] ? nextPoster.palette : themes[nextTheme]?.palette ?? "clean-blue";
     const normalizedPoster = { ...nextPoster, theme: nextTheme, palette: nextPalette };
     const nextQaIssues = runQa(normalizedPoster);
     setTheme(nextTheme);
@@ -262,16 +262,18 @@ export default function App() {
           {isGenerating ? "Generating…" : realSourceCount > 0 ? `Generate from ${realSourceCount} source${realSourceCount !== 1 ? "s" : ""}` : "Generate poster"}
         </button>
 
-        <aside className="theme-note">
-          <strong>{selectedTheme.name}</strong>
-          <p>{selectedTheme.description}</p>
-          <div className="palette-swatches" aria-label={`${selectedPalette.name} palette`}>
-            <span style={{ background: selectedPalette.colors.primary }} />
-            <span style={{ background: selectedPalette.colors.accent }} />
-            <span style={{ background: selectedPalette.colors.background }} />
-            <span style={{ background: selectedPalette.colors.ink }} />
-          </div>
-        </aside>
+        {selectedTheme && selectedPalette ? (
+          <aside className="theme-note">
+            <strong>{selectedTheme.name}</strong>
+            <p>{selectedTheme.description}</p>
+            <div className="palette-swatches" aria-label={`${selectedPalette.name} palette`}>
+              <span style={{ background: selectedPalette.colors.primary }} />
+              <span style={{ background: selectedPalette.colors.accent }} />
+              <span style={{ background: selectedPalette.colors.background }} />
+              <span style={{ background: selectedPalette.colors.ink }} />
+            </div>
+          </aside>
+        ) : null}
 
         <JsonProjectControls poster={poster} onImport={handleProjectImport} onReset={handleResetProject} />
         <ExportPanel poster={poster} />

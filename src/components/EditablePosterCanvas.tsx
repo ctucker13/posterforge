@@ -8,7 +8,7 @@ interface EditablePosterCanvasProps {
   poster: PosterProject;
   onPosterChange: (poster: PosterProject) => void;
   onSelectItem: (id: string, kind: PosterCanvasItemKind) => void;
-  selectedId?: string;
+  selectedId?: string | undefined;
 }
 
 type EditorViewMode = "fit" | "edit" | "check";
@@ -208,6 +208,7 @@ function collectEditorLayoutWarnings(root: HTMLElement | null) {
     for (let secondIndex = firstIndex + 1; secondIndex < gridItems.length; secondIndex += 1) {
       const first = gridItems[firstIndex];
       const second = gridItems[secondIndex];
+      if (!first || !second) continue;
       const overlapWidth = Math.max(0, Math.min(first.rect.right, second.rect.right) - Math.max(first.rect.left, second.rect.left));
       const overlapHeight = Math.max(0, Math.min(first.rect.bottom, second.rect.bottom) - Math.max(first.rect.top, second.rect.top));
 

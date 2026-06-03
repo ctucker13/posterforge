@@ -375,7 +375,7 @@ function renderVisual(
     });
     rows.forEach((row, rowIndex) => {
       columns.forEach((column, columnIndex) => {
-        const value = Array.isArray(row) ? row[columnIndex] : row[column];
+        const value = Array.isArray(row) ? (row[columnIndex] ?? null) : (row[column] ?? null);
         slide.addText(formatTableCell(value), {
           x: box.x + 0.08 + columnIndex * colW,
           y: box.y + 0.32 + (rowIndex + 1) * rowH,

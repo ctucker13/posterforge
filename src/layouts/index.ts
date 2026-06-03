@@ -75,7 +75,8 @@ export const layoutTemplates: LayoutTemplate[] = [
 ];
 
 export function resolveLayoutTemplate(layoutId: string): LayoutTemplate {
-  return layoutTemplates.find((layout) => layout.id === layoutId) ?? layoutTemplates[0];
+  // layoutTemplates is a non-empty hard-coded array; [0] always exists
+  return layoutTemplates.find((layout) => layout.id === layoutId) ?? layoutTemplates[0]!;
 }
 
 export function isFeaturedSection(layout: LayoutTemplate, section: PosterSection) {

@@ -25,9 +25,9 @@ export interface ExportArtifact {
   mimeType: string;
   status: ExportArtifactStatus;
   label: string;
-  createdAt?: string;
-  count?: number;
-  metadata?: Record<string, unknown>;
+  createdAt?: string | undefined;
+  count?: number | undefined;
+  metadata?: Record<string, unknown> | undefined;
 }
 
 export interface ExportJob {

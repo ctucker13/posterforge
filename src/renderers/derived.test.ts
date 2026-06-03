@@ -24,9 +24,9 @@ describe("renderer derived data", () => {
       { source: "A", target: "C", value: 20 },
     ]);
 
-    expect(formatPercent(summaries[0].share)).toBe("80.0%");
-    expect(summaries[0].widthPercent).toBe(100);
-    expect(summaries[1].widthPercent).toBe(25);
+    expect(formatPercent(summaries[0]!.share)).toBe("80.0%");
+    expect(summaries[0]!.widthPercent).toBe(100);
+    expect(summaries[1]!.widthPercent).toBe(25);
   });
 
   it("builds clamped Gantt segments", () => {
@@ -35,9 +35,9 @@ describe("renderer derived data", () => {
       { label: "B", start: "2026-06-03", end: "2026-06-07" },
     ]);
 
-    expect(segments[0].offsetPercent).toBe(0);
-    expect(segments[0].widthPercent).toBeGreaterThan(8);
-    expect(segments[1].offsetPercent).toBeGreaterThan(0);
-    expect(segments[1].offsetPercent + segments[1].widthPercent).toBeLessThanOrEqual(100);
+    expect(segments[0]!.offsetPercent).toBe(0);
+    expect(segments[0]!.widthPercent).toBeGreaterThan(8);
+    expect(segments[1]!.offsetPercent).toBeGreaterThan(0);
+    expect(segments[1]!.offsetPercent + segments[1]!.widthPercent).toBeLessThanOrEqual(100);
   });
 });

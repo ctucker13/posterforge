@@ -115,7 +115,8 @@ export const themes: Record<string, PosterTheme> = {
   },
 };
 
-export function resolvePalette(themeId: string, paletteOverride?: string): PosterPalette {
+export function resolvePalette(themeId: string, paletteOverride?: string | undefined): PosterPalette {
   const theme = themes[themeId] ?? themes["clean-academic"];
-  return palettes[paletteOverride ?? theme.palette ?? "clean-blue"] ?? palettes["clean-blue"];
+  const paletteId = paletteOverride ?? theme?.palette ?? "clean-blue";
+  return palettes[paletteId] ?? palettes["clean-blue"] ?? { id: "clean-blue", name: "Clean Blue", colors: { primary: "#17324D", accent: "#2176AE", background: "#F3F7FA", panel: "#FFFFFF", ink: "#122232" } };
 }

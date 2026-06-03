@@ -20,14 +20,14 @@ export interface SankeyLink {
 }
 
 export interface SankeyData {
-  nodes?: string[];
+  nodes?: string[] | undefined;
   links: SankeyLink[];
 }
 
 export interface TimelineEventData {
   date: string;
   label: string;
-  detail?: string;
+  detail?: string | undefined;
 }
 
 export interface TimelineData {
@@ -38,7 +38,7 @@ export interface GanttTaskData {
   label: string;
   start: string;
   end: string;
-  status?: string;
+  status?: string | undefined;
 }
 
 export interface GanttData {
@@ -47,9 +47,9 @@ export interface GanttData {
 
 export interface FlowRow {
   label: string;
-  detail?: string;
+  detail?: string | undefined;
   weight: number;
-  note?: string;
+  note?: string | undefined;
 }
 
 export interface FlowData {
@@ -62,17 +62,17 @@ export interface SourceTextData {
 
 export interface CodeBlockData {
   code: string;
-  language?: string;
+  language?: string | undefined;
 }
 
 export interface MetricCardData {
   label: string;
   value: string | number;
-  note?: string;
+  note?: string | undefined;
 }
 
 export interface GeneratedVisualData {
-  prompt?: string;
+  prompt?: string | undefined;
 }
 
 export type SupportedRendererData =

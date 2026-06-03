@@ -24,7 +24,9 @@ export function parseRepoUrl(raw: string): ParsedRepoUrl | null {
 
   if (url.hostname === "github.com") {
     if (parts.length < 2) return null;
-    const [owner, repo] = parts;
+    const owner = parts[0];
+    const repo = parts[1];
+    if (!owner || !repo) return null;
     return { kind: "github", owner, repo, baseUrl: `https://github.com/${owner}/${repo}` };
   }
 
@@ -32,6 +34,7 @@ export function parseRepoUrl(raw: string): ParsedRepoUrl | null {
     if (parts.length < 2) return null;
     const repo = parts[parts.length - 1];
     const owner = parts.slice(0, parts.length - 1).join("/");
+    if (!owner || !repo) return null;
     return { kind: "gitlab", owner, repo, baseUrl: `https://gitlab.com/${owner}/${repo}` };
   }
 
@@ -173,21 +176,21 @@ export async function fetchRepoFiles(parsed: ParsedRepoUrl): Promise<RepoFile[]>
       githubListFiles(parsed.owner, parsed.repo),
       githubRepoDescription(parsed.owner, parsed.repo),
     ]);
-    const results: RepoFile[] = [];
-    for (const { path, downloadUrl } of files) {
-      const body = await (await fetch(downloadUrl)).text();
-      results.push({ path, interpretation: buildInterpretation(parsed, path, body, description) });
-    }
-    return results;
+    return Promise.all(
+      files.map(async ({ path, downloadUrl }) => {
+        const body = await (await fetch(downloadUrl)).text();
+        return { path, interpretation: buildInterpretation(parsed, path, body, description) };
+      }),
+    );
   }
 
   // gitlab
   const info = await gitlabProjectInfo(parsed.owner, parsed.repo);
   const files = await gitlabListFiles(info.id, info.default_branch);
-  const results: RepoFile[] = [];
-  for (const { path } of files) {
-    const body = await gitlabFetchFile(info.id, path, info.default_branch);
-    results.push({ path, interpretation: buildInterpretation(parsed, path, body, info.description) });
-  }
-  return results;
+  return Promise.all(
+    files.map(async ({ path }) => {
+      const body = await gitlabFetchFile(info.id, path, info.default_branch);
+      return { path, interpretation: buildInterpretation(parsed, path, body, info.description) };
+    }),
+  );
 }

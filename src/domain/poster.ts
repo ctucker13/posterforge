@@ -19,19 +19,19 @@ export type PosterLayoutId =
   | "case-study-poster";
 
 export interface PosterMetadata {
-  prompt?: string;
-  created_at?: string;
-  updated_at?: string;
-  generator?: string;
+  prompt?: string | undefined;
+  created_at?: string | undefined;
+  updated_at?: string | undefined;
+  generator?: string | undefined;
 }
 
 export interface PosterSource {
   id: string;
   type: SourceType;
   title: string;
-  url?: string;
-  accessed_at?: string;
-  trust_level?: TrustLevel;
+  url?: string | undefined;
+  accessed_at?: string | undefined;
+  trust_level?: TrustLevel | undefined;
 }
 
 export interface SourceDocument {
@@ -39,15 +39,15 @@ export interface SourceDocument {
   source: PosterSource;
   title: string;
   body: string;
-  metadata?: Record<string, unknown>;
+  metadata?: Record<string, unknown> | undefined;
 }
 
 export interface SourceSummary {
   source_id: string;
   summary: string;
-  methods?: string[];
-  metrics?: string[];
-  figures?: string[];
+  methods?: string[] | undefined;
+  metrics?: string[] | undefined;
+  figures?: string[] | undefined;
 }
 
 export type EvidenceKind = "claim" | "method" | "metric" | "figure" | "code_summary" | "reference";
@@ -57,15 +57,15 @@ export interface EvidenceItem {
   source_id: string;
   kind: EvidenceKind;
   text: string;
-  location?: string;
-  confidence?: TrustLevel;
+  location?: string | undefined;
+  confidence?: TrustLevel | undefined;
 }
 
 export interface PosterClaim {
   id: string;
   text: string;
   source_ids: string[];
-  confidence?: TrustLevel;
+  confidence?: TrustLevel | undefined;
 }
 
 export interface ClaimMapEntry {
@@ -74,7 +74,7 @@ export interface ClaimMapEntry {
   source_ids: string[];
   evidence_ids: string[];
   section_ids: string[];
-  confidence?: TrustLevel;
+  confidence?: TrustLevel | undefined;
 }
 
 export interface ClaimMap {
@@ -94,75 +94,75 @@ export interface PosterSection {
     | "references"
     | "custom";
   title: string;
-  layout?: PosterSectionLayout;
+  layout?: PosterSectionLayout | undefined;
   blocks: PosterBlock[];
 }
 
 export interface PosterSectionLayout {
-  order?: number;
-  columnSpan?: 1 | 2 | 3 | 4;
-  rowSpan?: 1 | 2;
-  emphasis?: "normal" | "featured" | "hero";
-  hidden?: boolean;
+  order?: number | undefined;
+  columnSpan?: 1 | 2 | 3 | 4 | undefined;
+  rowSpan?: 1 | 2 | undefined;
+  emphasis?: "normal" | "featured" | "hero" | undefined;
+  hidden?: boolean | undefined;
 }
 
 export type PosterBlock =
-  | { type: "text"; text: string; claim_ids?: string[] }
-  | { type: "visual_ref"; visual_id: string; caption?: string };
+  | { type: "text"; text: string; claim_ids?: string[] | undefined }
+  | { type: "visual_ref"; visual_id: string; caption?: string | undefined };
 
 export interface PosterAsset {
   id: string;
   type: "ai_image" | "generated_background" | "generated_panel" | "uploaded_image";
   role: "atmosphere" | "section_art" | "background" | "comic_panel" | "reference";
-  title?: string;
-  prompt?: string;
-  model?: string;
-  theme?: string;
-  palette?: string;
-  source_ids?: string[];
-  url?: string;
-  width_px?: number;
-  height_px?: number;
-  metadata?: Record<string, unknown>;
+  title?: string | undefined;
+  prompt?: string | undefined;
+  model?: string | undefined;
+  theme?: string | undefined;
+  palette?: string | undefined;
+  source_ids?: string[] | undefined;
+  url?: string | undefined;
+  width_px?: number | undefined;
+  height_px?: number | undefined;
+  metadata?: Record<string, unknown> | undefined;
 }
 
 export interface PosterVisual {
   id: string;
   type: string;
   title: string;
-  source_ids?: string[];
-  data?: Record<string, unknown>;
-  options?: Record<string, unknown>;
-  asset?: PosterAsset;
+  source_ids?: string[] | undefined;
+  data?: Record<string, unknown> | undefined;
+  options?: Record<string, unknown> | undefined;
+  asset?: PosterAsset | undefined;
 }
 
 export interface PosterProject {
   id: string;
-  schemaVersion?: string;
-  metadata?: PosterMetadata;
+  schemaVersion?: string | undefined;
+  metadata?: PosterMetadata | undefined;
   title: string;
-  subtitle?: string;
-  logo?: string;
+  subtitle?: string | undefined;
+  logo?: string | undefined;
   format: {
     size: "A0" | "A1" | "A2" | "custom";
     orientation: "portrait" | "landscape";
   };
   theme: string;
-  palette?: string;
+  palette?: string | undefined;
   layout: PosterLayoutId;
-  audience?: string;
+  audience?: string | undefined;
   sources: PosterSource[];
-  sourceDocuments?: SourceDocument[];
-  sourceSummaries?: SourceSummary[];
-  evidence?: EvidenceItem[];
-  claimMap?: ClaimMap;
+  sourceDocuments?: SourceDocument[] | undefined;
+  sourceSummaries?: SourceSummary[] | undefined;
+  evidence?: EvidenceItem[] | undefined;
+  claimMap?: ClaimMap | undefined;
   claims: PosterClaim[];
   sections: PosterSection[];
   visuals: PosterVisual[];
-  assets?: PosterAsset[];
-  references?: Record<string, unknown>[];
-  traces?: PosterTraceEvent[];
-  qaResults?: PosterQaIssue[];
+  assets?: PosterAsset[] | undefined;
+  references?: Record<string, unknown>[] | undefined;
+  traces?: PosterTraceEvent[] | undefined;
+  qaResults?: PosterQaIssue[] | undefined;
 }
 
 export interface PosterQaIssue {
@@ -170,9 +170,9 @@ export interface PosterQaIssue {
   severity: QaSeverity;
   message: string;
   location: string;
-  suggestedFix?: string;
-  autoFixable?: boolean;
-  fixId?: "create_references";
+  suggestedFix?: string | undefined;
+  autoFixable?: boolean | undefined;
+  fixId?: "create_references" | undefined;
 }
 
 export interface PosterTraceArtifactRef {
@@ -196,8 +196,8 @@ export interface PosterTraceEvent {
   label: string;
   detail: string;
   status: TraceStatus;
-  timestamp?: string;
-  artifactRefs?: PosterTraceArtifactRef[];
+  timestamp?: string | undefined;
+  artifactRefs?: PosterTraceArtifactRef[] | undefined;
 }
 
 export type QaIssue = PosterQaIssue;

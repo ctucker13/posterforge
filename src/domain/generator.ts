@@ -232,16 +232,16 @@ function deriveTitle(prompt: string, sources: PosterSource[]): string {
     .replace(/^(create|generate|make|build)\s+(a|an)\s+[\w -]*?(poster|presentation|slide deck)\s+(about|for|on|covering)\s+/i, "")
     .replace(/^(poster|presentation)\s+(about|for|on)\s+/i, "")
     .trim();
-  const first = cleaned.split(/[.!?\n]/)[0].trim();
+  const first = cleaned.split(/[.!?\n]/)[0]?.trim() ?? "";
   if (first.length >= 4 && first.length <= 90) {
     return first.charAt(0).toUpperCase() + first.slice(1);
   }
-  return sources[0]?.title.split("/")[0].trim() ?? "Generated Poster";
+  return sources[0]?.title.split("/")[0]?.trim() ?? "Generated Poster";
 }
 
 function deriveAudience(prompt: string): string {
   const match = prompt.match(/\b(for|audience[:\s]+|presented to)\s+([^,.!?]{4,40})/i);
-  return match ? match[2].trim() : "poster session";
+  return match ? (match[2]?.trim() ?? "poster session") : "poster session";
 }
 
 function deriveLayout(evidence: EvidenceItem[]): PosterLayoutId {
@@ -342,8 +342,8 @@ function deriveVisuals(
         title: clip(source.title, 40),
         source_ids: [source.id],
         data: {
-          label: summary.metrics[0],
-          value: summary.metrics[0].match(/^([\d.]+)/)?.[1] ?? "—",
+          label: summary.metrics[0] ?? "",
+          value: summary.metrics[0]?.match(/^([\d.]+)/)?.[1] ?? "—",
           note: clip(summary.summary, 100),
         },
       });
@@ -554,7 +554,7 @@ function deriveHeroTitle(prompt: string, sources: PosterSource[]): string {
   // Extract the subject from the prompt after common prefixes
   const title = deriveTitle(prompt, sources);
   // Use just the first comma-delimited segment as a short heading
-  const short = title.split(/[,;–]/)[0].trim();
+  const short = title.split(/[,;–]/)[0]?.trim() ?? title;
   return short.length >= 3 ? short : title.split(/\s+/).slice(0, 5).join(" ");
 }
 
@@ -577,5 +577,5 @@ function clip(s: string, max: number): string {
 function extractCodeFence(body: string): { language: string; code: string } | null {
   const m = body.match(/```(\w+)?\n([\s\S]+?)```/);
   if (!m) return null;
-  return { language: m[1] || "text", code: m[2].trim().slice(0, 500) };
+  return { language: m[1] || "text", code: m[2]?.trim().slice(0, 500) ?? "" };
 }

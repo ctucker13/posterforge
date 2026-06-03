@@ -5,7 +5,7 @@ export interface HtmlPreviewDescriptor {
   posterId: string;
   title: string;
   theme: string;
-  palette?: string;
+  palette?: string | undefined;
   layout: string;
   format: PosterProject["format"];
   sections: Array<{

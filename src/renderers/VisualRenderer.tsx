@@ -76,7 +76,7 @@ export function VisualRenderer({ visual }: { visual: PosterVisual }) {
                 <tr key={rowIndex}>
                   {columns.map((column, columnIndex) => (
                     <td key={column}>
-                      {Array.isArray(row) ? formatCell(row[columnIndex]) : formatCell(row[column])}
+                      {Array.isArray(row) ? formatCell(row[columnIndex] ?? null) : formatCell(row[column] ?? null)}
                     </td>
                   ))}
                 </tr>

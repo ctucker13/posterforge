@@ -2,12 +2,12 @@ import type { PosterAsset, PosterProject, PosterVisual } from "../domain/poster"
 
 export interface ImageAssetRequest {
   id: string;
-  visualId?: string;
+  visualId?: string | undefined;
   title: string;
   prompt: string;
   role: PosterAsset["role"];
-  theme?: string;
-  palette?: string;
+  theme?: string | undefined;
+  palette?: string | undefined;
   model: string;
   size: string;
   outputPath: string;

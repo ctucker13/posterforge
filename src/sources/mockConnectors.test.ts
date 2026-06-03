@@ -9,11 +9,11 @@ describe("mock source connectors", () => {
     const results = await gitlabConnector!.search("confusion matrix");
 
     expect(results.length).toBeGreaterThan(0);
-    expect(results[0].source.type).toBe("gitlab");
+    expect(results[0]!.source.type).toBe("gitlab");
 
-    const document = await gitlabConnector!.fetch(results[0].ref);
+    const document = await gitlabConnector!.fetch(results[0]!.ref);
 
-    expect(document.title).toBe(results[0].title);
+    expect(document.title).toBe(results[0]!.title);
     expect(document.body).toContain("confusion matrix");
   });
 
@@ -47,7 +47,7 @@ describe("mock source connectors", () => {
   it("keeps acquisition separate from mock source interpretation", async () => {
     const connector = mockSourceConnectors.find((candidate) => candidate.id === "mock_confluence")!;
     const [result] = await connector.search("workflow");
-    const document = await connector.fetch(result.ref);
+    const document = await connector.fetch(result!.ref);
     const interpretation = interpretMockSourceDocument(document);
 
     expect(interpretation?.sourceDocument.id).toBe(document.id);

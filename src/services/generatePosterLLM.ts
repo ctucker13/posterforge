@@ -105,7 +105,7 @@ function deriveTitle(prompt: string): string {
   const cleaned = prompt
     .replace(/^(create|generate|make|build)\s+(a|an)\s+[\w -]*?(poster|presentation)\s+(about|for|on|covering)\s+/i, "")
     .trim();
-  const first = cleaned.split(/[.!?\n]/)[0].trim();
+  const first = cleaned.split(/[.!?\n]/)[0]?.trim() ?? "";
   return first.length >= 4 && first.length <= 90
     ? first.charAt(0).toUpperCase() + first.slice(1)
     : prompt.slice(0, 60);

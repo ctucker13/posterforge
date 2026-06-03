@@ -9,12 +9,12 @@ export type PosterCanvasItemKind = "section" | "block" | "visual";
 
 export interface PosterCanvasProps {
   poster: PosterProject;
-  mode?: "preview" | "edit" | "export";
-  selectedId?: string;
-  onSelectItem?: (id: string, kind: PosterCanvasItemKind) => void;
-  onUpdatePosterField?: (field: "title" | "subtitle", value: string) => void;
-  onUpdateSectionTitle?: (sectionId: string, title: string) => void;
-  onUpdateTextBlock?: (blockId: string, text: string) => void;
+  mode?: "preview" | "edit" | "export" | undefined;
+  selectedId?: string | undefined;
+  onSelectItem?: ((id: string, kind: PosterCanvasItemKind) => void) | undefined;
+  onUpdatePosterField?: ((field: "title" | "subtitle", value: string) => void) | undefined;
+  onUpdateSectionTitle?: ((sectionId: string, title: string) => void) | undefined;
+  onUpdateTextBlock?: ((blockId: string, text: string) => void) | undefined;
 }
 
 export function PosterCanvas({

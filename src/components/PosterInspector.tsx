@@ -5,8 +5,8 @@ import { parseBlockId } from "./posterUtils";
 
 interface PosterInspectorProps {
   poster: PosterProject;
-  selectedId?: string;
-  selectedKind?: PosterCanvasItemKind;
+  selectedId?: string | undefined;
+  selectedKind?: PosterCanvasItemKind | undefined;
   onPosterChange: (poster: PosterProject) => void;
 }
 
@@ -40,6 +40,7 @@ export function PosterInspector({ poster, selectedId, selectedKind, onPosterChan
 
     const sections = [...poster.sections];
     const [section] = sections.splice(index, 1);
+    if (!section) return;
     sections.splice(nextIndex, 0, section);
     onPosterChange({
       ...poster,
