@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AlertTriangle, CheckCircle2, Maximize2, ZoomIn, ZoomOut } from "lucide-react";
+import { AlertTriangle, CheckCircle2 } from "lucide-react";
 import type { PosterProject } from "../domain/poster";
 import { getA0PreviewFrame, PosterCanvas, type PosterCanvasItemKind } from "./PosterCanvas";
 
@@ -10,12 +10,37 @@ interface EditablePosterCanvasProps {
   selectedId?: string;
 }
 
+type EditorViewMode = "fit" | "edit" | "check";
+
 export function EditablePosterCanvas({ poster, selectedId, onPosterChange, onSelectItem }: EditablePosterCanvasProps) {
-  const [zoom, setZoom] = useState(0.16);
+  const [viewMode, setViewMode] = useState<EditorViewMode>("fit");
+  const [fitZoom, setFitZoom] = useState(0.16);
   const [layoutWarnings, setLayoutWarnings] = useState<string[]>([]);
+  const viewportRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const outputFrame = useMemo(() => getA0PreviewFrame(poster.format.orientation), [poster.format.orientation]);
+  const zoom = viewMode === "fit" ? fitZoom : viewMode === "edit" ? 0.24 : 0.16;
   const zoomLabel = `${Math.round(zoom * 100)}%`;
+
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) {
+      return;
+    }
+
+    function updateFitZoom() {
+      const rect = viewport!.getBoundingClientRect();
+      const availableWidth = Math.max(1, rect.width - 36);
+      const availableHeight = Math.max(1, rect.height - 36);
+      const nextZoom = Math.max(0.1, Math.min(0.5, availableWidth / outputFrame.width, availableHeight / outputFrame.height));
+      setFitZoom(Number(nextZoom.toFixed(3)));
+    }
+
+    updateFitZoom();
+    const observer = new ResizeObserver(updateFitZoom);
+    observer.observe(viewport);
+    return () => observer.disconnect();
+  }, [outputFrame.height, outputFrame.width]);
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -65,31 +90,33 @@ export function EditablePosterCanvas({ poster, selectedId, onPosterChange, onSel
     <section className="preview-panel editable-poster-panel" aria-label="Editable poster canvas">
       <div className="panel-header">
         <h2>Poster Editor</h2>
-        <span>{`A0 ${outputFrame.orientation} · ${zoomLabel}`}</span>
+        <span>{`A0 ${outputFrame.orientation} · ${viewMode} · ${zoomLabel}`}</span>
       </div>
-      <div className="preview-toolbar" aria-label="Editor zoom controls">
-        <button type="button" onClick={() => setZoom((value) => Math.max(0.1, Number((value - 0.03).toFixed(2))))} title="Zoom out">
-          <ZoomOut size={15} />
-        </button>
+      <div className="preview-toolbar" aria-label="Editor view controls">
+        <div className="view-mode-toggle" role="tablist" aria-label="Poster editor view mode">
+          <button className={viewMode === "fit" ? "active" : ""} type="button" role="tab" aria-selected={viewMode === "fit"} onClick={() => setViewMode("fit")}>
+            Fit
+          </button>
+          <button className={viewMode === "edit" ? "active" : ""} type="button" role="tab" aria-selected={viewMode === "edit"} onClick={() => setViewMode("edit")}>
+            Edit
+          </button>
+          <button className={viewMode === "check" ? "active" : ""} type="button" role="tab" aria-selected={viewMode === "check"} onClick={() => setViewMode("check")}>
+            Check
+          </button>
+        </div>
         <strong>{zoomLabel}</strong>
-        <button type="button" onClick={() => setZoom((value) => Math.min(0.5, Number((value + 0.03).toFixed(2))))} title="Zoom in">
-          <ZoomIn size={15} />
-        </button>
-        <button type="button" onClick={() => setZoom(0.16)} title="Reset zoom">
-          <Maximize2 size={15} />
-        </button>
-        <span>Click text to edit. Select sections for layout controls.</span>
+        <span>{viewMode === "edit" ? "Click text to edit. Select sections for layout controls." : viewMode === "check" ? "Export framing and layout warnings." : "Whole poster fitted to the workspace."}</span>
         <span className={layoutWarnings.length > 0 ? "render-check warning" : "render-check passed"} title={layoutWarnings.slice(0, 4).join("\n")}>
           {layoutWarnings.length > 0 ? <AlertTriangle size={15} /> : <CheckCircle2 size={15} />}
           {layoutWarnings.length > 0 ? `${layoutWarnings.length} layout warning${layoutWarnings.length === 1 ? "" : "s"}` : "Layout check passed"}
         </span>
       </div>
-      <div className="preview-viewport">
+      <div ref={viewportRef} className="preview-viewport">
         <div ref={stageRef} className="a0-preview-stage" style={{ width: outputFrame.width * zoom, height: outputFrame.height * zoom }}>
           <div style={{ transform: `scale(${zoom})`, transformOrigin: "top left" }}>
             <PosterCanvas
               poster={poster}
-              mode="edit"
+              mode={viewMode === "check" ? "preview" : "edit"}
               selectedId={selectedId}
               onSelectItem={onSelectItem}
               onUpdatePosterField={updatePosterField}
