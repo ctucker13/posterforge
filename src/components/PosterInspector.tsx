@@ -1,6 +1,7 @@
 import { ArrowDown, ArrowUp, Eye, EyeOff, MousePointer2 } from "lucide-react";
 import type { PosterBlock, PosterProject, PosterSection, PosterSectionLayout } from "../domain/poster";
 import type { PosterCanvasItemKind } from "./PosterCanvas";
+import { parseBlockId } from "./posterUtils";
 
 interface PosterInspectorProps {
   poster: PosterProject;
@@ -170,11 +171,3 @@ function findTextBlock(poster: PosterProject, blockId: string): { id: string; bl
   return block?.type === "text" ? { id: blockId, block } : undefined;
 }
 
-function parseBlockId(blockId: string): { sectionId: string; index: number } | undefined {
-  const match = blockId.match(/^(.+):block:(\d+)$/);
-  if (!match) {
-    return undefined;
-  }
-
-  return { sectionId: match[1], index: Number(match[2]) };
-}

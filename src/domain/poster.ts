@@ -138,6 +138,7 @@ export interface PosterVisual {
 
 export interface PosterProject {
   id: string;
+  schemaVersion?: string;
   metadata?: PosterMetadata;
   title: string;
   subtitle?: string;

@@ -16,6 +16,7 @@ export const examplePoster: PosterProject = {
     size: "A0",
     orientation: "landscape",
   },
+  schemaVersion: "posterforge.poster.v1",
   theme: "natwest-group",
   palette: "natwest-group",
   logo: "/assets/nwg-logo.png",

@@ -107,14 +107,34 @@ export const generationTrace: Omit<TraceEvent, "status">[] = [
   },
 ];
 
-export function generatePoster(options: GenerationOptions): PosterProject {
+export async function generatePoster(
+  options: GenerationOptions,
+  onProgress?: (stepId: string) => void,
+): Promise<PosterProject> {
+  const noop = (_id: string) => {};
+  const progress = onProgress ?? noop;
+
+  const apiKey = (typeof import.meta !== "undefined" && import.meta.env?.VITE_OPENAI_API_KEY) as string | undefined;
   const realSources = options.currentSources?.sources.filter((s) => !s.url?.startsWith("mock://")) ?? [];
 
+  // Route to real LLM when an API key is configured
+  if (apiKey) {
+    try {
+      const { generatePosterWithLLM } = await import("../services/generatePosterLLM");
+      return await generatePosterWithLLM(options, progress);
+    } catch (err) {
+      console.warn("[posterforge] LLM generation failed, falling back to deterministic path:", err);
+    }
+  }
+
   if (realSources.length > 0 && options.currentSources) {
+    progress("plan"); progress("sources"); progress("read_sources"); progress("evidence");
     return generateFromRealSources(options);
   }
 
-  // ── Mock path (unchanged) ─────────────────────────────────────────────────
+  // ── Mock path ──────────────────────────────────────────────────────────────
+  progress("plan"); progress("sources"); progress("read_sources"); progress("evidence");
+  progress("claim_map"); progress("layout"); progress("visuals");
   const sourcePackage = buildMockSourcePackage(options.sourceMode);
   const sourceText =
     options.sourceMode === "mock"
@@ -149,6 +169,7 @@ export function generatePoster(options: GenerationOptions): PosterProject {
       updated_at: new Date().toISOString(),
       generator: "posterforge-demo-generator",
     },
+    schemaVersion: "posterforge.poster.v1",
     theme: options.theme,
     palette: options.palette,
     logo: themes[options.theme]?.logoUrl,
@@ -180,6 +201,7 @@ function generateFromRealSources(options: GenerationOptions): PosterProject {
       created_at: new Date().toISOString(),
       generator: "posterforge-source-generator",
     },
+    schemaVersion: "posterforge.poster.v1",
     logo: themes[options.theme]?.logoUrl,
     title: deriveTitle(options.prompt, sources),
     subtitle: `Generated from ${sources.length} attached source${sources.length !== 1 ? "s" : ""}`,
@@ -542,19 +564,6 @@ function deriveHeroText(prompt: string, summaries: SourceSummary[]): string {
   return prompt.trim() || "A source-grounded poster generated from attached project evidence.";
 }
 
-// ── Mermaid builder ───────────────────────────────────────────────────────────
-
-function buildSourceMermaid(sources: PosterSource[]): string {
-  const lines = ["flowchart LR"];
-  for (let i = 0; i < Math.min(sources.length, 5); i++) {
-    const label = clip(sources[i].title.split("/").pop() ?? sources[i].title, 28).replace(/"/g, "'");
-    lines.push(`S${i}["${label}"] --> EV`);
-  }
-  lines.push('EV["Evidence"] --> CL["Claims"]');
-  lines.push('CL --> PO["Poster"]');
-  return lines.join("\n");
-}
-
 // ── Text/value utilities ──────────────────────────────────────────────────────
 
 function idSlug(id: string): string {
@@ -563,15 +572,6 @@ function idSlug(id: string): string {
 
 function clip(s: string, max: number): string {
   return s.length > max ? s.slice(0, max - 1) + "…" : s;
-}
-
-function metricLabel(metric: string): string {
-  return metric.replace(/^[\d%.,~<>≈±\s]+/, "").trim() || metric;
-}
-
-function metricValue(metric: string): string {
-  const m = metric.match(/^([\d%.,~<>≈±]+(?:\s*[%x×])?)/);
-  return m ? m[1].trim() : clip(metric, 20);
 }
 
 function extractCodeFence(body: string): { language: string; code: string } | null {

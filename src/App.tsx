@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { ClipboardCheck, Database, FileSearch, FolderOpen, Globe2, Layers3, Palette, Play, Route, Settings2, Sparkles } from "lucide-react";
 import { EditablePosterCanvas } from "./components/EditablePosterCanvas";
@@ -12,10 +12,12 @@ import { SourceSearchPanel } from "./components/SourceSearchPanel";
 import { TracePanel } from "./components/TracePanel";
 import { VisualRegistryPanel } from "./components/VisualRegistryPanel";
 import { generatePoster, generationTrace, type GenerationOptions } from "./domain/generator";
+import { examplePoster } from "./data/examplePoster";
 import type { PosterProject, QaIssue, TraceEvent } from "./domain/poster";
 import type { PosterCanvasItemKind } from "./components/PosterCanvas";
 import { applyQaFix, runQa } from "./qa";
 import { palettes, themes } from "./themes";
+import { debounce } from "./utils/debounce";
 import "./styles/app.css";
 
 const defaultPrompt =
@@ -26,12 +28,9 @@ function createQueuedTrace(): TraceEvent[] {
 }
 
 const initialTrace = createQueuedTrace();
-const initialPoster = generatePoster({
-  prompt: defaultPrompt,
-  theme: "natwest-group",
-  palette: "natwest-group",
-  sourceMode: "mock",
-});
+// Use the pre-built example poster as the initial state — avoids an async
+// call at module init time. generatePoster() is called on explicit Generate.
+const initialPoster = examplePoster;
 const initialQaIssues = runQa(initialPoster);
 type WorkspaceTab = "edit" | "sources" | "qa" | "trace" | "visuals";
 
@@ -52,56 +51,87 @@ export default function App() {
   const highQaCount = qaIssues.filter((issue) => issue.severity === "high").length;
   const realSourceCount = poster.sources.filter((s) => !s.url?.startsWith("mock://")).length;
 
+  const debouncedRunQa = useMemo(() => debounce((p: PosterProject) => {
+    const issues = runQa(p);
+    setQaIssues(issues);
+    setPoster((prev) => ({ ...prev, qaResults: issues }));
+  }, 400), []);
+
   async function handleGenerate() {
     setIsGenerating(true);
+    const startedAt = new Date().toISOString();
     setTrace(createQueuedTrace());
-    const completedTrace: TraceEvent[] = [];
+    const completedStepIds = new Set<string>();
 
-    for (const step of generationTrace) {
+    function onProgress(stepId: string) {
+      // Mark the previous in-progress step as complete, start the new one
       setTrace((events) =>
-        events.map((event) =>
-          event.id === step.id ? { ...event, status: "running", timestamp: new Date().toISOString() } : event,
-        ),
+        events.map((event) => {
+          if (event.id === stepId) return { ...event, status: "running" as const, timestamp: new Date().toISOString() };
+          if (event.status === "running") {
+            completedStepIds.add(event.id);
+            return { ...event, status: "complete" as const };
+          }
+          return event;
+        }),
       );
-      await new Promise((resolve) => setTimeout(resolve, 260));
-      const completedEvent: TraceEvent = { ...step, status: "complete", timestamp: new Date().toISOString() };
-      completedTrace.push(completedEvent);
-      setTrace((events) => events.map((event) => (event.id === step.id ? completedEvent : event)));
     }
 
-    const nextPoster = {
-      ...generatePoster({
-        prompt,
-        theme,
-        palette,
-        sourceMode,
-        currentSources: {
-          sources: poster.sources,
-          sourceDocuments: poster.sourceDocuments ?? [],
-          sourceSummaries: poster.sourceSummaries ?? [],
-          evidence: poster.evidence ?? [],
+    try {
+      const nextPoster = await generatePoster(
+        {
+          prompt,
+          theme,
+          palette,
+          sourceMode,
+          currentSources: {
+            sources: poster.sources,
+            sourceDocuments: poster.sourceDocuments ?? [],
+            sourceSummaries: poster.sourceSummaries ?? [],
+            evidence: poster.evidence ?? [],
+          },
         },
-      }),
-      traces: completedTrace,
-    };
-    const nextQaIssues = runQa(nextPoster);
-    setPoster({ ...nextPoster, qaResults: nextQaIssues });
-    setQaIssues(nextQaIssues);
-    setIsGenerating(false);
+        onProgress,
+      );
+
+      const completedTrace = generationTrace.map((step) => ({
+        ...step,
+        status: "complete" as const,
+        timestamp: startedAt,
+      }));
+
+      const nextQaIssues = runQa(nextPoster);
+      setPoster({ ...nextPoster, qaResults: nextQaIssues, traces: completedTrace });
+      setQaIssues(nextQaIssues);
+      setTrace(completedTrace);
+    } catch (err) {
+      console.error("[posterforge] Generation error:", err);
+      setTrace((events) =>
+        events.map((e) =>
+          e.status === "running"
+            ? { ...e, status: "complete" as const, detail: `Error: ${err instanceof Error ? err.message : String(err)}` }
+            : e,
+        ),
+      );
+    } finally {
+      setIsGenerating(false);
+    }
   }
 
   function handleThemeChange(nextTheme: string) {
-    const nextPoster = { ...poster, theme: nextTheme, logo: themes[nextTheme]?.logoUrl };
+    const nextQaIssues = runQa({ ...poster, theme: nextTheme });
+    const nextPoster = { ...poster, theme: nextTheme, logo: themes[nextTheme]?.logoUrl, qaResults: nextQaIssues };
     setTheme(nextTheme);
     setPoster(nextPoster);
-    setQaIssues(runQa(nextPoster));
+    setQaIssues(nextQaIssues);
   }
 
   function handlePaletteChange(nextPalette: string) {
-    const nextPoster = { ...poster, palette: nextPalette };
+    const nextQaIssues = runQa({ ...poster, palette: nextPalette });
+    const nextPoster = { ...poster, palette: nextPalette, qaResults: nextQaIssues };
     setPalette(nextPalette);
     setPoster(nextPoster);
-    setQaIssues(runQa(nextPoster));
+    setQaIssues(nextQaIssues);
   }
 
   function handleProjectImport(nextPoster: PosterProject) {
@@ -117,8 +147,8 @@ export default function App() {
     setTrace(nextPoster.traces?.length ? nextPoster.traces : createQueuedTrace());
   }
 
-  function handleResetProject() {
-    const nextPoster = generatePoster({ prompt: defaultPrompt, theme: "natwest-group", palette: "natwest-group", sourceMode: "mock" });
+  async function handleResetProject() {
+    const nextPoster = await generatePoster({ prompt: defaultPrompt, theme: "natwest-group", palette: "natwest-group", sourceMode: "mock" });
     const nextQaIssues = runQa(nextPoster);
     setPrompt(defaultPrompt);
     setTheme(nextPoster.theme);
@@ -136,9 +166,8 @@ export default function App() {
   }
 
   function handlePosterStateChange(nextPoster: PosterProject) {
-    const nextQaIssues = runQa(nextPoster);
-    setPoster({ ...nextPoster, qaResults: nextQaIssues });
-    setQaIssues(nextQaIssues);
+    setPoster(nextPoster);
+    debouncedRunQa(nextPoster);
   }
 
   function handleQaFix(fixId: NonNullable<QaIssue["fixId"]>) {

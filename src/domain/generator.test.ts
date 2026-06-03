@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { generatePoster } from "./generator";
 
 describe("generatePoster", () => {
-  it("creates a source-grounded poster project with evidence artifacts", () => {
-    const poster = generatePoster({
+  it("creates a source-grounded poster project with evidence artifacts", async () => {
+    const poster = await generatePoster({
       prompt: "Explain fraud model monitoring.",
       theme: "clean-academic",
       palette: "clean-blue",
@@ -19,14 +19,14 @@ describe("generatePoster", () => {
     expect(poster.references?.length).toBe(poster.sources.length);
   });
 
-  it("filters mock sources by requested source mode", () => {
-    const webPoster = generatePoster({
+  it("filters mock sources by requested source mode", async () => {
+    const webPoster = await generatePoster({
       prompt: "Use web and paper evidence.",
       theme: "clean-academic",
       palette: "clean-blue",
       sourceMode: "web",
     });
-    const localPoster = generatePoster({
+    const localPoster = await generatePoster({
       prompt: "Use local project evidence.",
       theme: "clean-academic",
       palette: "clean-blue",

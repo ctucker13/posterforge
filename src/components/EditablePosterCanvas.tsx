@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AlertTriangle, CheckCircle2 } from "lucide-react";
 import type { PosterProject } from "../domain/poster";
 import { getA0PreviewFrame, PosterCanvas, type PosterCanvasItemKind } from "./PosterCanvas";
+import { parseBlockId } from "./posterUtils";
 
 interface EditablePosterCanvasProps {
   poster: PosterProject;
@@ -131,7 +132,16 @@ export function EditablePosterCanvas({ poster, selectedId, onPosterChange, onSel
           {layoutWarnings.length > 0 ? `${layoutWarnings.length} layout warning${layoutWarnings.length === 1 ? "" : "s"}` : "Layout check passed"}
         </span>
       </div>
-      <div ref={viewportRef} className="preview-viewport">
+      <div
+        ref={viewportRef}
+        className="preview-viewport"
+        onWheel={(e) => {
+          e.preventDefault();
+          const delta = e.deltaY > 0 ? -0.05 : 0.05;
+          setFitZoom((prev) => Math.max(0.08, Math.min(2.0, prev + delta)));
+          setViewMode("fit");
+        }}
+      >
         <div ref={stageRef} className="a0-preview-stage" style={{ width: outputFrame.width * zoom, height: outputFrame.height * zoom }}>
           <div style={{ transform: `scale(${zoom})`, transformOrigin: "top left" }}>
             <PosterCanvas
@@ -148,15 +158,6 @@ export function EditablePosterCanvas({ poster, selectedId, onPosterChange, onSel
       </div>
     </section>
   );
-}
-
-function parseBlockId(blockId: string): { sectionId: string; index: number } | undefined {
-  const match = blockId.match(/^(.+):block:(\d+)$/);
-  if (!match) {
-    return undefined;
-  }
-
-  return { sectionId: match[1], index: Number(match[2]) };
 }
 
 function collectEditorLayoutWarnings(root: HTMLElement | null) {

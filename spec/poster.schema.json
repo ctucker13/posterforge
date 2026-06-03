@@ -8,6 +8,10 @@
     "id": {
       "type": "string"
     },
+    "schemaVersion": {
+      "type": "string",
+      "description": "Schema version string, e.g. posterforge.poster.v1"
+    },
     "title": {
       "type": "string"
     },
@@ -141,7 +145,7 @@
           "type": "string"
         },
         "type": {
-          "enum": ["mock", "local_file", "web", "research_paper", "confluence", "gitlab"]
+          "enum": ["mock", "local_file", "web", "research_paper", "confluence", "gitlab", "github"]
         },
         "title": {
           "type": "string"

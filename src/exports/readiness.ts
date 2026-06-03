@@ -30,7 +30,9 @@ export function getExportReadiness(poster: PosterProject): ExportReadiness[] {
 }
 
 export function getExportReadinessForTarget(poster: PosterProject, target: ExportTarget): ExportReadiness {
-  return getExportReadiness(poster).find((item) => item.target === target)!;
+  const result = getExportReadiness(poster).find((item) => item.target === target);
+  if (!result) throw new Error(`Unknown export target: ${target}`);
+  return result;
 }
 
 function getTargetBlockers(poster: PosterProject, target: ExportTarget): string[] {

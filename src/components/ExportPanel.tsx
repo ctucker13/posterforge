@@ -90,7 +90,7 @@ export function ExportPanel({ poster }: ExportPanelProps) {
         ))}
       </div>
 
-      <div className="export-status">
+      <div className="export-status" aria-live="polite">
         <CheckCircle2 size={16} />
         <span>{message}</span>
       </div>

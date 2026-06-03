@@ -40,7 +40,7 @@ const factualVisualTypes = new Set([
 
 const generatedVisualTypes = new Set(["ai_image", "generated_background", "generated_comic_panel"]);
 const generatedAssetTypes = new Set<PosterAsset["type"]>(["ai_image", "generated_background", "generated_panel"]);
-const supportedRendererTypes = new Set(["confusion_matrix", "table", "sankey", "timeline", "gantt", "mermaid_flow", "math", "code_block", "metric_card"]);
+const supportedRendererTypes = new Set(["confusion_matrix", "table", "sankey", "timeline", "gantt", "mermaid_flow", "math", "code_block", "metric_card", "flow"]);
 
 function hasText(value: string | undefined): boolean {
   return Boolean(value?.trim());
@@ -224,6 +224,15 @@ export function runQa(poster: PosterProject): QaIssue[] {
           suggestedFix: "Add label wrapping, truncation, or annotation rules before export render checks.",
         });
       }
+    }
+
+    if (!supportedRendererTypes.has(visual.type) && !generatedVisualTypes.has(visual.type)) {
+      issues.push({
+        id: `visual_type_unknown_${visual.id}`,
+        severity: "low",
+        location: `visuals.${visual.id}.type`,
+        message: `Visual type "${visual.type}" has no renderer — will show a placeholder in exports.`,
+      });
     }
 
     const rendererValidation = validateRendererData(visual);

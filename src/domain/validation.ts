@@ -11,7 +11,7 @@ export type PosterValidationResult =
 
 const formatSizes = ["A0", "A1", "A2", "custom"] as const;
 const orientations = ["portrait", "landscape"] as const;
-const sourceTypes = ["mock", "local_file", "web", "research_paper", "confluence", "gitlab"] as const;
+const sourceTypes = ["mock", "local_file", "web", "research_paper", "confluence", "gitlab", "github"] as const;
 const trustLevels = ["low", "medium", "high"] as const;
 const evidenceKinds = ["claim", "method", "metric", "figure", "code_summary", "reference"] as const;
 const layoutIds = [
@@ -85,12 +85,22 @@ export function parsePosterProjectJson(json: string): PosterProject {
     throw new Error(`Invalid JSON: ${detail}`);
   }
 
-  const validation = validatePosterProject(parsed);
+  const migrated = migratePosterProject(parsed);
+  const validation = validatePosterProject(migrated);
   if (!validation.valid) {
     throw new Error(formatPosterValidationIssues(validation.issues));
   }
 
   return validation.project;
+}
+
+function migratePosterProject(raw: unknown): unknown {
+  if (typeof raw !== "object" || raw === null || Array.isArray(raw)) return raw;
+  const record = raw as Record<string, unknown>;
+  if (!record.schemaVersion) {
+    return { ...record, schemaVersion: "posterforge.poster.v1" };
+  }
+  return raw;
 }
 
 export function formatPosterValidationIssues(issues: PosterValidationIssue[], limit = 6): string {

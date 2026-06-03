@@ -31,9 +31,9 @@ const page = await browser.newPage({
   deviceScaleFactor: 1,
 });
 
-await page.goto(pathToFileURL(path.resolve(htmlPath)).href, { waitUntil: "networkidle" });
+await page.goto(pathToFileURL(path.resolve(htmlPath)).href, { waitUntil: "domcontentloaded" });
 await page.emulateMedia({ media: "print" });
-await page.locator(".a0-preview-canvas").waitFor();
+await page.locator(".a0-preview-canvas").waitFor({ timeout: 15_000 });
 await waitForImages(page);
 
 const layoutIssues = await collectLayoutIssues(page);
