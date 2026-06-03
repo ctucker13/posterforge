@@ -11,6 +11,8 @@ interface EditablePosterCanvasProps {
 }
 
 type EditorViewMode = "fit" | "edit" | "check";
+const editZoom = 0.52;
+const checkZoom = 0.16;
 
 export function EditablePosterCanvas({ poster, selectedId, onPosterChange, onSelectItem }: EditablePosterCanvasProps) {
   const [viewMode, setViewMode] = useState<EditorViewMode>("fit");
@@ -19,7 +21,7 @@ export function EditablePosterCanvas({ poster, selectedId, onPosterChange, onSel
   const viewportRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const outputFrame = useMemo(() => getA0PreviewFrame(poster.format.orientation), [poster.format.orientation]);
-  const zoom = viewMode === "fit" ? fitZoom : viewMode === "edit" ? 0.24 : 0.16;
+  const zoom = viewMode === "fit" ? fitZoom : viewMode === "edit" ? editZoom : checkZoom;
   const zoomLabel = `${Math.round(zoom * 100)}%`;
 
   useEffect(() => {
@@ -49,6 +51,18 @@ export function EditablePosterCanvas({ poster, selectedId, onPosterChange, onSel
 
     return () => window.cancelAnimationFrame(frame);
   }, [poster, zoom]);
+
+  useEffect(() => {
+    if (viewMode !== "edit") {
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      focusEditableTarget(stageRef.current, viewportRef.current, selectedId);
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [poster, selectedId, viewMode, zoom]);
 
   function updatePosterField(field: "title" | "subtitle", value: string) {
     if (poster[field] === value) {
@@ -105,7 +119,13 @@ export function EditablePosterCanvas({ poster, selectedId, onPosterChange, onSel
           </button>
         </div>
         <strong>{zoomLabel}</strong>
-        <span>{viewMode === "edit" ? "Click text to edit. Select sections for layout controls." : viewMode === "check" ? "Export framing and layout warnings." : "Whole poster fitted to the workspace."}</span>
+        <span>
+          {viewMode === "edit"
+            ? "Selected section is focused for editing. Click another section to focus it."
+            : viewMode === "check"
+              ? "Export framing and layout warnings."
+              : "Whole poster fitted to the workspace."}
+        </span>
         <span className={layoutWarnings.length > 0 ? "render-check warning" : "render-check passed"} title={layoutWarnings.slice(0, 4).join("\n")}>
           {layoutWarnings.length > 0 ? <AlertTriangle size={15} /> : <CheckCircle2 size={15} />}
           {layoutWarnings.length > 0 ? `${layoutWarnings.length} layout warning${layoutWarnings.length === 1 ? "" : "s"}` : "Layout check passed"}
@@ -205,4 +225,42 @@ function collectEditorLayoutWarnings(root: HTMLElement | null) {
 
 function getElementId(element: HTMLElement) {
   return element.getAttribute("data-poster-id") ?? element.getAttribute("data-visual-id") ?? element.getAttribute("data-block-id") ?? element.tagName.toLowerCase();
+}
+
+function focusEditableTarget(stage: HTMLElement | null, viewport: HTMLElement | null, selectedId: string | undefined) {
+  if (!stage || !viewport) {
+    return;
+  }
+
+  const target = findFocusTarget(stage, selectedId);
+  if (!target) {
+    return;
+  }
+
+  const targetRect = target.getBoundingClientRect();
+  const viewportRect = viewport.getBoundingClientRect();
+  const inset = 24;
+
+  viewport.scrollTo({
+    left: viewport.scrollLeft + targetRect.left - viewportRect.left - inset,
+    top: viewport.scrollTop + targetRect.top - viewportRect.top - inset,
+    behavior: "smooth",
+  });
+}
+
+function findFocusTarget(stage: HTMLElement, selectedId: string | undefined) {
+  if (selectedId) {
+    const selected = stage.querySelector<HTMLElement>(
+      `[data-poster-id="${cssEscape(selectedId)}"], [data-visual-id="${cssEscape(selectedId)}"], [data-block-id="${cssEscape(selectedId)}"]`,
+    );
+    if (selected) {
+      return selected.closest<HTMLElement>('[data-poster-kind="section"]') ?? selected;
+    }
+  }
+
+  return stage.querySelector<HTMLElement>('[data-poster-kind="section"]');
+}
+
+function cssEscape(value: string) {
+  return typeof CSS !== "undefined" && CSS.escape ? CSS.escape(value) : value.replace(/["\\]/g, "\\$&");
 }
