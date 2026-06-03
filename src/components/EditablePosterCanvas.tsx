@@ -172,7 +172,7 @@ function collectEditorLayoutWarnings(root: HTMLElement | null) {
   }
 
   const canvasRect = canvas.getBoundingClientRect();
-  const measuredElements = [...root.querySelectorAll<HTMLElement>("[data-poster-id], [data-visual-id], [data-block-id]")];
+  const measuredElements = [...root.querySelectorAll<HTMLElement>("[data-poster-id], [data-visual-id], [data-block-id]")].filter(isMeasurableElement);
 
   for (const element of measuredElements) {
     const id = getElementId(element);
@@ -196,10 +196,12 @@ function collectEditorLayoutWarnings(root: HTMLElement | null) {
     }
   }
 
-  const gridItems = [...root.querySelectorAll<HTMLElement>(".poster-grid > .poster-card")].map((element) => ({
-    id: getElementId(element),
-    rect: element.getBoundingClientRect(),
-  }));
+  const gridItems = [...root.querySelectorAll<HTMLElement>(".poster-grid > .poster-card")]
+    .filter(isMeasurableElement)
+    .map((element) => ({
+      id: getElementId(element),
+      rect: element.getBoundingClientRect(),
+    }));
 
   for (let firstIndex = 0; firstIndex < gridItems.length; firstIndex += 1) {
     for (let secondIndex = firstIndex + 1; secondIndex < gridItems.length; secondIndex += 1) {
@@ -225,6 +227,11 @@ function collectEditorLayoutWarnings(root: HTMLElement | null) {
 
 function getElementId(element: HTMLElement) {
   return element.getAttribute("data-poster-id") ?? element.getAttribute("data-visual-id") ?? element.getAttribute("data-block-id") ?? element.tagName.toLowerCase();
+}
+
+function isMeasurableElement(element: HTMLElement) {
+  const style = getComputedStyle(element);
+  return style.display !== "none" && style.visibility !== "hidden" && element.getClientRects().length > 0;
 }
 
 function focusEditableTarget(stage: HTMLElement | null, viewport: HTMLElement | null, selectedId: string | undefined) {

@@ -175,7 +175,7 @@ async function collectLayoutIssues(page: Page): Promise<LayoutIssue[]> {
     }
 
     const canvasRect = rectOf(canvas);
-    const measuredElements = [...document.querySelectorAll<HTMLElement>("[data-poster-id], [data-visual-id], [data-block-id]")];
+    const measuredElements = [...document.querySelectorAll<HTMLElement>("[data-poster-id], [data-visual-id], [data-block-id]")].filter(isMeasurableElement);
 
     for (const element of measuredElements) {
       const id = getElementId(element);
@@ -224,10 +224,12 @@ async function collectLayoutIssues(page: Page): Promise<LayoutIssue[]> {
       }
     }
 
-    const gridItems = [...document.querySelectorAll<HTMLElement>(".poster-grid > .poster-card")].map((element) => ({
-      id: getElementId(element),
-      rect: rectOf(element),
-    }));
+    const gridItems = [...document.querySelectorAll<HTMLElement>(".poster-grid > .poster-card")]
+      .filter(isMeasurableElement)
+      .map((element) => ({
+        id: getElementId(element),
+        rect: rectOf(element),
+      }));
 
     for (let firstIndex = 0; firstIndex < gridItems.length; firstIndex += 1) {
       for (let secondIndex = firstIndex + 1; secondIndex < gridItems.length; secondIndex += 1) {
@@ -263,6 +265,11 @@ async function collectLayoutIssues(page: Page): Promise<LayoutIssue[]> {
 
     function getElementId(element: HTMLElement) {
       return element.getAttribute("data-poster-id") ?? element.getAttribute("data-visual-id") ?? element.getAttribute("data-block-id") ?? element.tagName.toLowerCase();
+    }
+
+    function isMeasurableElement(element: HTMLElement) {
+      const style = getComputedStyle(element);
+      return style.display !== "none" && style.visibility !== "hidden" && element.getClientRects().length > 0;
     }
 
     function rectOf(element: Element) {
