@@ -1368,6 +1368,27 @@ textarea {
   cursor: pointer;
 }
 
+.poster-canvas-mode-edit [contenteditable="true"] {
+  cursor: text;
+  border-radius: 4px;
+  outline: 1px dashed transparent;
+  outline-offset: 3px;
+}
+
+.poster-canvas-mode-edit [contenteditable="true"]:hover {
+  outline-color: color-mix(in srgb, var(--theme-accent), white 35%);
+  background: color-mix(in srgb, var(--theme-accent), transparent 92%);
+}
+
+.poster-canvas-mode-edit [contenteditable="true"]:focus {
+  outline: 2px solid #f79009;
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.poster-canvas-mode-edit .poster-hero [contenteditable="true"]:focus {
+  color: var(--theme-primary);
+}
+
 .poster-canvas-mode-edit .poster-card:hover,
 .poster-canvas-mode-edit .poster-text-block:hover,
 .poster-canvas-mode-edit [data-visual-id]:hover {

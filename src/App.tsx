@@ -254,6 +254,7 @@ export default function App() {
         <EditablePosterCanvas
           poster={poster}
           selectedId={selectedCanvasItem?.id}
+          onPosterChange={handlePosterStateChange}
           onSelectItem={(id, kind) => setSelectedCanvasItem({ id, kind })}
         />
         <PosterPreview poster={poster} />

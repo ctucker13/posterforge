@@ -1,4 +1,4 @@
-import { type CSSProperties } from "react";
+import { type CSSProperties, type KeyboardEvent } from "react";
 import { FileCheck2, Image, Link2 } from "lucide-react";
 import type { PosterBlock, PosterClaim, PosterProject, PosterSource } from "../domain/poster";
 import { isFeaturedSection, resolveLayoutTemplate } from "../layouts";
@@ -12,9 +12,20 @@ export interface PosterCanvasProps {
   mode?: "preview" | "edit" | "export";
   selectedId?: string;
   onSelectItem?: (id: string, kind: PosterCanvasItemKind) => void;
+  onUpdatePosterField?: (field: "title" | "subtitle", value: string) => void;
+  onUpdateSectionTitle?: (sectionId: string, title: string) => void;
+  onUpdateTextBlock?: (blockId: string, text: string) => void;
 }
 
-export function PosterCanvas({ poster, mode = "preview", selectedId, onSelectItem }: PosterCanvasProps) {
+export function PosterCanvas({
+  poster,
+  mode = "preview",
+  selectedId,
+  onSelectItem,
+  onUpdatePosterField,
+  onUpdateSectionTitle,
+  onUpdateTextBlock,
+}: PosterCanvasProps) {
   const palette = resolvePalette(poster.theme, poster.palette);
   const layout = resolveLayoutTemplate(poster.layout);
   const outputFrame = getA0PreviewFrame(poster.format.orientation);
@@ -53,8 +64,22 @@ export function PosterCanvas({ poster, mode = "preview", selectedId, onSelectIte
         <header className="poster-hero" data-poster-id="hero" data-poster-kind="hero">
           <div>
             <p className="poster-kicker">{layout.name} · {poster.audience}</p>
-            <h2>{poster.title}</h2>
-            <p>{poster.subtitle}</p>
+            <h2
+              contentEditable={mode === "edit"}
+              suppressContentEditableWarning
+              onBlur={(event) => onUpdatePosterField?.("title", event.currentTarget.innerText.trim())}
+              onKeyDown={handleSingleLineEditKeyDown}
+            >
+              {poster.title}
+            </h2>
+            <p
+              contentEditable={mode === "edit"}
+              suppressContentEditableWarning
+              onBlur={(event) => onUpdatePosterField?.("subtitle", event.currentTarget.innerText.trim())}
+              onKeyDown={handleSingleLineEditKeyDown}
+            >
+              {poster.subtitle}
+            </p>
           </div>
           <div className="hero-asset" aria-label="Generated image asset placeholder">
             <Image size={42} />
@@ -94,8 +119,15 @@ export function PosterCanvas({ poster, mode = "preview", selectedId, onSelectIte
                   }
                 }}
               >
-                <h3>{section.title}</h3>
-                {section.blocks.map((block, index) => renderBlock(block, index, section.id, visuals, claims, sources, mode, selectedId, onSelectItem))}
+                <h3
+                  contentEditable={mode === "edit"}
+                  suppressContentEditableWarning
+                  onBlur={(event) => onUpdateSectionTitle?.(section.id, event.currentTarget.innerText.trim())}
+                  onKeyDown={handleSingleLineEditKeyDown}
+                >
+                  {section.title}
+                </h3>
+                {section.blocks.map((block, index) => renderBlock(block, index, section.id, visuals, claims, sources, mode, selectedId, onSelectItem, onUpdateTextBlock))}
               </section>
             );
           })}
@@ -157,6 +189,7 @@ function renderBlock(
   mode: PosterCanvasProps["mode"],
   selectedId?: string,
   onSelectItem?: PosterCanvasProps["onSelectItem"],
+  onUpdateTextBlock?: PosterCanvasProps["onUpdateTextBlock"],
 ) {
   const blockId = `${sectionId}:block:${index}`;
   const selected = selectedId === blockId;
@@ -177,7 +210,9 @@ function renderBlock(
           }
         }}
       >
-        <p>{block.text}</p>
+        <p contentEditable={mode === "edit"} suppressContentEditableWarning onBlur={(event) => onUpdateTextBlock?.(blockId, event.currentTarget.innerText.trim())}>
+          {block.text}
+        </p>
         {blockClaims.length > 0 ? (
           <div className="text-claim-badges" aria-label="Text claim sources">
             {blockClaims.map((claim) => (
@@ -213,4 +248,11 @@ function renderBlock(
       <VisualRenderer visual={visual} />
     </div>
   );
+}
+
+function handleSingleLineEditKeyDown(event: KeyboardEvent<HTMLElement>) {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    event.currentTarget.blur();
+  }
 }
