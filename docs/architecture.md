@@ -278,7 +278,7 @@ Current:
 - `src/components/PosterPreview.tsx` wraps the canvas in zoom controls so users can inspect the output frame without changing the source layout.
 - `src/components/EditablePosterCanvas.tsx` and `src/components/PosterInspector.tsx` provide structured browser editing that updates `PosterProject` JSON rather than editing an exported file.
 - `src/exports/renderPosterHtml.tsx` renders the shared canvas to a static HTML export document.
-- `scripts/export-pdf.ts` uses Playwright to produce a print-ready A0 PDF and a clipping QA report from that static HTML document.
+- `scripts/export-pdf.ts` uses Playwright to run a DOM layout preflight and produce a print-ready A0 PDF from that static HTML document.
 
 The current primary fidelity path is:
 
@@ -328,7 +328,7 @@ Current:
 - browser JSON export for the current `PosterProject`
 - browser project bundle manifest export
 - browser PPTX compatibility export
-- CLI A0 PDF export through Playwright
+- CLI A0 PDF export through Playwright with layout preflight checks for clipping, section overlap, off-canvas elements, zero-size regions, and missing image assets
 - export capability registry
 - UI showing JSON, A0 PDF, PPTX compatibility snapshot, and bundle manifest as available outputs
 - UI showing editable HTML project and PNG as planned outputs

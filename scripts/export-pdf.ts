@@ -11,6 +11,8 @@ const args = parseArgs(process.argv.slice(2));
 const posterPath = String(args.poster ?? "spec/example-poster.json");
 const outDir = String(args["out-dir"] ?? "exports");
 const baseName = String(args.name ?? path.basename(posterPath, path.extname(posterPath)));
+const checkOnly = Boolean(args["check-only"]);
+const strict = Boolean(args.strict);
 const poster = normalizeAssetUrls(JSON.parse(await readFile(posterPath, "utf8")) as PosterProject);
 const css = await readFile("src/styles/app.css", "utf8");
 const frame = getA0PreviewFrame(poster.format.orientation);
@@ -34,28 +36,18 @@ await page.emulateMedia({ media: "print" });
 await page.locator(".a0-preview-canvas").waitFor();
 await waitForImages(page);
 
-const clippedElements = await page.$$eval("[data-poster-id], [data-visual-id], [data-block-id]", (elements) =>
-  elements
-    .map((element) => ({
-      id: element.getAttribute("data-poster-id") ?? element.getAttribute("data-visual-id") ?? element.getAttribute("data-block-id") ?? "unknown",
-      kind: element.getAttribute("data-poster-kind") ?? element.getAttribute("data-visual-type") ?? element.tagName.toLowerCase(),
-      scrollWidth: element.scrollWidth,
-      clientWidth: element.clientWidth,
-      scrollHeight: element.scrollHeight,
-      clientHeight: element.clientHeight,
-      clipped: element.scrollWidth > element.clientWidth + 1 || element.scrollHeight > element.clientHeight + 1,
-    }))
-    .filter((item) => item.clipped),
-);
+const layoutIssues = await collectLayoutIssues(page);
 
-await page.pdf({
-  path: pdfPath,
-  width: `${frame.mmWidth}mm`,
-  height: `${frame.mmHeight}mm`,
-  printBackground: true,
-  preferCSSPageSize: true,
-  margin: { top: "0mm", right: "0mm", bottom: "0mm", left: "0mm" },
-});
+if (!checkOnly) {
+  await page.pdf({
+    path: pdfPath,
+    width: `${frame.mmWidth}mm`,
+    height: `${frame.mmHeight}mm`,
+    printBackground: true,
+    preferCSSPageSize: true,
+    margin: { top: "0mm", right: "0mm", bottom: "0mm", left: "0mm" },
+  });
+}
 
 await browser.close();
 
@@ -68,17 +60,29 @@ const report = {
     widthMm: frame.mmWidth,
     heightMm: frame.mmHeight,
   },
-  clippedElements,
+  status: layoutIssues.length === 0 ? "passed" : "warning",
+  layoutIssues,
+  clippedElements: layoutIssues.filter((issue) => issue.type === "content_clipped"),
   createdAt: new Date().toISOString(),
 };
 
 await writeFile(qaPath, `${JSON.stringify(report, null, 2)}\n`);
 
-console.log(`PDF export: ${pdfPath}`);
+console.log(checkOnly ? "PDF export skipped: check-only mode" : `PDF export: ${pdfPath}`);
 console.log(`HTML export document: ${htmlPath}`);
 console.log(`PDF QA report: ${qaPath}`);
 console.log(`A0 ${frame.orientation}: ${frame.mmWidth}mm x ${frame.mmHeight}mm`);
-console.log(`Clipping warnings: ${clippedElements.length}`);
+console.log(`Layout warnings: ${layoutIssues.length}`);
+
+if (layoutIssues.length > 0) {
+  for (const issue of layoutIssues.slice(0, 8)) {
+    console.log(`- [${issue.severity}] ${issue.id}: ${issue.message}`);
+  }
+}
+
+if (strict && layoutIssues.length > 0) {
+  process.exitCode = 1;
+}
 
 function parseArgs(argv: string[]) {
   const parsed: Record<string, string | boolean> = {};
@@ -142,5 +146,150 @@ async function waitForImages(page: Page) {
         });
       }),
     );
+  });
+}
+
+interface LayoutIssue {
+  id: string;
+  type: "content_clipped" | "outside_canvas" | "grid_overlap" | "image_missing" | "zero_size";
+  severity: "high" | "medium" | "low";
+  message: string;
+  metrics?: Record<string, number | string>;
+}
+
+async function collectLayoutIssues(page: Page): Promise<LayoutIssue[]> {
+  return page.evaluate(() => {
+    const tolerance = 2;
+    const issues: LayoutIssue[] = [];
+    const canvas = document.querySelector<HTMLElement>(".a0-preview-canvas");
+
+    if (!canvas) {
+      return [
+        {
+          id: "canvas",
+          type: "zero_size",
+          severity: "high",
+          message: "A0 poster canvas was not found.",
+        },
+      ];
+    }
+
+    const canvasRect = rectOf(canvas);
+    const measuredElements = [...document.querySelectorAll<HTMLElement>("[data-poster-id], [data-visual-id], [data-block-id]")];
+
+    for (const element of measuredElements) {
+      const id = getElementId(element);
+      const rect = rectOf(element);
+      const clippedX = element.scrollWidth > element.clientWidth + tolerance;
+      const clippedY = element.scrollHeight > element.clientHeight + tolerance;
+
+      if (rect.width <= tolerance || rect.height <= tolerance) {
+        issues.push({
+          id,
+          type: "zero_size",
+          severity: "high",
+          message: "Element rendered with zero or near-zero size.",
+          metrics: { width: rect.width, height: rect.height },
+        });
+      }
+
+      if (clippedX || clippedY) {
+        issues.push({
+          id,
+          type: "content_clipped",
+          severity: "high",
+          message: "Element content is clipped inside its assigned poster region.",
+          metrics: {
+            scrollWidth: element.scrollWidth,
+            clientWidth: element.clientWidth,
+            scrollHeight: element.scrollHeight,
+            clientHeight: element.clientHeight,
+          },
+        });
+      }
+
+      if (
+        rect.left < canvasRect.left - tolerance ||
+        rect.top < canvasRect.top - tolerance ||
+        rect.right > canvasRect.right + tolerance ||
+        rect.bottom > canvasRect.bottom + tolerance
+      ) {
+        issues.push({
+          id,
+          type: "outside_canvas",
+          severity: "high",
+          message: "Element extends outside the A0 poster canvas.",
+          metrics: rect,
+        });
+      }
+    }
+
+    const gridItems = [...document.querySelectorAll<HTMLElement>(".poster-grid > .poster-card")].map((element) => ({
+      id: getElementId(element),
+      rect: rectOf(element),
+    }));
+
+    for (let firstIndex = 0; firstIndex < gridItems.length; firstIndex += 1) {
+      for (let secondIndex = firstIndex + 1; secondIndex < gridItems.length; secondIndex += 1) {
+        const first = gridItems[firstIndex];
+        const second = gridItems[secondIndex];
+        const overlap = getOverlap(first.rect, second.rect);
+
+        if (overlap.width > tolerance && overlap.height > tolerance) {
+          issues.push({
+            id: `${first.id}:${second.id}`,
+            type: "grid_overlap",
+            severity: "high",
+            message: "Poster grid sections overlap each other.",
+            metrics: { overlapWidth: overlap.width, overlapHeight: overlap.height },
+          });
+        }
+      }
+    }
+
+    for (const image of [...document.images]) {
+      if (!image.complete || image.naturalWidth === 0 || image.naturalHeight === 0) {
+        issues.push({
+          id: image.getAttribute("data-asset-id") ?? image.alt ?? image.currentSrc ?? "image",
+          type: "image_missing",
+          severity: "medium",
+          message: "Image asset did not load before export.",
+          metrics: { naturalWidth: image.naturalWidth, naturalHeight: image.naturalHeight },
+        });
+      }
+    }
+
+    return issues;
+
+    function getElementId(element: HTMLElement) {
+      return element.getAttribute("data-poster-id") ?? element.getAttribute("data-visual-id") ?? element.getAttribute("data-block-id") ?? element.tagName.toLowerCase();
+    }
+
+    function rectOf(element: Element) {
+      const rect = element.getBoundingClientRect();
+      return {
+        left: round(rect.left),
+        top: round(rect.top),
+        right: round(rect.right),
+        bottom: round(rect.bottom),
+        width: round(rect.width),
+        height: round(rect.height),
+      };
+    }
+
+    function getOverlap(first: ReturnType<typeof rectOf>, second: ReturnType<typeof rectOf>) {
+      const left = Math.max(first.left, second.left);
+      const right = Math.min(first.right, second.right);
+      const top = Math.max(first.top, second.top);
+      const bottom = Math.min(first.bottom, second.bottom);
+      return {
+        width: Math.max(0, round(right - left)),
+        height: Math.max(0, round(bottom - top)),
+      };
+    }
+
+    function round(value: number) {
+      return Math.round(value * 100) / 100;
+    }
   });
 }

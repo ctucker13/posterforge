@@ -166,13 +166,19 @@ export function PosterCanvas({
 
 export function getA0PreviewFrame(orientation: PosterProject["format"]["orientation"]) {
   const isPortrait = orientation === "portrait";
+  const mmWidth = isPortrait ? 841 : 1189;
+  const mmHeight = isPortrait ? 1189 : 841;
   return {
     orientation: isPortrait ? "portrait" : "landscape",
-    mmWidth: isPortrait ? 841 : 1189,
-    mmHeight: isPortrait ? 1189 : 841,
-    width: isPortrait ? 841 : 1189,
-    height: isPortrait ? 1189 : 841,
+    mmWidth,
+    mmHeight,
+    width: mmToCssPx(mmWidth),
+    height: mmToCssPx(mmHeight),
   };
+}
+
+function mmToCssPx(value: number) {
+  return Math.round((value * 96) / 25.4);
 }
 
 export function getOrderedSections(poster: PosterProject) {

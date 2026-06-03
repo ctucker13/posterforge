@@ -10,6 +10,7 @@
     "test:run": "vitest run",
     "image:plan": "node scripts/generate-image-asset.mjs --dry-run",
     "image:generate": "node scripts/generate-image-asset.mjs",
+    "export:check": "tsx scripts/export-pdf.ts --check-only",
     "export:pdf": "tsx scripts/export-pdf.ts",
     "export:pptx:html": "node scripts/export-html-pptx.mjs",
     "preview": "vite preview --host 127.0.0.1",

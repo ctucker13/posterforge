@@ -1045,6 +1045,31 @@ textarea {
   color: #101828;
 }
 
+.render-check {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  border: 1px solid;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.render-check.passed {
+  border-color: #abefc6;
+  color: #067647;
+  background: #ecfdf3;
+}
+
+.render-check.warning {
+  border-color: #fedf89;
+  color: #93370d;
+  background: #fffaeb;
+}
+
 .preview-toolbar strong {
   min-width: 48px;
   color: #101828;
@@ -1152,6 +1177,36 @@ textarea {
 .poster-output-frame .visual-box {
   flex: 1;
   min-height: 0;
+}
+
+.poster-output-frame .visual-box {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.poster-output-frame .matrix,
+.poster-output-frame .flow-list,
+.poster-output-frame .table-wrap,
+.poster-output-frame .timeline-list,
+.poster-output-frame .gantt-list,
+.poster-output-frame .math-placeholder,
+.poster-output-frame .code-placeholder,
+.poster-output-frame .metric-card {
+  flex: 1;
+  min-height: 0;
+}
+
+.poster-output-frame .flow-list,
+.poster-output-frame .timeline-list,
+.poster-output-frame .gantt-list {
+  align-content: center;
+}
+
+.poster-output-frame .table-wrap,
+.poster-output-frame .diagram-source,
+.poster-output-frame .code-placeholder {
+  overflow: hidden;
 }
 
 .poster-output-frame .generated-asset,

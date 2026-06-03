@@ -27,6 +27,7 @@ npm run build
 npm run image:plan -- --visual vis_generated_panel
 OPENAI_API_KEY=... npm run image:generate -- --visual vis_generated_panel --model gpt-image-1.5
 npx playwright install chromium
+npm run export:check -- --poster spec/example-poster.json
 npm run export:pdf -- --poster spec/example-poster.json
 npm run export:pptx:html -- --poster public/generated-assets/poster_demo_fraud_model.generated.json
 ```
@@ -35,7 +36,9 @@ npm run export:pptx:html -- --poster public/generated-assets/poster_demo_fraud_m
 
 `npm run image:plan` writes prompt metadata without calling OpenAI. `npm run image:generate` calls the OpenAI Images API from Node, saves the PNG and metadata under `public/generated-assets/`, and writes an updated importable poster JSON. The sample spec keeps image asset model names configurable; the current OpenAI image-generation docs list `gpt-image-1.5`, `gpt-image-1`, and `gpt-image-1-mini`, so pass `--model gpt-image-1.5` if a future placeholder model name is rejected.
 
-`npm run export:pdf` renders poster JSON through the shared React poster canvas, writes a static HTML export document, and creates a print-ready A0 PDF with Playwright. For landscape posters the output is `1189mm x 841mm`; for portrait posters it is `841mm x 1189mm`. The script also writes a clipping QA report beside the PDF.
+`npm run export:check` renders poster JSON through the shared React poster canvas and writes a layout QA report without producing the final PDF. It checks clipping, section overlap, elements outside the A0 canvas, zero-size regions, and missing image assets.
+
+`npm run export:pdf` runs the same layout preflight, writes a static HTML export document, and creates a print-ready A0 PDF with Playwright. For landscape posters the output is `1189mm x 841mm`; for portrait posters it is `841mm x 1189mm`. The script writes the layout QA report beside the PDF.
 
 `npm run export:pptx:html` is now a compatibility path. It captures the HTML poster canvas and places that capture into an actual A0-sized PPTX slide. It is useful when a PowerPoint file is required, but the browser-native HTML canvas and A0 PDF are the fidelity targets.
 
@@ -87,7 +90,7 @@ Python is intentionally not the app core. It can be added later with `uv` for da
 - Export capability panel with poster JSON, A0 PDF, PPTX compatibility snapshot, and project bundle manifest available; editable HTML project and PNG marked as planned.
 - First-pass PptxGenJS compiler for one-slide editable poster export with native text, claim/source cards, lightweight native visual renderers, and generated image embedding when asset URLs are available.
 - Playwright-backed high-fidelity HTML render to PPTX export script with PNG capture and DOM measurement output.
-- Playwright-backed A0 PDF export script with static HTML output and clipping QA report.
+- Playwright-backed A0 PDF export script with static HTML output and DOM layout preflight.
 - HTML preview artifact descriptor for project bundles and export QA.
 - HTML poster preview.
 
