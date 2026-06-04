@@ -13,6 +13,8 @@ const outDir = String(args["out-dir"] ?? "exports");
 const baseName = String(args.name ?? path.basename(posterPath, path.extname(posterPath)));
 const checkOnly = Boolean(args["check-only"]);
 const strict = Boolean(args.strict);
+const target = String(args.target ?? "print") as "print" | "screen";
+const isScreen = target === "screen";
 const poster = normalizeAssetUrls(JSON.parse(await readFile(posterPath, "utf8")) as PosterProject);
 const css = await readFile("src/styles/app.css", "utf8");
 const frame = getA0PreviewFrame(poster.format.orientation);
@@ -20,14 +22,14 @@ const frame = getA0PreviewFrame(poster.format.orientation);
 await mkdir(outDir, { recursive: true });
 
 const htmlPath = path.join(outDir, `${baseName}.pdf.html`);
-const pdfPath = path.join(outDir, `${baseName}.pdf`);
+const pdfPath = path.join(outDir, isScreen ? `${baseName}-screen.pdf` : `${baseName}.pdf`);
 const qaPath = path.join(outDir, `${baseName}.pdf-qa.json`);
 
-await writeFile(htmlPath, renderPosterHtml(poster, { css, title: poster.title, mode: "export" }));
+await writeFile(htmlPath, renderPosterHtml(poster, { css, title: poster.title, mode: "export", target }));
 
 const browser = await chromium.launch();
 const page = await browser.newPage({
-  viewport: { width: poster.format.orientation === "portrait" ? 1131 : 1600, height: poster.format.orientation === "portrait" ? 1600 : 1132 },
+  viewport: isScreen ? { width: 1920, height: 1080 } : { width: poster.format.orientation === "portrait" ? 1131 : 1600, height: poster.format.orientation === "portrait" ? 1600 : 1132 },
   deviceScaleFactor: 1,
 });
 
@@ -39,14 +41,23 @@ await waitForImages(page);
 const layoutIssues = await collectLayoutIssues(page);
 
 if (!checkOnly) {
-  await page.pdf({
-    path: pdfPath,
-    width: `${frame.mmWidth}mm`,
-    height: `${frame.mmHeight}mm`,
-    printBackground: true,
-    preferCSSPageSize: true,
-    margin: { top: "0mm", right: "0mm", bottom: "0mm", left: "0mm" },
-  });
+  await page.pdf(
+    isScreen
+      ? {
+          path: pdfPath,
+          width: "1920px",
+          height: "1080px",
+          printBackground: true,
+        }
+      : {
+          path: pdfPath,
+          width: `${frame.mmWidth}mm`,
+          height: `${frame.mmHeight}mm`,
+          printBackground: true,
+          preferCSSPageSize: true,
+          margin: { top: "0mm", right: "0mm", bottom: "0mm", left: "0mm" },
+        },
+  );
 }
 
 await browser.close();

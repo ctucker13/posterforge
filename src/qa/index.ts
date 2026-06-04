@@ -73,6 +73,9 @@ export function runQa(poster: PosterProject): QaIssue[] {
   const visualIds = new Set(poster.visuals.map((visual) => visual.id));
   const claimIds = new Set(poster.claims.map((claim) => claim.id));
   const referencedSourceIds = new Set<string>();
+  const intent = poster.outputIntent ?? "both";
+  const checkPrint = intent === "print" || intent === "both";
+  const checkVirtual = intent === "virtual" || intent === "both";
 
   if (poster.title.trim().length === 0) {
     issues.push({
@@ -213,6 +216,23 @@ export function runQa(poster: PosterProject): QaIssue[] {
       });
     }
 
+    if (checkPrint && generatedVisualTypes.has(visual.type) && Number.isFinite(width) && width > 0) {
+      const section = poster.sections.find((item) => item.blocks.some((block) => block.type === "visual_ref" && block.visual_id === visual.id));
+      const columnSpan = section?.layout?.columnSpan ?? 1;
+      const a0WidthInches = 46.8;
+      const columnWidthInches = (a0WidthInches / 3) * columnSpan;
+      const estimatedDpi = width / columnWidthInches;
+      if (estimatedDpi < 100) {
+        issues.push({
+          id: "print_image_dpi",
+          severity: "medium",
+          location: `visuals.${visual.id}`,
+          message: `Generated image estimated at ~${Math.round(estimatedDpi)} DPI at A0 print size — below recommended 100 DPI minimum.`,
+          suggestedFix: "Use as background/atmosphere only, or regenerate at a smaller slot size.",
+        });
+      }
+    }
+
     if (["sankey", "alluvial", "funnel", "timeline", "gantt", "plotly_generic"].includes(visual.type)) {
       const hasLabelPlan = Boolean(visual.options?.label_strategy ?? visual.options?.labelStrategy);
       if (!hasLabelPlan) {
@@ -292,6 +312,19 @@ export function runQa(poster: PosterProject): QaIssue[] {
   }
 
   for (const section of poster.sections) {
+    if (checkVirtual) {
+      const totalTextLength = section.blocks.filter((block) => block.type === "text").reduce((sum, block) => sum + (block.type === "text" ? block.text.length : 0), 0);
+      if (totalTextLength > 600) {
+        issues.push({
+          id: "virtual_text_density",
+          severity: "low",
+          location: `sections.${section.id}`,
+          message: "Section text may be too dense to read at 1080p virtual session zoom.",
+          suggestedFix: "Reduce text to key findings only for virtual poster sessions.",
+        });
+      }
+    }
+
     if (section.blocks.length > 4) {
       issues.push({
         id: "section_density_risk",

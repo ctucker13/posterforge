@@ -54,6 +54,14 @@ function getTargetBlockers(poster: PosterProject, target: ExportTarget): string[
     return [...baseBlockers, ...getRendererBlockers(poster), poster.format.size !== "A0" ? "A0 PDF export requires poster format size A0." : ""].filter(Boolean);
   }
 
+  if (target === "screen_pdf") {
+    return [
+      ...baseBlockers,
+      ...getRendererBlockers(poster),
+      poster.format.orientation !== "landscape" ? "Portrait A0 does not fit a landscape screen well. Consider landscape orientation for virtual sessions." : "",
+    ].filter(Boolean);
+  }
+
   if (target === "html_project") {
     return [...baseBlockers, ...getRendererBlockers(poster), "Editable HTML project package is not implemented."];
   }

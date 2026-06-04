@@ -1,5 +1,5 @@
 import type OpenAI from "openai";
-import type { EvidenceItem, PosterSource, SourceSummary } from "../domain/poster";
+import type { EvidenceItem, PosterOutline, PosterSource, SourceSummary } from "../domain/poster";
 
 // The system prompt tells the model exactly what JSON structure to produce.
 // We ask only for the generated fields — sources/evidence are merged by the caller.
@@ -66,6 +66,7 @@ export function buildPosterGenerationMessages(
   prompt: string,
   theme: string,
   context: SourceContext,
+  outline?: PosterOutline | undefined,
 ): OpenAI.Chat.ChatCompletionMessageParam[] {
   const sourceLines = context.sources
     .map((s) => {
@@ -83,6 +84,7 @@ export function buildPosterGenerationMessages(
   const userMessage = `
 Prompt: ${prompt}
 Theme: ${theme}
+${outline ? `\nConfirmed outline to follow:\n${JSON.stringify(outline, null, 2)}\n` : ""}
 
 Attached sources (use these source IDs in claims and visuals):
 ${sourceLines || "No sources attached — generate general content based on the prompt alone."}

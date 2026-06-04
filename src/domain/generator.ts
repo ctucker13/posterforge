@@ -2,6 +2,7 @@ import type {
   EvidenceItem,
   PosterBlock,
   PosterClaim,
+  PosterOutline,
   PosterLayoutId,
   PosterProject,
   PosterSection,
@@ -30,6 +31,7 @@ export interface GenerationOptions {
     sourceSummaries: SourceSummary[];
     evidence: EvidenceItem[];
   };
+  outline?: PosterOutline;
 }
 
 export const generationTrace: Omit<TraceEvent, "status">[] = [
@@ -107,6 +109,196 @@ export const generationTrace: Omit<TraceEvent, "status">[] = [
   },
 ];
 
+export async function generateOutline(options: GenerationOptions, onProgress?: (stepId: string) => void): Promise<PosterOutline> {
+  onProgress?.("plan");
+  const realSources = options.currentSources?.sources.filter((s) => !s.url?.startsWith("mock://")) ?? [];
+  const title = deriveTitle(options.prompt, realSources.length > 0 ? realSources : examplePoster.sources);
+  const apiKey = (typeof import.meta !== "undefined" && import.meta.env?.VITE_OPENAI_API_KEY) as string | undefined;
+
+  if (apiKey) {
+    try {
+      const { default: OpenAI } = await import("openai");
+      const client = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
+      const response = await client.responses.create({
+        model: "gpt-5-mini",
+        input: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "input_text",
+                text: [
+                  "Create a lightweight PosterForge outline. Return only JSON with title, subtitle, layout, and sections.",
+                  "Section objects must contain id, type, title, and description. Use 3-6 sections.",
+                  `Prompt: ${options.prompt}`,
+                  `Theme: ${options.theme}`,
+                  `Sources: ${JSON.stringify(options.currentSources?.sources ?? [])}`,
+                  `Evidence: ${JSON.stringify(options.currentSources?.evidence?.slice(0, 16) ?? [])}`,
+                ].join("\n\n"),
+              },
+            ],
+          },
+        ],
+      });
+      const parsed = JSON.parse(response.output_text) as PosterOutline;
+      return normalizeOutline(parsed, title);
+    } catch (error) {
+      console.warn("[posterforge] Outline generation failed, using deterministic fallback:", error);
+    }
+  }
+
+  return {
+    title,
+    subtitle: realSources.length > 0 ? `Generated from ${realSources.length} attached source${realSources.length === 1 ? "" : "s"}` : "Generated from mock source package",
+    layout: examplePoster.layout,
+    sections: examplePoster.sections.map((section) => ({
+      id: section.id,
+      type: section.type,
+      title: section.title,
+      description: "",
+    })),
+  };
+}
+
+function normalizeOutline(candidate: PosterOutline, fallbackTitle: string): PosterOutline {
+  const fallback = {
+    title: fallbackTitle,
+    subtitle: "Generated outline",
+    layout: examplePoster.layout,
+    sections: examplePoster.sections.map((section) => ({
+      id: section.id,
+      type: section.type,
+      title: section.title,
+      description: "",
+    })),
+  } satisfies PosterOutline;
+
+  if (!candidate || typeof candidate !== "object" || !Array.isArray(candidate.sections)) {
+    return fallback;
+  }
+
+  return {
+    title: typeof candidate.title === "string" && candidate.title.trim() ? candidate.title : fallback.title,
+    subtitle: typeof candidate.subtitle === "string" ? candidate.subtitle : fallback.subtitle,
+    layout: candidate.layout ?? fallback.layout,
+    sections: candidate.sections
+      .filter((section) => section && typeof section.id === "string" && typeof section.title === "string")
+      .map((section) => ({
+        id: section.id,
+        type: section.type ?? "custom",
+        title: section.title,
+        description: typeof section.description === "string" ? section.description : "",
+      }))
+      .slice(0, 8),
+  };
+}
+
+export async function reviseTextBlock(
+  block: Extract<PosterBlock, { type: "text" }>,
+  instruction: string,
+  sectionTitle: string,
+  posterTitle: string,
+): Promise<string> {
+  const apiKey = (typeof import.meta !== "undefined" && import.meta.env?.VITE_OPENAI_API_KEY) as string | undefined;
+  if (!apiKey) {
+    return `${block.text} [revised: ${instruction}]`;
+  }
+
+  try {
+    const { default: OpenAI } = await import("openai");
+    const client = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
+    const response = await client.responses.create({
+      model: "gpt-5-mini",
+      input: [
+        {
+          role: "user",
+          content: [
+            {
+              type: "input_text",
+              text: `Revise the following poster text block. Return only the revised text.\n\nPoster: ${posterTitle}\nSection: ${sectionTitle}\nInstruction: ${instruction}\n\nText:\n${block.text}`,
+            },
+          ],
+        },
+      ],
+    });
+    return response.output_text.trim() || block.text;
+  } catch (error) {
+    console.warn("[posterforge] Text block revision failed, using deterministic fallback:", error);
+    return `${block.text} [revised: ${instruction}]`;
+  }
+}
+
+export async function regenerateSection(section: PosterSection, instruction: string | undefined, poster: PosterProject): Promise<PosterSection> {
+  const apiKey = (typeof import.meta !== "undefined" && import.meta.env?.VITE_OPENAI_API_KEY) as string | undefined;
+  if (apiKey) {
+    try {
+      const { default: OpenAI } = await import("openai");
+      const client = new OpenAI({ apiKey, dangerouslyAllowBrowser: true });
+      const evidence = (poster.evidence ?? [])
+        .filter((item) => section.blocks.some((block) => block.type === "text" && block.claim_ids?.some((claimId) => poster.claims.find((claim) => claim.id === claimId)?.source_ids.includes(item.source_id))))
+        .slice(0, 12);
+      const response = await client.responses.create({
+        model: "gpt-5-mini",
+        input: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "input_text",
+                text: [
+                  "Regenerate this poster section. Return only JSON for a PosterSection with the same id, layout, and block schema.",
+                  `Poster title: ${poster.title}`,
+                  `Instruction: ${instruction?.trim() || "Improve clarity and concision."}`,
+                  `Current section JSON: ${JSON.stringify(section)}`,
+                  `Available evidence JSON: ${JSON.stringify(evidence)}`,
+                ].join("\n\n"),
+              },
+            ],
+          },
+        ],
+      });
+      const parsed = JSON.parse(response.output_text) as PosterSection;
+      return normalizeRegeneratedSection(section, parsed);
+    } catch (error) {
+      console.warn("[posterforge] Section regeneration failed, using deterministic fallback:", error);
+    }
+  }
+
+  const note = instruction?.trim() ? `Regenerated note: ${instruction.trim()}` : "Regenerated section draft.";
+  return {
+    ...section,
+    blocks: section.blocks.map((block, index) =>
+      index === 0 && block.type === "text"
+        ? {
+            ...block,
+            text: `${block.text} ${note}`,
+          }
+        : block,
+    ),
+  };
+}
+
+function normalizeRegeneratedSection(original: PosterSection, candidate: PosterSection): PosterSection {
+  if (!candidate || typeof candidate !== "object" || !Array.isArray(candidate.blocks)) {
+    return original;
+  }
+
+  return {
+    ...original,
+    title: typeof candidate.title === "string" && candidate.title.trim() ? candidate.title : original.title,
+    type: candidate.type ?? original.type,
+    blocks: candidate.blocks.filter(isPosterBlock),
+  };
+}
+
+function isPosterBlock(value: unknown): value is PosterBlock {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const block = value as Record<string, unknown>;
+  if (block.type === "text") return typeof block.text === "string";
+  if (block.type === "visual_ref") return typeof block.visual_id === "string";
+  return false;
+}
+
 export async function generatePoster(
   options: GenerationOptions,
   onProgress?: (stepId: string) => void,
@@ -148,20 +340,23 @@ export async function generatePoster(
         : "local project files";
 
   const sections = examplePoster.sections.map((section) =>
-    section.id === "hero"
-      ? {
-          ...section,
-          blocks: [
-            {
-              type: "text" as const,
-              claim_ids: ["claim_001", "claim_002"],
-              text:
-                options.prompt.trim() ||
-                "Create a source-grounded academic data science poster with traceable claims and rich visuals.",
-            },
-          ],
-        }
-      : section,
+    applyOutlineToSection(
+      section.id === "hero"
+        ? {
+            ...section,
+            blocks: [
+              {
+                type: "text" as const,
+                claim_ids: ["claim_001", "claim_002"],
+                text:
+                  options.prompt.trim() ||
+                  "Create a source-grounded academic data science poster with traceable claims and rich visuals.",
+              },
+            ],
+          }
+        : section,
+      options.outline,
+    ),
   );
   const claimMap = buildClaimMap(examplePoster.claims, sections, sourcePackage.evidence);
 
@@ -177,7 +372,9 @@ export async function generatePoster(
     theme: options.theme,
     palette: options.palette,
     logo: themes[options.theme]?.logoUrl,
-    subtitle: `Generated from ${sourceText}`,
+    title: options.outline?.title ?? examplePoster.title,
+    subtitle: options.outline?.subtitle || `Generated from ${sourceText}`,
+    layout: options.outline?.layout ?? examplePoster.layout,
     sources: sourcePackage.sources,
     sourceDocuments: sourcePackage.sourceDocuments,
     sourceSummaries: sourcePackage.sourceSummaries,
@@ -185,6 +382,27 @@ export async function generatePoster(
     claimMap,
     references: createReferencesFromSources(sourcePackage.sources),
     sections,
+  };
+}
+
+function applyOutlineToSection(section: PosterSection, outline: PosterOutline | undefined): PosterSection {
+  if (!outline) {
+    return section;
+  }
+
+  const outlineSection = outline.sections.find((item) => item.id === section.id);
+  if (!outlineSection) {
+    return section;
+  }
+
+  return {
+    ...section,
+    type: outlineSection.type,
+    title: outlineSection.title,
+    layout: {
+      ...(section.layout ?? {}),
+      order: outline.sections.findIndex((item) => item.id === section.id),
+    },
   };
 }
 

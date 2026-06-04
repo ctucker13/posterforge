@@ -47,6 +47,10 @@
         }
       }
     },
+    "outputIntent": {
+      "enum": ["print", "virtual", "both"],
+      "description": "Controls whether QA applies print checks, virtual session checks, or both."
+    },
     "theme": {
       "type": "string"
     },

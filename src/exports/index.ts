@@ -31,6 +31,15 @@ export const exportCapabilities: ExportCapability[] = [
     requirements: ["Playwright", "A0 page size", "HTML/CSS poster canvas", "clipping QA report"],
   },
   {
+    id: "screen_pdf",
+    label: "Export virtual session PDF",
+    status: "available",
+    description:
+      "Full A0 poster composition scaled to fit a 1920x1080 screen. Aspect ratio preserved, letterboxed. Open fullscreen in any PDF viewer for virtual poster sessions.",
+    output: "poster-screen.pdf",
+    requirements: ["Playwright", "npm run export:screen -- --poster spec/example-poster.json"],
+  },
+  {
     id: "html_project",
     label: "Export editable HTML project",
     status: "planned",
@@ -56,11 +65,11 @@ export const exportCapabilities: ExportCapability[] = [
   },
   {
     id: "project_bundle",
-    label: "Export project bundle",
+    label: "Export project bundle ZIP",
     status: "available",
-    description: "Downloads a manifest for the future ZIP bundle containing spec, sources, assets, traces, QA, and exports.",
-    output: "posterforge-bundle-manifest.json",
-    requirements: ["valid PosterProject state", "bundle manifest"],
+    description: "ZIP containing poster JSON, sources, evidence, claims, traces, QA results, and references.",
+    output: "posterforge-bundle.zip",
+    requirements: ["valid PosterProject state", "jszip"],
   },
 ];
 
@@ -95,6 +104,32 @@ export function buildProjectBundleManifest(poster: PosterProject, createdAt = ne
 
 export function downloadProjectBundleManifest(poster: PosterProject) {
   downloadJson(`${poster.id || "poster"}-bundle-manifest.json`, buildProjectBundleManifest(poster));
+}
+
+export async function downloadPosterZipBundle(poster: PosterProject) {
+  const JSZip = (await import("jszip")).default;
+  const zip = new JSZip();
+
+  zip.file("poster.json", JSON.stringify(poster, null, 2));
+  zip.file("bundle-manifest.json", JSON.stringify(buildProjectBundleManifest(poster), null, 2));
+
+  if (poster.sourceDocuments?.length) zip.file("sources/documents.json", JSON.stringify(poster.sourceDocuments, null, 2));
+  if (poster.sourceSummaries?.length) zip.file("sources/summaries.json", JSON.stringify(poster.sourceSummaries, null, 2));
+  if (poster.evidence?.length) zip.file("evidence/evidence.json", JSON.stringify(poster.evidence, null, 2));
+  if (poster.claimMap) zip.file("evidence/claim-map.json", JSON.stringify(poster.claimMap, null, 2));
+  if (poster.references?.length) zip.file("references/references.json", JSON.stringify(poster.references, null, 2));
+  if (poster.traces?.length) zip.file("traces/trace.json", JSON.stringify(poster.traces, null, 2));
+  if (poster.qaResults?.length) zip.file("qa/qa-results.json", JSON.stringify(poster.qaResults, null, 2));
+
+  const blob = await zip.generateAsync({ type: "blob" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${poster.id || "poster"}-bundle.zip`;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 }
 
 function countAssets(poster: PosterProject): number {

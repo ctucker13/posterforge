@@ -1,4 +1,4 @@
-import { FileText, LayoutTemplate, Maximize2, Users } from "lucide-react";
+import { FileText, LayoutTemplate, Maximize2, Monitor, Users } from "lucide-react";
 import type { PosterLayoutId, PosterProject } from "../domain/poster";
 import { layoutTemplates, resolveLayoutTemplate } from "../layouts";
 
@@ -97,6 +97,17 @@ export function ProjectEditor({ poster, onPosterChange }: ProjectEditorProps) {
             </select>
           </label>
         </div>
+
+        <label className="field">
+          <span>
+            <Monitor size={15} /> Output intent
+          </span>
+          <select value={poster.outputIntent ?? "both"} onChange={(event) => updateField("outputIntent", event.target.value as PosterProject["outputIntent"])}>
+            <option value="both">Print and virtual</option>
+            <option value="print">Print only</option>
+            <option value="virtual">Virtual session only</option>
+          </select>
+        </label>
 
         <aside className="layout-note">
           <strong>{selectedLayout.name}</strong>

@@ -1,5 +1,7 @@
 import type { PosterVisual } from "../domain/poster";
+import { Image } from "lucide-react";
 import { buildGanttSegments, formatPercent, summarizeConfusionMatrix, summarizeSankeyLinks } from "./derived";
+import { nearestApiSize } from "../utils/imageSize";
 import {
   parseCodeBlockData,
   parseConfusionMatrixData,
@@ -277,17 +279,23 @@ export function VisualRenderer({ visual }: { visual: PosterVisual }) {
     }
 
     const imageUrl = visual.asset?.url;
+    const widthPx = visual.asset?.width_px;
+    const heightPx = visual.asset?.height_px;
+    const aspectRatio = widthPx && heightPx && widthPx > 0 && heightPx > 0 ? widthPx / heightPx : undefined;
+    const apiSize = aspectRatio ? nearestApiSize(aspectRatio) : undefined;
 
     return (
       <div className="visual-box generated-asset">
-        <h3>{visual.title}</h3>
-        <div className={`generated-asset-frame ${imageUrl ? "has-image" : ""}`}>
+        <VisualHeader title={visual.title} meta={apiSize} />
+        <div className={`generated-asset-frame ${imageUrl ? "has-image" : "is-placeholder"}`} style={aspectRatio ? { aspectRatio: String(aspectRatio) } : undefined}>
           {imageUrl ? (
-            <img className="generated-asset-image" src={imageUrl} alt={visual.asset?.title ?? visual.title} />
+            <img className="generated-asset-image" src={imageUrl} alt={visual.asset?.title ?? visual.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
           ) : (
             <>
+              <Image size={28} aria-hidden="true" />
               <span>{visual.type.replace(/_/g, " ")}</span>
-              <p>{visual.asset?.prompt ?? parsed.data.prompt ?? "Generated visual asset placeholder."}</p>
+              {apiSize ? <code className="asset-size-badge">{apiSize}</code> : null}
+              <p className="asset-prompt-preview">{visual.asset?.prompt ?? parsed.data.prompt ?? "No prompt yet."}</p>
             </>
           )}
         </div>
@@ -311,7 +319,7 @@ function formatCell(value: TableCell) {
   return String(value ?? "");
 }
 
-function VisualHeader({ title, meta }: { title: string; meta?: string }) {
+function VisualHeader({ title, meta }: { title: string; meta?: string | undefined }) {
   return (
     <div className="visual-header">
       <h3>{title}</h3>

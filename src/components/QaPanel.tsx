@@ -1,10 +1,11 @@
-import { AlertTriangle, CheckCircle2, RefreshCw, ShieldCheck, Wrench } from "lucide-react";
+import { AlertTriangle, CheckCircle2, MapPin, RefreshCw, ShieldCheck, Wrench } from "lucide-react";
 import type { QaIssue } from "../domain/poster";
 
 interface QaPanelProps {
   issues: QaIssue[];
   onRunQa: () => void;
   onApplyFix: (fixId: NonNullable<QaIssue["fixId"]>) => void;
+  onNavigate?: (location: string) => void;
 }
 
 const severityOrder: Record<QaIssue["severity"], number> = {
@@ -13,7 +14,7 @@ const severityOrder: Record<QaIssue["severity"], number> = {
   low: 2,
 };
 
-export function QaPanel({ issues, onRunQa, onApplyFix }: QaPanelProps) {
+export function QaPanel({ issues, onRunQa, onApplyFix, onNavigate }: QaPanelProps) {
   const sortedIssues = [...issues].sort((a, b) => severityOrder[a.severity] - severityOrder[b.severity]);
   const highCount = issues.filter((issue) => issue.severity === "high").length;
   const mediumCount = issues.filter((issue) => issue.severity === "medium").length;
@@ -64,11 +65,18 @@ export function QaPanel({ issues, onRunQa, onApplyFix }: QaPanelProps) {
                 <p>{issue.suggestedFix}</p>
                 <code>{issue.location}</code>
               </div>
-              {issue.fixId ? (
-                <button type="button" onClick={() => onApplyFix(issue.fixId!)}>
-                  <Wrench size={15} /> Fix
-                </button>
-              ) : null}
+              <div className="qa-issue-actions">
+                {onNavigate ? (
+                  <button type="button" onClick={() => onNavigate(issue.location)}>
+                    <MapPin size={15} /> Go
+                  </button>
+                ) : null}
+                {issue.fixId ? (
+                  <button type="button" onClick={() => onApplyFix(issue.fixId!)}>
+                    <Wrench size={15} /> Fix
+                  </button>
+                ) : null}
+              </div>
             </li>
           ))}
         </ol>
