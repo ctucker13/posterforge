@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { ClipboardCheck, Database, FileSearch, FolderOpen, Globe2, Layers3, Palette, Play, Route, Settings2, Sparkles } from "lucide-react";
 import { EditablePosterCanvas } from "./components/EditablePosterCanvas";
@@ -43,8 +43,10 @@ export default function App() {
   const [poster, setPoster] = useState<PosterProject>({ ...initialPoster, qaResults: initialQaIssues });
   const [qaIssues, setQaIssues] = useState<QaIssue[]>(initialQaIssues);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generationWarning, setGenerationWarning] = useState<string | null>(null);
   const [selectedCanvasItem, setSelectedCanvasItem] = useState<{ id: string; kind: PosterCanvasItemKind } | undefined>();
   const [activeTab, setActiveTab] = useState<WorkspaceTab>("edit");
+  const generationIdRef = useRef(0);
 
   const selectedTheme = themes[theme];
   const selectedPalette = palettes[palette];
@@ -57,14 +59,17 @@ export default function App() {
     setPoster((prev) => ({ ...prev, qaResults: issues }));
   }, 400), []);
 
+  useEffect(() => () => debouncedRunQa.cancel(), [debouncedRunQa]);
+
   async function handleGenerate() {
+    const thisId = ++generationIdRef.current;
     setIsGenerating(true);
+    setGenerationWarning(null);
     const startedAt = new Date().toISOString();
     setTrace(createQueuedTrace());
     const completedStepIds = new Set<string>();
 
     function onProgress(stepId: string) {
-      // Mark the previous in-progress step as complete, start the new one
       setTrace((events) =>
         events.map((event) => {
           if (event.id === stepId) return { ...event, status: "running" as const, timestamp: new Date().toISOString() };
@@ -92,7 +97,10 @@ export default function App() {
           },
         },
         onProgress,
+        (msg) => setGenerationWarning(msg),
       );
+
+      if (generationIdRef.current !== thisId) return;
 
       const completedTrace = generationTrace.map((step) => ({
         ...step,
@@ -105,7 +113,9 @@ export default function App() {
       setQaIssues(nextQaIssues);
       setTrace(completedTrace);
     } catch (err) {
+      if (generationIdRef.current !== thisId) return;
       console.error("[posterforge] Generation error:", err);
+      setGenerationWarning(`Generation failed: ${err instanceof Error ? err.message : String(err)}`);
       setTrace((events) =>
         events.map((e) =>
           e.status === "running"
@@ -114,7 +124,7 @@ export default function App() {
         ),
       );
     } finally {
-      setIsGenerating(false);
+      if (generationIdRef.current === thisId) setIsGenerating(false);
     }
   }
 
@@ -205,6 +215,13 @@ export default function App() {
           </div>
         </div>
       </header>
+
+      {generationWarning ? (
+        <div className="generation-warning" role="alert">
+          <span>{generationWarning}</span>
+          <button type="button" aria-label="Dismiss" onClick={() => setGenerationWarning(null)}>✕</button>
+        </div>
+      ) : null}
 
       <section className="control-panel tool-panel" aria-label="Generation controls">
         <div className="panel-header">

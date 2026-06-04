@@ -1,4 +1,4 @@
-import { type CSSProperties, type KeyboardEvent } from "react";
+import { type CSSProperties, type KeyboardEvent, type ClipboardEvent } from "react";
 import { FileCheck2, Image, Link2 } from "lucide-react";
 import type { PosterBlock, PosterClaim, PosterProject, PosterSource } from "../domain/poster";
 import { isFeaturedSection, resolveLayoutTemplate } from "../layouts";
@@ -69,6 +69,7 @@ export function PosterCanvas({
               suppressContentEditableWarning
               onBlur={(event) => onUpdatePosterField?.("title", event.currentTarget.innerText.trim())}
               onKeyDown={handleSingleLineEditKeyDown}
+              onPaste={handlePlainTextPaste}
             >
               {poster.title}
             </h2>
@@ -77,6 +78,7 @@ export function PosterCanvas({
               suppressContentEditableWarning
               onBlur={(event) => onUpdatePosterField?.("subtitle", event.currentTarget.innerText.trim())}
               onKeyDown={handleSingleLineEditKeyDown}
+              onPaste={handlePlainTextPaste}
             >
               {poster.subtitle}
             </p>
@@ -130,6 +132,7 @@ export function PosterCanvas({
                   suppressContentEditableWarning
                   onBlur={(event) => onUpdateSectionTitle?.(section.id, event.currentTarget.innerText.trim())}
                   onKeyDown={handleSingleLineEditKeyDown}
+                  onPaste={handlePlainTextPaste}
                 >
                   {section.title}
                 </h3>
@@ -183,6 +186,12 @@ export function getA0PreviewFrame(orientation: PosterProject["format"]["orientat
   };
 }
 
+function handlePlainTextPaste(e: ClipboardEvent) {
+  e.preventDefault();
+  const text = e.clipboardData.getData("text/plain");
+  document.execCommand("insertText", false, text);
+}
+
 function mmToCssPx(value: number) {
   return Math.round((value * 96) / 25.4);
 }
@@ -222,7 +231,7 @@ function renderBlock(
           }
         }}
       >
-        <p contentEditable={mode === "edit"} suppressContentEditableWarning onBlur={(event) => onUpdateTextBlock?.(blockId, event.currentTarget.innerText.trim())}>
+        <p contentEditable={mode === "edit"} suppressContentEditableWarning onBlur={(event) => onUpdateTextBlock?.(blockId, event.currentTarget.innerText.trim())} onPaste={handlePlainTextPaste}>
           {block.text}
         </p>
         {blockClaims.length > 0 ? (

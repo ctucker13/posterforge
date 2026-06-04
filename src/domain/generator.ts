@@ -110,6 +110,7 @@ export const generationTrace: Omit<TraceEvent, "status">[] = [
 export async function generatePoster(
   options: GenerationOptions,
   onProgress?: (stepId: string) => void,
+  onWarning?: (message: string) => void,
 ): Promise<PosterProject> {
   const noop = (_id: string) => {};
   const progress = onProgress ?? noop;
@@ -124,6 +125,9 @@ export async function generatePoster(
       return await generatePosterWithLLM(options, progress);
     } catch (err) {
       console.warn("[posterforge] LLM generation failed, falling back to deterministic path:", err);
+      onWarning?.(
+        `LLM generation failed: ${err instanceof Error ? err.message : String(err)}. Using template poster — results may not match your prompt.`,
+      );
     }
   }
 

@@ -48,6 +48,30 @@ button {
   box-shadow: 0 16px 42px rgba(29, 41, 57, 0.08);
 }
 
+.generation-warning {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  background: #fff3cd;
+  border: 1px solid #f0c040;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: #7a5c00;
+}
+
+.generation-warning button {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #7a5c00;
+  padding: 0 4px;
+}
+
 .workspace-header {
   grid-column: 1 / -1;
   display: flex;
