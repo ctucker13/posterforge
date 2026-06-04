@@ -3,6 +3,7 @@ import { ArrowDown, ArrowUp, CheckCircle2, Eye, EyeOff, MousePointer2 } from "lu
 import type { PosterBlock, PosterProject, PosterSection, PosterSectionLayout, PosterVisual } from "../domain/poster";
 import type { PosterCanvasItemKind } from "./PosterCanvas";
 import { parseBlockId } from "./posterUtils";
+import { VisualRegistryPanel } from "./VisualRegistryPanel";
 import {
   parseCodeBlockData,
   parseConfusionMatrixData,
@@ -100,9 +101,12 @@ export function PosterInspector({ poster, selectedId, selectedKind, onPosterChan
       </div>
 
       {!selectedId ? (
-        <div className="empty-inspector">
-          <MousePointer2 size={18} />
-          <p>Select a section or text block on the poster canvas.</p>
+        <div className="inspector-empty-state">
+          <div className="empty-inspector">
+            <MousePointer2 size={18} />
+            <p>Select a section, visual, or text block on the poster canvas.</p>
+          </div>
+          <VisualRegistryPanel poster={poster} />
         </div>
       ) : null}
 

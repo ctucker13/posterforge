@@ -119,10 +119,10 @@ export function PosterCanvas({
                 <button
                   className="section-action-btn"
                   type="button"
-                  title="Regenerate this section"
+                  title="Open section regeneration instructions"
                   onClick={(event) => {
                     event.stopPropagation();
-                    onRegenerateSection?.(section.id, window.prompt("Regeneration instruction", "") ?? undefined);
+                    onRegenerateSection?.(section.id);
                   }}
                 >
                   <RotateCcw size={13} />
@@ -144,7 +144,7 @@ export function PosterCanvas({
                   type="button"
                   onClick={(event) => {
                     event.stopPropagation();
-                    onRegenerateSection?.(section.id, window.prompt("Regeneration instruction", "") ?? undefined);
+                    onRegenerateSection?.(section.id);
                   }}
                 >
                   <RotateCcw size={12} /> Regen

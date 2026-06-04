@@ -69,7 +69,8 @@ export function OutlineConfirmDialog({
   }
 
   return (
-    <dialog className="outline-confirm-dialog" open aria-labelledby="outline-confirm-title">
+    <div className="outline-confirm-modal" role="presentation">
+      <dialog className="outline-confirm-dialog" open aria-labelledby="outline-confirm-title">
       <div className="panel-header compact">
         <h2 id="outline-confirm-title">Confirm Outline</h2>
         <span>{draft.sections.length} sections</span>
@@ -140,7 +141,8 @@ export function OutlineConfirmDialog({
           Back
         </button>
       </div>
-    </dialog>
+      </dialog>
+    </div>
   );
 }
 

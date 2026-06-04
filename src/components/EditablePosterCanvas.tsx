@@ -9,6 +9,17 @@ import { PosterMinimap } from "./PosterMinimap";
 import { parseBlockId } from "./posterUtils";
 import { SectionNavigator } from "./SectionNavigator";
 import { resolvePalette } from "../themes";
+import {
+  clampPosterZoom,
+  getFitPageZoom,
+  getFitVirtualZoom,
+  getFitWidthZoom,
+  getVirtualFrameSize,
+  getZoomLabel,
+  zoomIn,
+  zoomOut,
+  type ViewportSize,
+} from "./posterViewport";
 
 interface EditablePosterCanvasProps {
   poster: PosterProject;
@@ -25,10 +36,7 @@ interface EditablePosterCanvasProps {
 }
 
 type CanvasEditMode = "editing" | "preview";
-const MIN_ZOOM = 0.08;
-const MAX_ZOOM = 2;
-const ZOOM_STEP = 0.05;
-const VIRTUAL_ASPECT = 1920 / 1080;
+type ZoomMode = "fitPage" | "fitWidth" | "fitVirtual" | "custom";
 
 export function EditablePosterCanvas({
   poster,
@@ -44,42 +52,60 @@ export function EditablePosterCanvas({
   onDeleteSection,
 }: EditablePosterCanvasProps) {
   const [canvasEditMode, setCanvasEditMode] = useState<CanvasEditMode>("editing");
-  const [fitZoom, setFitZoom] = useState(0.16);
   const [zoom, setZoom] = useState(0.16);
-  const [viewportWidth, setViewportWidth] = useState(960);
+  const [zoomMode, setZoomMode] = useState<ZoomMode>("fitPage");
+  const [viewportSize, setViewportSize] = useState<ViewportSize>({ width: 960, height: 640 });
   const [virtualMode, setVirtualMode] = useState(false);
   const [showLayoutCheck, setShowLayoutCheck] = useState(false);
   const [layoutWarnings, setLayoutWarnings] = useState<string[]>([]);
   const [commandBarValue, setCommandBarValue] = useState("");
   const [revisionDiff, setRevisionDiff] = useState<{ original: string; revised: string; blockId: string } | null>(null);
+  const [regenerateTarget, setRegenerateTarget] = useState<{ sectionId: string; instruction: string } | null>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const commandInputRef = useRef<HTMLInputElement>(null);
+  const regenerateInputRef = useRef<HTMLInputElement>(null);
   const outputFrame = useMemo(() => getA0PreviewFrame(poster.format.orientation), [poster.format.orientation]);
   const palette = resolvePalette(poster.theme, poster.palette);
-  const virtualFrameWidth = Math.max(320, Math.floor(viewportWidth - 36));
-  const virtualFrameHeight = Math.floor(virtualFrameWidth / VIRTUAL_ASPECT);
-  const virtualZoom = Number((virtualFrameHeight / outputFrame.height).toFixed(4));
-  const zoomLabel = `${Math.round(zoom * 100)}%`;
+  const virtualFrame = useMemo(() => getVirtualFrameSize(viewportSize), [viewportSize]);
+  const fitPageZoom = useMemo(() => getFitPageZoom(outputFrame, viewportSize), [outputFrame, viewportSize]);
+  const fitWidthZoom = useMemo(() => getFitWidthZoom(outputFrame, viewportSize), [outputFrame, viewportSize]);
+  const fitVirtualZoom = useMemo(() => getFitVirtualZoom(outputFrame, virtualFrame), [outputFrame, virtualFrame]);
+  const scaledPosterWidth = outputFrame.width * zoom;
+  const scaledPosterHeight = outputFrame.height * zoom;
+  const zoomLabel = getZoomLabel(zoom);
 
-  const updateFitZoom = useCallback(() => {
+  const updateViewportSize = useCallback(() => {
     const viewport = viewportRef.current;
-    if (!viewport) return 0.16;
+    if (!viewport) return;
 
     const rect = viewport.getBoundingClientRect();
-    setViewportWidth(rect.width);
-    const availableWidth = Math.max(1, rect.width - 36);
-    const availableHeight = Math.max(1, rect.height - 36);
-    const nextZoom = Math.max(0.1, Math.min(0.5, availableWidth / outputFrame.width, availableHeight / outputFrame.height));
-    const roundedZoom = Number(nextZoom.toFixed(3));
-    setFitZoom(roundedZoom);
-    return roundedZoom;
-  }, [outputFrame.height, outputFrame.width]);
+    setViewportSize({ width: rect.width, height: rect.height });
+  }, []);
 
-  function setBoundedZoom(nextZoom: number | ((current: number) => number)) {
+  function setCustomZoom(nextZoom: number | ((current: number) => number)) {
     setZoom((current) => {
       const rawZoom = typeof nextZoom === "function" ? nextZoom(current) : nextZoom;
-      return Number(Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, rawZoom)).toFixed(3));
+      return clampPosterZoom(rawZoom);
+    });
+    setZoomMode("custom");
+  }
+
+  function applyZoomMode(mode: ZoomMode) {
+    setZoomMode(mode);
+    if (mode === "fitPage") setZoom(fitPageZoom);
+    if (mode === "fitWidth") setZoom(fitWidthZoom);
+    if (mode === "fitVirtual") setZoom(fitVirtualZoom);
+  }
+
+  function toggleVirtualMode() {
+    setVirtualMode((current) => {
+      if (!current) {
+        applyZoomMode("fitVirtual");
+      } else if (zoomMode === "fitVirtual") {
+        setZoomMode("custom");
+      }
+      return !current;
     });
   }
 
@@ -89,12 +115,17 @@ export function EditablePosterCanvas({
       return;
     }
 
-    const nextFitZoom = updateFitZoom();
-    setZoom((current) => (current === 0.16 ? nextFitZoom : current));
-    const observer = new ResizeObserver(updateFitZoom);
+    updateViewportSize();
+    const observer = new ResizeObserver(updateViewportSize);
     observer.observe(viewport);
     return () => observer.disconnect();
-  }, [updateFitZoom]);
+  }, [updateViewportSize]);
+
+  useEffect(() => {
+    if (zoomMode === "fitPage") setZoom(fitPageZoom);
+    if (zoomMode === "fitWidth") setZoom(fitWidthZoom);
+    if (zoomMode === "fitVirtual") setZoom(fitVirtualZoom);
+  }, [fitPageZoom, fitVirtualZoom, fitWidthZoom, zoomMode]);
 
   useEffect(() => {
     if (!showLayoutCheck) {
@@ -110,20 +141,14 @@ export function EditablePosterCanvas({
   }, [poster, showLayoutCheck, zoom]);
 
   useEffect(() => {
-    if (!selectedId) {
-      setBoundedZoom(updateFitZoom());
-      return;
-    }
+    if (!selectedId) return;
 
     const frame = window.requestAnimationFrame(() => {
       focusEditableTarget(stageRef.current, viewportRef.current, selectedId);
-      if (selectedKind === "section") {
-        sectionZoomFocus(stageRef.current, viewportRef.current, selectedId, zoom, setBoundedZoom);
-      }
     });
 
     return () => window.cancelAnimationFrame(frame);
-  }, [poster, selectedId, selectedKind, updateFitZoom, zoom]);
+  }, [poster, selectedId]);
 
   useEffect(() => {
     function handleKeyboard(event: KeyboardEvent) {
@@ -131,13 +156,13 @@ export function EditablePosterCanvas({
 
       if (event.key === "0") {
         event.preventDefault();
-        setBoundedZoom(fitZoom);
+        applyZoomMode(virtualMode ? "fitVirtual" : "fitPage");
       } else if (event.key === "+" || event.key === "=") {
         event.preventDefault();
-        setBoundedZoom((current) => current + ZOOM_STEP);
+        setCustomZoom(zoomIn);
       } else if (event.key === "-") {
         event.preventDefault();
-        setBoundedZoom((current) => current - ZOOM_STEP);
+        setCustomZoom(zoomOut);
       } else if (event.key.toLowerCase() === "k" && selectedKind === "block") {
         event.preventDefault();
         commandInputRef.current?.focus();
@@ -146,7 +171,11 @@ export function EditablePosterCanvas({
 
     document.addEventListener("keydown", handleKeyboard);
     return () => document.removeEventListener("keydown", handleKeyboard);
-  }, [fitZoom, selectedKind]);
+  }, [fitPageZoom, fitVirtualZoom, selectedKind, virtualMode]);
+
+  useEffect(() => {
+    regenerateInputRef.current?.focus();
+  }, [regenerateTarget?.sectionId]);
 
   function updatePosterField(field: "title" | "subtitle", value: string) {
     if (poster[field] === value) {
@@ -199,6 +228,23 @@ export function EditablePosterCanvas({
     setCommandBarValue("");
   }
 
+  function openRegenerateInstruction(sectionId: string) {
+    setRegenerateTarget({ sectionId, instruction: "" });
+    onSelectItem(sectionId, "section");
+  }
+
+  function submitRegenerateInstruction() {
+    if (!regenerateTarget) {
+      return;
+    }
+
+    const instruction = regenerateTarget.instruction.trim();
+    onRegenerateSection?.(regenerateTarget.sectionId, instruction.length > 0 ? instruction : undefined);
+    setRegenerateTarget(null);
+  }
+
+  const regenerateSectionTitle = regenerateTarget ? poster.sections.find((section) => section.id === regenerateTarget.sectionId)?.title : undefined;
+
   return (
     <section className="preview-panel editable-poster-panel" aria-label="Editable poster canvas">
       <div className="panel-header">
@@ -207,25 +253,27 @@ export function EditablePosterCanvas({
       </div>
       <SectionNavigator poster={poster} selectedId={selectedId} qaIssues={qaIssues} onSelectSection={(id) => onSelectItem(id, "section")} />
       <div className="preview-toolbar" aria-label="Editor view controls">
-        <button className={virtualMode ? "active" : ""} type="button" title="Virtual session view" aria-label="Virtual session view" onClick={() => setVirtualMode((current) => !current)}>
+        <button className={virtualMode ? "active" : ""} type="button" title="Virtual session view" aria-label="Virtual session view" onClick={toggleVirtualMode}>
           <Monitor size={15} />
         </button>
-        {!virtualMode ? (
-          <>
-            <button type="button" title="Fit poster" aria-label="Fit poster" onClick={() => setBoundedZoom(fitZoom)}>
-              <Maximize2 size={15} />
-            </button>
-            <button type="button" title="Zoom out" aria-label="Zoom out" onClick={() => setBoundedZoom((current) => current - ZOOM_STEP)}>
-              <Minus size={15} />
-            </button>
-            <strong>{zoomLabel}</strong>
-            <button type="button" title="Zoom in" aria-label="Zoom in" onClick={() => setBoundedZoom((current) => current + ZOOM_STEP)}>
-              <Plus size={15} />
-            </button>
-          </>
-        ) : (
-          <strong>{`Virtual · 1920x1080 · ${Math.round(virtualZoom * 100)}%`}</strong>
-        )}
+        <button type="button" title="Fit page" aria-label="Fit page" onClick={() => applyZoomMode(virtualMode ? "fitVirtual" : "fitPage")}>
+          <Maximize2 size={15} />
+        </button>
+        <button className={zoomMode === "fitWidth" ? "active view-preset-button" : "view-preset-button"} type="button" onClick={() => applyZoomMode("fitWidth")}>
+          Fit width
+        </button>
+        {virtualMode ? (
+          <button className={zoomMode === "fitVirtual" ? "active view-preset-button" : "view-preset-button"} type="button" onClick={() => applyZoomMode("fitVirtual")}>
+            Fit virtual
+          </button>
+        ) : null}
+        <button type="button" title="Zoom out" aria-label="Zoom out" onClick={() => setCustomZoom(zoomOut)}>
+          <Minus size={15} />
+        </button>
+        <strong>{zoomLabel}</strong>
+        <button type="button" title="Zoom in" aria-label="Zoom in" onClick={() => setCustomZoom(zoomIn)}>
+          <Plus size={15} />
+        </button>
         <button
           className={canvasEditMode === "preview" ? "active" : ""}
           type="button"
@@ -244,7 +292,7 @@ export function EditablePosterCanvas({
         >
           {layoutWarnings.length > 0 ? <AlertTriangle size={15} /> : <CheckCircle2 size={15} />}
         </button>
-        <span>{virtualMode ? "Virtual session framing." : canvasEditMode === "editing" ? "Click sections, visuals, and text blocks to edit." : "Preview mode disables in-canvas text editing."}</span>
+        <span>{virtualMode ? "Virtual output preview; zoom remains free." : canvasEditMode === "editing" ? "Scroll to pan. Cmd/Ctrl + wheel zooms." : "Preview mode disables in-canvas text editing."}</span>
         {showLayoutCheck ? (
           <span className={layoutWarnings.length > 0 ? "render-check warning" : "render-check passed"} title={layoutWarnings.slice(0, 4).join("\n")}>
             {layoutWarnings.length > 0 ? <AlertTriangle size={15} /> : <CheckCircle2 size={15} />}
@@ -256,28 +304,46 @@ export function EditablePosterCanvas({
         ref={viewportRef}
         className="preview-viewport"
         onWheel={(e) => {
-          if (virtualMode) return;
+          if (!(e.metaKey || e.ctrlKey)) return;
           e.preventDefault();
-          const delta = e.deltaY > 0 ? -0.05 : 0.05;
-          setBoundedZoom((current) => current + delta);
+          setCustomZoom(e.deltaY > 0 ? zoomOut : zoomIn);
         }}
       >
         {virtualMode ? (
           <div
             className="virtual-screen-frame"
             style={{
-              width: virtualFrameWidth,
-              height: virtualFrameHeight,
+              width: virtualFrame.width,
+              height: virtualFrame.height,
               background: palette.colors.background,
             }}
           >
-            <div style={{ width: outputFrame.width, height: outputFrame.height, transform: `scale(${virtualZoom})`, transformOrigin: "center top", flexShrink: 0 }}>
-              <PosterCanvas poster={poster} mode="preview" />
+            <div
+              className="virtual-stage-area"
+              style={{
+                width: Math.max(virtualFrame.width, scaledPosterWidth),
+                height: Math.max(virtualFrame.height, scaledPosterHeight),
+              }}
+            >
+              <div
+                ref={stageRef}
+                className="a0-preview-stage"
+                style={{
+                  width: scaledPosterWidth,
+                  height: scaledPosterHeight,
+                  marginLeft: Math.max(0, (virtualFrame.width - scaledPosterWidth) / 2),
+                  marginTop: Math.max(0, (virtualFrame.height - scaledPosterHeight) / 2),
+                }}
+              >
+                <div style={{ transform: `scale(${zoom})`, transformOrigin: "top left" }}>
+                  <PosterCanvas poster={poster} mode="preview" />
+                </div>
+              </div>
             </div>
           </div>
         ) : (
           <>
-            <div ref={stageRef} className="a0-preview-stage" style={{ width: outputFrame.width * zoom, height: outputFrame.height * zoom }}>
+            <div ref={stageRef} className="a0-preview-stage" style={{ width: scaledPosterWidth, height: scaledPosterHeight }}>
               <div style={{ transform: `scale(${zoom})`, transformOrigin: "top left" }}>
                 <PosterCanvas
                   poster={poster}
@@ -289,7 +355,7 @@ export function EditablePosterCanvas({
                   onUpdateSectionTitle={updateSectionTitle}
                   onUpdateTextBlock={updateTextBlock}
                   onSectionReorder={onSectionReorder}
-                  onRegenerateSection={onRegenerateSection}
+                  onRegenerateSection={openRegenerateInstruction}
                   onMoveSection={onMoveSection}
                   onToggleHideSection={onToggleHideSection}
                   onDeleteSection={onDeleteSection}
@@ -300,6 +366,30 @@ export function EditablePosterCanvas({
           </>
         )}
       </div>
+      {regenerateTarget ? (
+        <div className="regenerate-instruction-bar" role="form" aria-label="Section regeneration instruction">
+          <Wand2 size={14} aria-hidden="true" />
+          <div>
+            <strong>{regenerateSectionTitle ?? "Selected section"}</strong>
+            <input
+              ref={regenerateInputRef}
+              placeholder="Optional instruction: make this shorter, focus on results..."
+              value={regenerateTarget.instruction}
+              onChange={(event) => setRegenerateTarget((current) => (current ? { ...current, instruction: event.target.value } : current))}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") submitRegenerateInstruction();
+                if (event.key === "Escape") setRegenerateTarget(null);
+              }}
+            />
+          </div>
+          <button type="button" onClick={submitRegenerateInstruction}>
+            Regenerate
+          </button>
+          <button type="button" onClick={() => setRegenerateTarget(null)}>
+            Cancel
+          </button>
+        </div>
+      ) : null}
       {selectedKind === "block" ? (
         <div className="command-bar" role="search">
           <Wand2 size={14} aria-hidden="true" />
@@ -425,32 +515,6 @@ function focusEditableTarget(stage: HTMLElement | null, viewport: HTMLElement | 
     top: viewport.scrollTop + targetRect.top - viewportRect.top - inset,
     behavior: "smooth",
   });
-}
-
-function sectionZoomFocus(
-  stage: HTMLElement | null,
-  viewport: HTMLElement | null,
-  selectedId: string,
-  currentZoom: number,
-  setZoom: (nextZoom: number | ((current: number) => number)) => void,
-) {
-  if (!stage || !viewport) {
-    return;
-  }
-
-  const target = stage.querySelector<HTMLElement>(`[data-poster-id="${cssEscape(selectedId)}"]`);
-  if (!target) {
-    return;
-  }
-
-  const scaledHeight = target.getBoundingClientRect().height;
-  const naturalHeight = scaledHeight / Math.max(currentZoom, 0.001);
-  if (naturalHeight <= 0) {
-    return;
-  }
-
-  const targetZoom = Math.min(1, (viewport.clientHeight * 0.7) / naturalHeight);
-  setZoom(Number(targetZoom.toFixed(3)));
 }
 
 function findFocusTarget(stage: HTMLElement, selectedId: string | undefined) {
