@@ -12,12 +12,16 @@
     "image:generate": "node scripts/generate-image-asset.mjs",
     "export:check": "tsx scripts/export-pdf.ts --check-only",
     "export:pdf": "tsx scripts/export-pdf.ts",
+    "export:screen": "tsx scripts/export-pdf.ts --target screen",
     "export:pptx:html": "tsx scripts/export-html-pptx.ts",
     "preview": "vite preview --host 127.0.0.1",
     "dev:local": "vite --host 127.0.0.1"
   },
   "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
     "@vitejs/plugin-react": "^6.0.2",
+    "jszip": "^3.10.1",
     "lucide-react": "^0.468.0",
     "openai": "^6.41.0",
     "pptxgenjs": "^4.0.1",

@@ -12,8 +12,9 @@ user prompt + sources
   -> browser-native HTML poster canvas
   -> QA loop
   -> A0 print PDF
+  -> 1920x1080 virtual session PDF
   -> optional PPTX compatibility snapshot
-  -> project bundle
+  -> project bundle ZIP
 ```
 
 The `PosterProject` / `poster.json` spec is the source of truth. The React HTML/CSS poster canvas is the canonical visual renderer. PDF, PPTX, PNG, images, traces, QA results, and bundles are generated outputs.
@@ -29,6 +30,7 @@ OPENAI_API_KEY=... npm run image:generate -- --visual vis_generated_panel --mode
 npx playwright install chromium
 npm run export:check -- --poster spec/example-poster.json
 npm run export:pdf -- --poster spec/example-poster.json
+npm run export:screen -- --poster spec/example-poster.json
 npm run export:pptx:html -- --poster public/generated-assets/poster_demo_fraud_model.generated.json
 ```
 
@@ -40,6 +42,8 @@ npm run export:pptx:html -- --poster public/generated-assets/poster_demo_fraud_m
 
 `npm run export:pdf` runs the same layout preflight, writes a static HTML export document, and creates a print-ready A0 PDF with Playwright. For landscape posters the output is `1189mm x 841mm`; for portrait posters it is `841mm x 1189mm`. The script writes the layout QA report beside the PDF.
 
+`npm run export:screen` renders the same A0 poster composition into a single 1920x1080 PDF page for virtual poster sessions. Aspect ratio is preserved and the poster is letterboxed using the poster background colour.
+
 `npm run export:pptx:html` is now a compatibility path. It captures the HTML poster canvas and places that capture into an actual A0-sized PPTX slide. It is useful when a PowerPoint file is required, but the browser-native HTML canvas and A0 PDF are the fidelity targets.
 
 ## Current Stack
@@ -48,19 +52,26 @@ npm run export:pptx:html -- --poster public/generated-assets/poster_demo_fraud_m
 - React
 - TypeScript
 - lucide-react
+- @dnd-kit
+- jszip
+- Playwright
+- PptxGenJS
 - npm
 
 Python is intentionally not the app core. It can be added later with `uv` for data science helpers such as Pandas summaries, sklearn metrics, SHAP, notebook processing, or statistical analysis.
 
 ## Current Features
 
-- Prompt-driven poster generation flow.
+- Mode-based workspace for Generate, Edit, Review, and Export.
+- Prompt-driven poster generation flow with an outline confirmation step before full generation.
 - Typed `PosterProject` model with metadata, sources, source documents, evidence, claim map, sections, visuals, assets, traces, QA results, and references.
 - Runtime `PosterProject` validation for JSON import, including nested shape and cross-reference checks.
+- Schema migration chain for legacy imported posters.
 - Mock source package for Confluence, GitLab, research paper, and web-page style sources.
 - Mock source connector capability metadata and a clear acquisition/interpretation boundary.
+- Source mode warning when Web or Local modes are selected while search results are still mock-backed.
 - Evidence panel showing source summaries, source type/trust badges, claim confidence, poster locations, and linked evidence snippets.
-- Theme and palette separation.
+- Theme and palette separation with swatch-based theme selection and opt-in palette override.
 - NatWest Group theme and palette scoped to explicit selection.
 - Typed layout templates:
   - three-column academic
@@ -78,16 +89,19 @@ Python is intentionally not the app core. It can be added later with `uv` for da
   - other/generated assets
 - Typed visual data parsers for deterministic renderer inputs.
 - Lightweight deterministic renderers/placeholders for confusion matrix, Sankey-style flow, table, timeline, Gantt, metric card, Mermaid source, math source, code block, and generated asset slots.
+- Typed visual inspector controls for metric cards, tables, source/code/math visuals, confusion matrices, and generated image prompts, with JSON repair fallback.
+- Aspect-ratio-aware generated image placeholders with nearest OpenAI Images API size labels.
 - GPT Image asset planning/generation script for non-factual backgrounds, comic panels, and section art, with prompt/model/theme/palette metadata preserved.
 - Derived renderer summaries for confusion matrix metrics, Sankey flow shares, and Gantt timeline segments.
 - Structured trace UI showing observable work, not hidden reasoning.
-- QA panel with actionable issues, renderer data-shape checks, preview density risks, and a simple safe auto-fix for generated references.
+- QA panel with actionable issues, canvas navigation, renderer data-shape checks, print/virtual output-intent checks, preview density risks, and a simple safe auto-fix for generated references.
 - Poster JSON import, export, and reset.
 - Export job/artifact model with centralized readiness checks.
 - Shared React poster canvas used by preview, editor, and A0 PDF export.
-- Zoomable A0 preview frame so the aspect ratio and poster use of space match exported files.
-- Structured browser editing controls for section order, visibility, span/emphasis, and text block copy.
-- Export capability panel with poster JSON, A0 PDF, PPTX compatibility snapshot, and project bundle manifest available; editable HTML project and PNG marked as planned.
+- Continuous zoom controls, fit snapping, section focus zoom, layout check overlay, minimap, and virtual 16:9 preview mode.
+- Structured browser editing controls for section order, visibility, span/emphasis, text block copy, drag-to-reorder, selected-section toolbar actions, and section regeneration review.
+- Cmd+K text block revision flow with accept/reject diff.
+- Export capability panel with poster JSON, A0 PDF, virtual session PDF, PPTX compatibility snapshot, and project bundle ZIP available; editable HTML project and PNG marked as planned.
 - First-pass PptxGenJS compiler for one-slide editable poster export with native text, claim/source cards, lightweight native visual renderers, and generated image embedding when asset URLs are available.
 - Playwright-backed high-fidelity HTML render to PPTX export script with PNG capture and DOM measurement output.
 - Playwright-backed A0 PDF export script with static HTML output and DOM layout preflight.
@@ -148,21 +162,17 @@ docs/architecture.md
 
 4. Strengthen QA:
    - colour contrast
-   - print readability
    - chart clipping
    - QR scanability
-   - poster density
    - visual hierarchy
 
 5. Strengthen export implementations:
    - editable HTML project package
    - Playwright PNG preview export
-   - project bundle ZIP output
    - optional richer PptxGenJS compatibility export where practical
 
 ## Long-Term Roadmap
 
-- GPT Image generated image assets for backgrounds, panels, section art, comic-strip frames, and atmosphere.
 - Browser-native editable poster project package.
 - Playwright PDF/PNG render checks.
 - Optional richer PptxGenJS PowerPoint compatibility compiler.

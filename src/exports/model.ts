@@ -1,6 +1,6 @@
 import type { PosterProject } from "../domain/poster";
 
-export type ExportTarget = "poster_json" | "pdf" | "html_project" | "png" | "pptx" | "project_bundle";
+export type ExportTarget = "poster_json" | "pdf" | "screen_pdf" | "html_project" | "png" | "pptx" | "project_bundle";
 export type ExportArtifactStatus = "planned" | "ready" | "running" | "complete" | "failed";
 
 export type ExportArtifactKind =

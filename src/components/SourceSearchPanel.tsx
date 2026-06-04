@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
-import { Database, FilePlus2, FileSearch, Globe2, Search } from "lucide-react";
+import { AlertTriangle, Database, FilePlus2, FileSearch, Globe2, Search } from "lucide-react";
 import type { PosterProject, SourceDocument } from "../domain/poster";
+import type { GenerationOptions } from "../domain/generator";
 import { buildClaimMap } from "../domain/evidence";
 import { createReferencesFromSources } from "../sources/mockConnectors";
 import { getMockSourceArtifacts, mockSourceConnectors } from "../sources/mockConnectors";
@@ -9,6 +10,7 @@ import { fetchRepoFiles, parseRepoUrl, type RepoFile } from "../sources/repoConn
 
 interface SourceSearchPanelProps {
   poster: PosterProject;
+  sourceMode: GenerationOptions["sourceMode"];
   onPosterChange: (poster: PosterProject) => void;
 }
 
@@ -18,7 +20,7 @@ interface DecoratedSearchResult extends SourceSearchResult {
 
 type PanelMode = "search" | "url";
 
-export function SourceSearchPanel({ poster, onPosterChange }: SourceSearchPanelProps) {
+export function SourceSearchPanel({ poster, sourceMode, onPosterChange }: SourceSearchPanelProps) {
   const [mode, setMode] = useState<PanelMode>("search");
 
   // keyword-search state
@@ -139,6 +141,15 @@ export function SourceSearchPanel({ poster, onPosterChange }: SourceSearchPanelP
       </div>
 
       <div className="source-search-body">
+        {sourceMode !== "mock" ? (
+          <div className="source-mode-warning" role="alert">
+            <AlertTriangle size={15} />
+            <span>
+              {sourceMode === "web" ? "Web" : "Local"} connector is not yet live. Search results are mock data. Real connector support is planned.
+            </span>
+          </div>
+        ) : null}
+
         <div className="source-mode-toggle view-mode-toggle">
           <button type="button" className={mode === "search" ? "active" : ""} onClick={() => setMode("search")}>
             <Search size={13} /> Search

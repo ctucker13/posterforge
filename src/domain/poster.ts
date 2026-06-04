@@ -18,6 +18,18 @@ export type PosterLayoutId =
   | "comic-strip-narrative"
   | "case-study-poster";
 
+export interface PosterOutline {
+  title: string;
+  subtitle: string;
+  layout: PosterLayoutId;
+  sections: Array<{
+    id: string;
+    type: PosterSection["type"];
+    title: string;
+    description: string;
+  }>;
+}
+
 export interface PosterMetadata {
   prompt?: string | undefined;
   created_at?: string | undefined;
@@ -147,6 +159,7 @@ export interface PosterProject {
     size: "A0" | "A1" | "A2" | "custom";
     orientation: "portrait" | "landscape";
   };
+  outputIntent?: "print" | "virtual" | "both" | undefined;
   theme: string;
   palette?: string | undefined;
   layout: PosterLayoutId;

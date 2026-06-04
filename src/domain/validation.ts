@@ -1,4 +1,5 @@
 import type { PosterProject } from "./poster";
+import { migratePosterProject } from "./migration";
 
 export interface PosterValidationIssue {
   path: string;
@@ -42,6 +43,7 @@ const artifactKinds = [
 ] as const;
 const qaSeverities = ["high", "medium", "low"] as const;
 const qaFixIds = ["create_references"] as const;
+const outputIntents = ["print", "virtual", "both"] as const;
 
 export function validatePosterProject(value: unknown): PosterValidationResult {
   const issues: PosterValidationIssue[] = [];
@@ -86,21 +88,12 @@ export function parsePosterProjectJson(json: string): PosterProject {
   }
 
   const migrated = migratePosterProject(parsed);
-  const validation = validatePosterProject(migrated);
+  const validation = validatePosterProject(migrated.poster);
   if (!validation.valid) {
     throw new Error(formatPosterValidationIssues(validation.issues));
   }
 
   return validation.project;
-}
-
-function migratePosterProject(raw: unknown): unknown {
-  if (typeof raw !== "object" || raw === null || Array.isArray(raw)) return raw;
-  const record = raw as Record<string, unknown>;
-  if (!record.schemaVersion) {
-    return { ...record, schemaVersion: "posterforge.poster.v1" };
-  }
-  return raw;
 }
 
 export function formatPosterValidationIssues(issues: PosterValidationIssue[], limit = 6): string {
@@ -122,6 +115,7 @@ function validateRoot(poster: Record<string, unknown>, issues: PosterValidationI
   });
   optionalString(poster.subtitle, "subtitle", issues);
   validateFormat(poster.format, issues);
+  optionalEnum(poster.outputIntent, "outputIntent", outputIntents, issues);
   requireString(poster, "theme", "theme", issues);
   optionalString(poster.palette, "palette", issues);
   requireEnum(poster.layout, "layout", layoutIds, issues);

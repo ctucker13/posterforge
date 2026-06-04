@@ -13,11 +13,16 @@ export async function generatePosterWithLLM(
   const { sources = [], sourceDocuments = [], sourceSummaries = [], evidence = [] } = options.currentSources ?? {};
 
   onProgress("plan");
-  const messages = buildPosterGenerationMessages(options.prompt, options.theme, {
-    sources,
-    summaries: sourceSummaries,
-    evidence,
-  });
+  const messages = buildPosterGenerationMessages(
+    options.prompt,
+    options.theme,
+    {
+      sources,
+      summaries: sourceSummaries,
+      evidence,
+    },
+    options.outline,
+  );
 
   onProgress("sources");
   const client = getOpenAIClient();
@@ -50,13 +55,13 @@ export async function generatePosterWithLLM(
       created_at: new Date().toISOString(),
       generator: `posterforge-llm/${DEFAULT_MODEL}`,
     },
-    title: String(generated.title ?? deriveTitle(options.prompt)),
-    subtitle: String(generated.subtitle ?? `Generated with ${DEFAULT_MODEL}`),
+    title: String(generated.title ?? options.outline?.title ?? deriveTitle(options.prompt)),
+    subtitle: String(generated.subtitle ?? options.outline?.subtitle ?? `Generated with ${DEFAULT_MODEL}`),
     logo: themes[options.theme]?.logoUrl,
     format: { size: "A0", orientation: "landscape" },
     theme: options.theme,
     palette: options.palette,
-    layout: isValidLayout(generated.layout) ? generated.layout : "three-column-academic",
+    layout: isValidLayout(generated.layout) ? generated.layout : options.outline?.layout ?? "three-column-academic",
     audience: String(generated.audience ?? "poster session"),
     sources,
     sourceDocuments,

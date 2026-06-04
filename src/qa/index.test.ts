@@ -165,6 +165,49 @@ describe("runQa", () => {
     expect(exportIssues.map((issue) => issue.location)).toContain("exports.project_bundle");
   });
 
+  it("gates print and virtual checks by output intent", () => {
+    const denseSection = {
+      id: "dense",
+      type: "results" as const,
+      title: "Dense virtual panel",
+      blocks: [
+        {
+          type: "text" as const,
+          claim_ids: ["claim_001"],
+          text: "x".repeat(650),
+        },
+      ],
+    };
+    const generatedVisual = {
+      id: "generated_low_dpi",
+      type: "generated_comic_panel",
+      title: "Generated panel",
+      asset: {
+        id: "asset_low_dpi",
+        type: "generated_panel" as const,
+        role: "section_art" as const,
+        prompt: "panel",
+        model: "gpt-image-1.5",
+        width_px: 400,
+        height_px: 300,
+      },
+    };
+    const poster: PosterProject = {
+      ...examplePoster,
+      outputIntent: "virtual",
+      sections: [{ ...denseSection, blocks: [...denseSection.blocks, { type: "visual_ref", visual_id: generatedVisual.id }] }],
+      visuals: [generatedVisual],
+    };
+
+    const virtualIssueIds = runQa(poster).map((issue) => issue.id);
+    const printIssueIds = runQa({ ...poster, outputIntent: "print" }).map((issue) => issue.id);
+
+    expect(virtualIssueIds).toContain("virtual_text_density");
+    expect(virtualIssueIds).not.toContain("print_image_dpi");
+    expect(printIssueIds).toContain("print_image_dpi");
+    expect(printIssueIds).not.toContain("virtual_text_density");
+  });
+
   it("flags visual renderer data shape problems", () => {
     const poster: PosterProject = {
       ...examplePoster,

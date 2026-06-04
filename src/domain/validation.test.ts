@@ -3,6 +3,7 @@ import examplePosterJson from "../../spec/example-poster.json";
 import { examplePoster } from "../data/examplePoster";
 import type { PosterProject } from "./poster";
 import { parsePosterProjectJson, validatePosterProject } from "./validation";
+import { migratePosterProject } from "./migration";
 
 describe("validatePosterProject", () => {
   it("accepts the generated sample poster and JSON fixture", () => {
@@ -81,5 +82,20 @@ describe("validatePosterProject", () => {
   it("reports JSON parse and validation errors for imports", () => {
     expect(() => parsePosterProjectJson("{")).toThrow("Invalid JSON");
     expect(() => parsePosterProjectJson(JSON.stringify({ ...examplePoster, title: "" }))).toThrow("title: must not be empty");
+  });
+
+  it("migrates legacy posters with missing schema metadata", () => {
+    const legacy = { ...examplePoster, schemaVersion: undefined, format: undefined } as unknown;
+    const result = migratePosterProject(legacy);
+
+    expect(result.poster.schemaVersion).toBe("posterforge.poster.v1");
+    expect(result.poster.format).toEqual({ size: "A0", orientation: "landscape" });
+    expect(result.changes).toContain("Backfilled missing schemaVersion to v1");
+  });
+
+  it("accepts output intent values and rejects invalid ones", () => {
+    expect(validatePosterProject({ ...examplePoster, outputIntent: "virtual" }).valid).toBe(true);
+    const invalid = validatePosterProject({ ...examplePoster, outputIntent: "screen" });
+    expect(invalid.valid).toBe(false);
   });
 });
