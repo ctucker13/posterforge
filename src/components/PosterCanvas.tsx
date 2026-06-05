@@ -6,7 +6,7 @@ import { AlertTriangle, ArrowDown, ArrowUp, Eye, EyeOff, GripVertical, Image, Pe
 import type { ContentRegion, GeneratedImageSlot, PosterBlock, PosterProject, QaIssue } from "../domain/poster";
 import type { AssetSidecar } from "../layouts/buildLayoutSpec";
 import { isFeaturedSection, resolveLayoutTemplate } from "../layouts";
-import { resolvePalette } from "../themes";
+import { resolvePalette, resolveComponentSkins, type ComponentSkins, type SkinTokens } from "../themes";
 import { VisualRenderer } from "../renderers/VisualRenderer";
 import { backgroundStrategyForTheme } from "../layouts/buildLayoutSpec";
 import { ThemeMotifLayer } from "./ThemeMotifLayer";
@@ -76,6 +76,12 @@ export function PosterCanvas({
     onSectionReorder?.(arrayMove(sectionIds, oldIndex, newIndex));
   }
 
+  const skins = resolveComponentSkins(poster.theme);
+
+  function toSkinStyle(tokens: SkinTokens | undefined): CSSProperties {
+    return (tokens ?? {}) as CSSProperties;
+  }
+
   function renderSection(section: (typeof sections)[number]) {
     const isSelected = selectedId === section.id;
     const className = [
@@ -99,6 +105,7 @@ export function PosterCanvas({
         id={section.id}
         key={section.id}
         sortable={mode === "edit" && Boolean(onSectionReorder)}
+        skinStyle={toSkinStyle(skins.sectionCard)}
         onClick={(event) => {
           if (mode === "edit") {
             event.stopPropagation();
@@ -188,7 +195,7 @@ export function PosterCanvas({
               {section.title}
             </h3>
             {section.blocks.map((block, index) =>
-              renderBlock(block, index, section.id, visuals, imageSlots, mode, selectedId, qaIssuesByLocation, onSelectItem, onUpdateTextBlock, onGenerateImageSlot, onUpdateImageSlotPosition, onImageSlotSidecarLoaded, generatingSlotIds),
+              renderBlock(block, index, section.id, visuals, imageSlots, mode, skins, palette, selectedId, qaIssuesByLocation, onSelectItem, onUpdateTextBlock, onGenerateImageSlot, onUpdateImageSlotPosition, onImageSlotSidecarLoaded, generatingSlotIds),
             )}
               </>
             )}
@@ -327,21 +334,24 @@ function SortableSectionShell({
   id,
   className,
   sortable,
+  skinStyle,
   onClick,
   children,
 }: {
   id: string;
   className: string;
   sortable: boolean;
+  skinStyle?: CSSProperties;
   onClick: (event: React.MouseEvent<HTMLElement>) => void;
   children: (dragHandleProps: Record<string, unknown> | undefined) => React.ReactNode;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled: !sortable });
-  const style = {
+  const style: CSSProperties = {
+    ...skinStyle,
     transform: CSS.Transform.toString(transform),
     transition,
     zIndex: isDragging ? 20 : undefined,
-  } as CSSProperties;
+  };
 
   return (
     <section ref={setNodeRef} className={className} data-poster-id={id} data-poster-kind="section" style={style} onClick={onClick}>
@@ -384,6 +394,8 @@ function renderBlock(
   visuals: Map<string, PosterProject["visuals"][number]>,
   imageSlots: Map<string, GeneratedImageSlot>,
   mode: PosterCanvasProps["mode"],
+  skins?: ComponentSkins,
+  palette?: ReturnType<typeof resolvePalette>,
   selectedId?: string,
   qaIssuesByLocation?: Map<string, QaIssue[]>,
   onSelectItem?: PosterCanvasProps["onSelectItem"],
@@ -455,7 +467,7 @@ function renderBlock(
       }}
     >
       <QaBadge issues={qaIssuesByLocation?.get(`visuals.${visual.id}`) ?? []} onClick={() => onSelectItem?.(visual.id, "visual")} />
-      <VisualRenderer visual={visual} />
+      <VisualRenderer visual={visual} palette={palette} skins={skins} />
     </div>
   );
 }

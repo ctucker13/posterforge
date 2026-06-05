@@ -6,8 +6,6 @@ Working task list for the PosterForge project. Update this file as work is compl
 
 ## In Progress
 
-- [ ] **Phase 5 — Theme-specific component skins (rendering)** — Wire `componentSkins` tokens from `PosterTheme` into `VisualRenderer` and section card wrappers in `PosterCanvas`. CSS custom properties (`--skin-bg`, `--skin-border`, `--skin-radius`, `--skin-shadow`, `--skin-backdrop`, `--skin-heading-*`) are defined; renderers need to read and apply them.
-
 ---
 
 ## Backlog
@@ -17,7 +15,7 @@ Working task list for the PosterForge project. Update this file as work is compl
 - [ ] **Phase 2 — Generated-image slot model** — Promote image slots to first-class plan elements with `x`, `y`, `widthPx`, `heightPx` positioning in `buildLayoutSpec`.
 - [ ] **Phase 3 — Layout spec generation** — Extend `buildLayoutSpec` to write one section per raster slot; SVG/svg-hybrid slots resolve through `ThemeMotifLayer`.
 - [ ] **Phase 4 — Canvas overlay renderer** — Place deterministic content into sidecar-defined content regions; keep pan/resize/regenerate controls per slot.
-- [ ] **Phase 5 — Theme-specific component skins** — Replace generic renderer styling with theme-aware skins for cards, tables, metrics, timelines, flow diagrams, and Mermaid output. Types and skin data are defined; rendering wiring is the remaining work.
+- [ ] **Phase 5 — Theme-specific component skins (timeline, network-graph, sankey)** — Remaining visual types (timeline, network-graph, sankey) not yet wired to skin vars. Section card heading vars (font/transform/tracking) are CSS-only; verify they render correctly for blueprint-engineering uppercase headings.
 - [ ] **Phase 6 — QA additions** — Checks for missing generated assets, stale dimensions, region overflow, low contrast, factual content in image prompts.
 
 ### Glassmorphism
@@ -69,3 +67,4 @@ Working task list for the PosterForge project. Update this file as work is compl
 - [x] PosterMinimap removed
 - [x] `neural-network-glassmorphism` and `stained-glass-data-mosaic` themes defined in JSON
 - [x] Theme contract types (Phase 1) — `ComponentSkins`, `SlotTemplate`, `ThemeHtmlTokens`, `ThemeTypography` added to `PosterTheme`; `componentSkins` data added for `whiteboard-explainer`, `blueprint-engineering`, `neural-network-glassmorphism`; `resolveComponentSkins()` export added
+- [x] Phase 5 component skin rendering — `VisualRenderer` accepts `skins?: ComponentSkins`, applies correct skin slice (`pickSkin`) as CSS custom property vars on `.visual-box` for metric_card, flow_diagram, mermaid_flow, data-table, data_table, table, code_block. `PosterCanvas` computes `resolveComponentSkins(theme)`, sets `sectionCard` skin vars inline on `<section>`, passes `skins` + `palette` to `VisualRenderer`. CSS rules consume `var(--skin-bg/border/radius/shadow/backdrop/heading-*)` with fallbacks preserving existing appearance.

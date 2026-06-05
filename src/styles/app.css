@@ -2403,6 +2403,38 @@ textarea {
   min-width: 0;
 }
 
+/* Component skin var consumption — vars are set as inline style on .visual-box by VisualRenderer */
+.visual-box .metric-card {
+  background: var(--skin-bg, transparent);
+  border: var(--skin-border, none);
+  border-radius: var(--skin-radius, 0);
+  box-shadow: var(--skin-shadow, none);
+  backdrop-filter: var(--skin-backdrop, none);
+}
+
+.visual-box .mermaid-diagram {
+  background: var(--skin-bg, transparent);
+  border: var(--skin-border, none);
+  border-radius: var(--skin-radius, 0);
+  box-shadow: var(--skin-shadow, none);
+  backdrop-filter: var(--skin-backdrop, none);
+  padding: var(--skin-padding, 0);
+}
+
+.visual-box .table-wrap {
+  background: var(--skin-bg, transparent);
+  border: var(--skin-border, none);
+  border-radius: var(--skin-radius, 0);
+  backdrop-filter: var(--skin-backdrop, none);
+}
+
+.visual-box .code-placeholder {
+  background: var(--skin-bg, transparent);
+  border: var(--skin-border, none);
+  border-radius: var(--skin-radius, 0);
+  backdrop-filter: var(--skin-backdrop, none);
+}
+
 .poster-output-frame .data-table {
   table-layout: fixed;
 }
@@ -2813,10 +2845,12 @@ textarea {
 
 .poster-card {
   min-height: 230px;
-  border: 1px solid color-mix(in srgb, var(--theme-primary), white 78%);
-  border-radius: 8px;
-  padding: 18px;
-  background: var(--theme-bg);
+  border: var(--skin-border, 1px solid color-mix(in srgb, var(--theme-primary), white 78%));
+  border-radius: var(--skin-radius, 8px);
+  padding: var(--skin-padding, 18px);
+  background: var(--skin-bg, var(--theme-bg));
+  box-shadow: var(--skin-shadow, none);
+  backdrop-filter: var(--skin-backdrop, none);
 }
 
 .poster-canvas-mode-edit .poster-card,
@@ -2863,6 +2897,9 @@ textarea {
   color: var(--theme-primary);
   font-size: 24px;
   line-height: 1.1;
+  font-family: var(--skin-heading-font, inherit);
+  text-transform: var(--skin-heading-transform, none);
+  letter-spacing: var(--skin-heading-tracking, normal);
 }
 
 .poster-card p,

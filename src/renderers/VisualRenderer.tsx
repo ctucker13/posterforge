@@ -1,5 +1,5 @@
 import type { PosterVisual } from "../domain/poster";
-import type { PosterPalette } from "../themes";
+import type { PosterPalette, ComponentSkins, SkinTokens } from "../themes";
 import { Image } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -68,7 +68,21 @@ function normalizeMermaidSvg(rendered: string): string {
     .replace(/\swidth="[^"]*"/, ' width="100%"');
 }
 
-export function VisualRenderer({ visual, palette }: { visual: PosterVisual; palette?: PosterPalette | undefined }) {
+function toSkinVars(tokens: SkinTokens | undefined): React.CSSProperties {
+  return (tokens ?? {}) as React.CSSProperties;
+}
+
+function pickSkin(skins: ComponentSkins | undefined, type: string): SkinTokens | undefined {
+  if (!skins) return undefined;
+  if (type === "metric_card") return skins.metricCard;
+  if (type === "flow_diagram" || type === "flow-diagram" || type === "mermaid_flow") return skins.mermaidDiagram;
+  if (type === "data-table" || type === "data_table" || type === "table") return skins.dataTable;
+  if (type === "code_block") return skins.codeBlock;
+  return undefined;
+}
+
+export function VisualRenderer({ visual, palette, skins }: { visual: PosterVisual; palette?: PosterPalette | undefined; skins?: ComponentSkins | undefined }) {
+  const skinVars = toSkinVars(pickSkin(skins, visual.type));
   const chartColors: string[] = [
     palette?.colors.accent ?? CHART_COLOURS[0] ?? "#2176AE",
     palette?.colors.primary ?? CHART_COLOURS[1] ?? "#17324D",
@@ -123,7 +137,7 @@ export function VisualRenderer({ visual, palette }: { visual: PosterVisual; pale
     const { columns, rows } = parsed.data;
 
     return (
-      <div className="visual-box">
+      <div className="visual-box" style={skinVars}>
         <VisualHeader title={visual.title} meta={`${rows.length} row${rows.length === 1 ? "" : "s"}`} />
         <div className="table-wrap">
           <table className="data-table">
@@ -274,7 +288,7 @@ export function VisualRenderer({ visual, palette }: { visual: PosterVisual; pale
     }
 
     return (
-      <div className="visual-box">
+      <div className="visual-box" style={skinVars}>
         <h3>{visual.title}</h3>
         <pre className="code-placeholder">
           <code>{parsed.data.code}</code>
@@ -290,7 +304,7 @@ export function VisualRenderer({ visual, palette }: { visual: PosterVisual; pale
     }
 
     return (
-      <div className="visual-box">
+      <div className="visual-box" style={skinVars}>
         <h3>{visual.title}</h3>
         <div className="metric-card">
           <span>{parsed.data.label}</span>
@@ -306,7 +320,7 @@ export function VisualRenderer({ visual, palette }: { visual: PosterVisual; pale
     const src = (visual.data as Record<string, unknown>)?.definition as string | undefined;
     if (!src) return <InvalidVisualData visual={visual} message="No diagram definition provided." />;
     return (
-      <div className="visual-box">
+      <div className="visual-box" style={skinVars}>
         <VisualHeader title={visual.title} />
         <MermaidDiagram definition={src} />
       </div>
@@ -318,7 +332,7 @@ export function VisualRenderer({ visual, palette }: { visual: PosterVisual; pale
     const parsed = parseSourceTextData(visual.data, "mermaid_flow");
     if (!parsed.ok) return <InvalidVisualData visual={visual} message={parsed.message} />;
     return (
-      <div className="visual-box">
+      <div className="visual-box" style={skinVars}>
         <VisualHeader title={visual.title} />
         <MermaidDiagram definition={parsed.data.source} />
       </div>
@@ -483,7 +497,7 @@ export function VisualRenderer({ visual, palette }: { visual: PosterVisual; pale
     const headers: string[] = (data?.headers as string[]) ?? [];
     const rows: string[][] = (data?.rows as string[][]) ?? [];
     return (
-      <div className="visual-box">
+      <div className="visual-box" style={skinVars}>
         <VisualHeader title={visual.title} meta={`${rows.length} row${rows.length === 1 ? "" : "s"}`} />
         <div className="table-wrap">
           <table className="data-table">
