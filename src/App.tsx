@@ -454,6 +454,7 @@ export default function App() {
           onMoveSection={handleMoveSection}
           onToggleHideSection={handleToggleHideSection}
           onDeleteSection={handleDeleteSection}
+          onDeselectItem={() => setSelectedCanvasItem(undefined)}
           onSelectItem={(id, kind) => {
             setSelectedCanvasItem({ id, kind });
             setAppMode("edit");
