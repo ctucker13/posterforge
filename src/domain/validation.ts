@@ -265,7 +265,13 @@ function validateBlock(value: unknown, path: string, issues: PosterValidationIss
     return;
   }
 
-  addIssue(issues, `${path}.type`, "must be either 'text' or 'visual_ref'.");
+  if (value.type === "generated_image") {
+    requireString(value, "slot_id", `${path}.slot_id`, issues);
+    optionalString(value.objectPosition, `${path}.objectPosition`, issues);
+    return;
+  }
+
+  addIssue(issues, `${path}.type`, "must be either 'text', 'visual_ref', or 'generated_image'.");
 }
 
 function validateVisual(value: unknown, path: string, issues: PosterValidationIssue[]) {

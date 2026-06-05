@@ -30,6 +30,9 @@ export interface PosterCanvasProps {
   onGenerateImageSlot?: ((slotId: string) => void) | undefined;
   onUpdateImageSlotPosition?: ((slotId: string, objectPosition: string) => void) | undefined;
   onImageSlotSidecarLoaded?: ((slotId: string, patch: { seed?: number; contentRegions?: ContentRegion[] }) => void) | undefined;
+  onDeselectItem?: (() => void) | undefined;
+  /** Slot ids with an in-flight generation request; used to show progress UI. */
+  generatingSlotIds?: Set<string> | undefined;
 }
 
 export function PosterCanvas({
@@ -49,6 +52,8 @@ export function PosterCanvas({
   onGenerateImageSlot,
   onUpdateImageSlotPosition,
   onImageSlotSidecarLoaded,
+  onDeselectItem,
+  generatingSlotIds,
 }: PosterCanvasProps) {
   const palette = resolvePalette(poster.theme, poster.palette);
   const layout = resolveLayoutTemplate(poster.layout);
@@ -185,7 +190,7 @@ export function PosterCanvas({
               {section.title}
             </h3>
             {section.blocks.map((block, index) =>
-              renderBlock(block, index, section.id, visuals, claims, sources, imageSlots, mode, selectedId, qaIssuesByLocation, onSelectItem, onUpdateTextBlock, onGenerateImageSlot, onUpdateImageSlotPosition, onImageSlotSidecarLoaded),
+              renderBlock(block, index, section.id, visuals, claims, sources, imageSlots, mode, selectedId, qaIssuesByLocation, onSelectItem, onUpdateTextBlock, onGenerateImageSlot, onUpdateImageSlotPosition, onImageSlotSidecarLoaded, generatingSlotIds),
             )}
               </>
             )}
@@ -201,6 +206,7 @@ export function PosterCanvas({
       data-poster-id={poster.id}
       data-poster-kind="canvas"
       data-orientation={outputFrame.orientation}
+      onClick={() => onDeselectItem?.()}
       style={
         {
           width: outputFrame.width,
@@ -226,6 +232,44 @@ export function PosterCanvas({
         {(bgStrategy === "svg" || bgStrategy === "svg-hybrid") && (
           <ThemeMotifLayer themeId={poster.theme} mode="full-background" />
         )}
+        {bgStrategy === "raster" && (() => {
+          const bgSlot = [...imageSlots.values()].find((s) => s.role === "background");
+          if (!bgSlot) return null;
+          const assetId = bgSlot.assetId;
+          const fmt = bgSlot.outputFormat ?? "webp";
+          const effectiveUrl = assetId ? `/generated-assets/${assetId}.${fmt}` : bgSlot.url;
+          const generating = generatingSlotIds?.has(bgSlot.id) ?? false;
+          return (
+            <>
+              {effectiveUrl ? (
+                <img
+                  src={effectiveUrl}
+                  alt=""
+                  style={{ position: "absolute", inset: 0, width: "100%", height: "100%",
+                           objectFit: "cover", zIndex: 0, pointerEvents: "none" }}
+                />
+              ) : null}
+              {mode === "edit" && (!effectiveUrl || generating) ? (
+                <div className="raster-bg-placeholder">
+                  {generating ? (
+                    <span className="raster-bg-hint">Generating background…</span>
+                  ) : (
+                    <button
+                      type="button"
+                      className="raster-bg-generate-btn"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onGenerateImageSlot?.(bgSlot.id);
+                      }}
+                    >
+                      Generate background
+                    </button>
+                  )}
+                </div>
+              ) : null}
+            </>
+          );
+        })()}
         <header className="poster-hero" data-poster-id="hero" data-poster-kind="hero">
           <div>
             <p className="poster-kicker">{layout.name} · {poster.audience}</p>
@@ -378,6 +422,7 @@ function renderBlock(
   onGenerateImageSlot?: PosterCanvasProps["onGenerateImageSlot"],
   onUpdateImageSlotPosition?: PosterCanvasProps["onUpdateImageSlotPosition"],
   onImageSlotSidecarLoaded?: PosterCanvasProps["onImageSlotSidecarLoaded"],
+  generatingSlotIds?: Set<string> | undefined,
 ) {
   const blockId = `${sectionId}:block:${index}`;
   const selected = selectedId === blockId;
@@ -425,6 +470,7 @@ function renderBlock(
         slotId={block.slot_id}
         objectPosition={block.objectPosition}
         mode={mode}
+        generating={generatingSlotIds?.has(block.slot_id) ?? false}
         onGenerate={onGenerateImageSlot}
         onUpdatePosition={onUpdateImageSlotPosition}
         onSidecarLoaded={onImageSlotSidecarLoaded}
@@ -501,6 +547,7 @@ function GeneratedImageBlock({
   slotId,
   objectPosition,
   mode,
+  generating = false,
   onGenerate,
   onUpdatePosition,
   onSidecarLoaded,
@@ -510,6 +557,7 @@ function GeneratedImageBlock({
   slotId: string;
   objectPosition?: string | undefined;
   mode: PosterCanvasProps["mode"];
+  generating?: boolean | undefined;
   onGenerate?: ((slotId: string) => void) | undefined;
   onUpdatePosition?: ((slotId: string, objectPosition: string) => void) | undefined;
   onSidecarLoaded?: PosterCanvasProps["onImageSlotSidecarLoaded"];
@@ -614,13 +662,13 @@ function GeneratedImageBlock({
             aria-hidden="true"
           />
         ))}
-        {/* Gap 3: regenerate buttons shown when seed is known */}
-        {slot?.seed !== undefined && mode === "edit" ? (
+        {/* Regenerate controls — available in edit mode for any generated image */}
+        {mode === "edit" ? (
           <div className="image-slot-actions">
-            <button type="button" className="image-slot-btn" onClick={() => onGenerate?.(slotId)}>
-              <RotateCcw size={11} /> Regen
+            <button type="button" className="image-slot-btn" disabled={generating} onClick={() => onGenerate?.(slotId)}>
+              <RotateCcw size={11} /> {generating ? "Generating…" : "Regen"}
             </button>
-            <button type="button" className="image-slot-btn" onClick={() => onGenerate?.(`${slotId}:exact`)}>
+            <button type="button" className="image-slot-btn" disabled={generating} onClick={() => onGenerate?.(`${slotId}:exact`)}>
               <RotateCcw size={11} /> Exact
             </button>
           </div>
@@ -634,8 +682,8 @@ function GeneratedImageBlock({
       <Image size={28} />
       <span>{roleLabel}</span>
       {mode === "edit" ? (
-        <button type="button" className="image-slot-generate-btn" onClick={() => onGenerate?.(slotId)}>
-          Generate image
+        <button type="button" className="image-slot-generate-btn" disabled={generating} onClick={() => onGenerate?.(slotId)}>
+          {generating ? "Generating…" : "Generate image"}
         </button>
       ) : null}
     </div>

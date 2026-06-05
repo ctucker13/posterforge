@@ -90,6 +90,14 @@ function selectCandidate(project, options) {
     return match;
   }
 
+  if (options.slot) {
+    const match = candidates.find((candidate) => candidate.source === "slot" && candidate.asset.id === options.slot);
+    if (!match) {
+      throw new Error(`No image slot found for --slot ${options.slot}`);
+    }
+    return match;
+  }
+
   if (options.asset) {
     const match = candidates.find((candidate) => candidate.asset.id === options.asset);
     if (!match) {
@@ -119,7 +127,27 @@ function listCandidates(project) {
     .filter((asset) => generatedAssetTypes.has(asset.type))
     .map((asset) => ({ source: "asset", asset }));
 
-  return [...visualCandidates, ...projectAssetCandidates];
+  // Image slots are first-class generation targets. Adapt each slot into the
+  // common candidate.asset shape so the rest of the pipeline is unchanged.
+  const slotCandidates = (project.imageSlots ?? []).map((slot) => ({
+    source: "slot",
+    slot,
+    asset: {
+      id: slot.id,
+      title: slot.title ?? slot.id,
+      role: slot.role,
+      prompt: slot.prompt,
+      output_format: slot.outputFormat,
+      width_px: slot.width_px,
+      height_px: slot.height_px,
+      contentRegions: slot.contentRegions,
+      theme: typeof project.theme === "string" ? project.theme : project.theme?.id,
+      palette: typeof project.palette === "string" ? project.palette : project.palette?.id,
+      source_ids: [],
+    },
+  }));
+
+  return [...visualCandidates, ...projectAssetCandidates, ...slotCandidates];
 }
 
 function toImageAssetRequest(candidate, outputDirectory, options) {
@@ -127,7 +155,13 @@ function toImageAssetRequest(candidate, outputDirectory, options) {
   const outputPath = path.join(outputDirectory, `${asset.id}.png`);
   const metadataPath = path.join(outputDirectory, `${asset.id}.json`);
   const publicUrl = outputPath.startsWith(`public${path.sep}`) ? `/${path.relative("public", outputPath).replaceAll(path.sep, "/")}` : outputPath;
-  const model = String(options.model ?? asset.model ?? "gpt-image-1.5");
+  const model = String(options.model ?? asset.model ?? "gpt-image-2");
+  const outputFormat = String(options.format ?? asset.output_format ?? "webp");
+  const outputExt = outputFormat === "jpeg" ? "jpg" : outputFormat;
+  const outputPathFmt = path.join(outputDirectory, `${asset.id}.${outputExt}`);
+  const metadataPathFmt = path.join(outputDirectory, `${asset.id}.json`);
+  const publicUrlFmt = outputPathFmt.startsWith(`public${path.sep}`) ? `/${path.relative("public", outputPathFmt).replaceAll(path.sep, "/")}` : outputPathFmt;
+  const background = options.background ? String(options.background) : undefined;
 
   return {
     id: asset.id,
@@ -136,13 +170,16 @@ function toImageAssetRequest(candidate, outputDirectory, options) {
     role: asset.role,
     prompt: buildImagePrompt(asset, candidate.visual),
     model,
+    outputFormat,
+    background,
     size: String(options.size ?? inferImageSize(asset)),
-    outputPath,
-    metadataPath,
-    publicUrl,
+    outputPath: outputPathFmt,
+    metadataPath: metadataPathFmt,
+    publicUrl: publicUrlFmt,
     theme: asset.theme,
     palette: asset.palette,
     sourceIds: asset.source_ids ?? [],
+    contentRegions: asset.contentRegions ?? [],
   };
 }
 
@@ -185,7 +222,9 @@ async function generateImage(request, apiKey) {
     prompt: request.prompt,
     size: request.size,
     n: 1,
+    output_format: request.outputFormat,
   };
+  if (request.background) body.background = request.background;
 
   const response = await fetch("https://api.openai.com/v1/images/generations", {
     method: "POST",
@@ -238,10 +277,12 @@ function buildMetadata(request, options) {
     provider: "openai",
     model: request.model,
     size: request.size,
+    output_format: request.outputFormat,
     prompt: request.prompt,
     theme: request.theme,
     palette: request.palette,
     source_ids: request.sourceIds,
+    contentRegions: request.contentRegions,
     outputPath: request.outputPath,
     publicUrl: request.publicUrl,
     status: options.status,
@@ -255,7 +296,15 @@ function buildMetadata(request, options) {
 function attachGeneratedAsset(project, candidate, metadata) {
   const next = JSON.parse(JSON.stringify(project));
 
-  if (candidate.visual?.id) {
+  if (candidate.source === "slot") {
+    const slot = next.imageSlots?.find((item) => item.id === candidate.slot.id);
+    if (slot) {
+      // assetId is the file stem; the canvas derives the URL as
+      // /generated-assets/{assetId}.{outputFormat} at render time.
+      slot.assetId = candidate.slot.id;
+      slot.outputFormat = metadata.output_format;
+    }
+  } else if (candidate.visual?.id) {
     const visual = next.visuals?.find((item) => item.id === candidate.visual.id);
     if (visual?.asset) {
       visual.asset.url = metadata.publicUrl;
@@ -295,13 +344,14 @@ function printPlan(request, metadata) {
   console.log(`Planned generated image asset: ${request.title}`);
   console.log(`Model: ${request.model}`);
   console.log(`Size: ${request.size}`);
+  console.log(`Format: ${request.outputFormat}`);
   console.log(`Output: ${request.outputPath}`);
   console.log(`Metadata: ${request.metadataPath}`);
   console.log(`Status: ${metadata.status}`);
   console.log("");
   console.log(request.prompt);
   console.log("");
-  console.log("Run with OPENAI_API_KEY set to generate the PNG.");
+  console.log(`Run with OPENAI_API_KEY set to generate the image (default model: gpt-image-2).`);
 }
 
 class OpenAiImageError extends Error {

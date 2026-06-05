@@ -3,6 +3,7 @@ import { AlertTriangle, CheckCircle2, Eye, Maximize2, Minus, Monitor, Pencil, Pl
 import { Wand2 } from "lucide-react";
 import type { PosterProject, QaIssue } from "../domain/poster";
 import { reviseTextBlock } from "../domain/generator";
+import { generateImageForSlot } from "../services/imageGen";
 import { getA0PreviewFrame, PosterCanvas, type PosterCanvasItemKind } from "./PosterCanvas";
 import { BlockRevisionDiff } from "./BlockRevisionDiff";
 import { PosterMinimap } from "./PosterMinimap";
@@ -33,6 +34,7 @@ interface EditablePosterCanvasProps {
   onMoveSection?: (sectionId: string, direction: -1 | 1) => void;
   onToggleHideSection?: (sectionId: string) => void;
   onDeleteSection?: (sectionId: string) => void;
+  onDeselectItem?: () => void;
 }
 
 type CanvasEditMode = "editing" | "preview";
@@ -50,6 +52,7 @@ export function EditablePosterCanvas({
   onMoveSection,
   onToggleHideSection,
   onDeleteSection,
+  onDeselectItem,
 }: EditablePosterCanvasProps) {
   const [canvasEditMode, setCanvasEditMode] = useState<CanvasEditMode>("editing");
   const [zoom, setZoom] = useState(0.16);
@@ -61,6 +64,8 @@ export function EditablePosterCanvas({
   const [commandBarValue, setCommandBarValue] = useState("");
   const [revisionDiff, setRevisionDiff] = useState<{ original: string; revised: string; blockId: string } | null>(null);
   const [regenerateTarget, setRegenerateTarget] = useState<{ sectionId: string; instruction: string } | null>(null);
+  const [generatingSlotIds, setGeneratingSlotIds] = useState<Set<string>>(() => new Set());
+  const [imageGenError, setImageGenError] = useState<string | null>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const commandInputRef = useRef<HTMLInputElement>(null);
@@ -213,6 +218,42 @@ export function EditablePosterCanvas({
     });
   }
 
+  async function handleGenerateImageSlot(rawSlotId: string) {
+    // The canvas encodes an "exact" regeneration request as "<slotId>:exact".
+    const exact = rawSlotId.endsWith(":exact");
+    const slotId = exact ? rawSlotId.slice(0, -":exact".length) : rawSlotId;
+    if (generatingSlotIds.has(slotId)) {
+      return;
+    }
+
+    const slot = (poster.imageSlots ?? []).find((s) => s.id === slotId);
+    if (!slot) {
+      return;
+    }
+
+    setImageGenError(null);
+    setGeneratingSlotIds((prev) => new Set(prev).add(slotId));
+    try {
+      const { dataUrl, outputFormat } = await generateImageForSlot(slot, poster, { exact });
+      // Preview lives in slot.url as a data URL; clear assetId so the canvas
+      // renders the fresh preview rather than a previously-baked file.
+      onPosterChange({
+        ...poster,
+        imageSlots: (poster.imageSlots ?? []).map((s) =>
+          s.id === slotId ? { ...s, url: dataUrl, outputFormat, assetId: null } : s,
+        ),
+      });
+    } catch (error) {
+      setImageGenError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setGeneratingSlotIds((prev) => {
+        const next = new Set(prev);
+        next.delete(slotId);
+        return next;
+      });
+    }
+  }
+
   async function handleBlockRevise() {
     if (!selectedId || selectedKind !== "block" || commandBarValue.trim().length === 0) {
       return;
@@ -359,6 +400,30 @@ export function EditablePosterCanvas({
                   onMoveSection={onMoveSection}
                   onToggleHideSection={onToggleHideSection}
                   onDeleteSection={onDeleteSection}
+                  onDeselectItem={onDeselectItem}
+                  generatingSlotIds={generatingSlotIds}
+                  onGenerateImageSlot={handleGenerateImageSlot}
+                  onUpdateImageSlotPosition={(slotId, objectPosition) => {
+                    onPosterChange({
+                      ...poster,
+                      sections: poster.sections.map((section) => ({
+                        ...section,
+                        blocks: section.blocks.map((block) =>
+                          block.type === "generated_image" && block.slot_id === slotId
+                            ? { ...block, objectPosition }
+                            : block,
+                        ),
+                      })),
+                    });
+                  }}
+                  onImageSlotSidecarLoaded={(slotId, patch) => {
+                    onPosterChange({
+                      ...poster,
+                      imageSlots: (poster.imageSlots ?? []).map((slot) =>
+                        slot.id === slotId ? { ...slot, ...patch } : slot,
+                      ),
+                    });
+                  }}
                 />
               </div>
             </div>
@@ -366,6 +431,15 @@ export function EditablePosterCanvas({
           </>
         )}
       </div>
+      {imageGenError ? (
+        <div className="image-gen-error-bar" role="alert">
+          <AlertTriangle size={14} aria-hidden="true" />
+          <span>{imageGenError}</span>
+          <button type="button" onClick={() => setImageGenError(null)} aria-label="Dismiss image generation error">
+            ×
+          </button>
+        </div>
+      ) : null}
       {regenerateTarget ? (
         <div className="regenerate-instruction-bar" role="form" aria-label="Section regeneration instruction">
           <Wand2 size={14} aria-hidden="true" />

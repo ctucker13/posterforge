@@ -249,38 +249,6 @@ export function VisualRenderer({ visual, palette }: { visual: PosterVisual; pale
     );
   }
 
-  if (visual.type === "mermaid_flow") {
-    const parsed = parseSourceTextData(visual.data, "mermaid_flow");
-    if (!parsed.ok) {
-      return <InvalidVisualData visual={visual} message={parsed.message} />;
-    }
-
-    // Render as a styled code block — Mermaid rendering requires a browser plugin
-    return (
-      <div className="visual-box">
-        <h3>{visual.title}</h3>
-        <pre className="diagram-source">{parsed.data.source}</pre>
-      </div>
-    );
-  }
-
-  if (visual.type === "math") {
-    const parsed = parseSourceTextData(visual.data, "math");
-    if (!parsed.ok) {
-      return <InvalidVisualData visual={visual} message={parsed.message} />;
-    }
-
-    return (
-      <div className="visual-box">
-        <h3>{visual.title}</h3>
-        <div className="math-placeholder">
-          <span>LaTeX source</span>
-          <code>{parsed.data.source}</code>
-        </div>
-      </div>
-    );
-  }
-
   if (visual.type === "code_block") {
     const parsed = parseCodeBlockData(visual.data);
     if (!parsed.ok) {
