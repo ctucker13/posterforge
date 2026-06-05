@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 864">
+  <rect width="1536" height="864" fill="#F5F0E8"/>
+  <!-- Primary geometric shapes — Bauhaus primary colours -->
+  <rect x="0" y="0" width="384" height="864" fill="rgba(200,50,30,0.06)"/>
+  <circle cx="1152" cy="432" r="280" fill="rgba(30,80,160,0.05)"/>
+  <polygon points="768,80 960,720 576,720" fill="rgba(220,170,0,0.06)"/>
+  <!-- Strong horizontal bar -->
+  <rect x="0" y="100" width="1536" height="8" fill="#C8321E"/>
+  <!-- Grid overlay -->
+  <g stroke="rgba(0,0,0,0.06)" stroke-width="1">
+    <line x1="384" y1="0" x2="384" y2="864"/>
+    <line x1="768" y1="0" x2="768" y2="864"/>
+    <line x1="1152" y1="0" x2="1152" y2="864"/>
+    <line x1="0" y1="432" x2="1536" y2="432"/>
+  </g>
+  <!-- Bold accent blocks -->
+  <rect x="0" y="0" width="8" height="864" fill="#C8321E"/>
+  <rect x="1528" y="0" width="8" height="864" fill="#1E50A0"/>
+  <rect x="0" y="856" width="1536" height="8" fill="#DCAA00"/>
+</svg>

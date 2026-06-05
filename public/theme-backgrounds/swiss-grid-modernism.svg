@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 864">
+  <rect width="1536" height="864" fill="#F5F5F0"/>
+  <defs>
+    <pattern id="swiss-grid" width="128" height="128" patternUnits="userSpaceOnUse">
+      <rect width="128" height="128" fill="none" stroke="rgba(0,0,0,0.06)" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1536" height="864" fill="url(#swiss-grid)"/>
+  <!-- Strong horizontal rule -->
+  <rect x="0" y="120" width="1536" height="4" fill="#CC0000"/>
+  <!-- Vertical column markers -->
+  <rect x="128" y="0" width="2" fill="rgba(0,0,0,0.08)" height="864"/>
+  <rect x="640" y="0" width="2" fill="rgba(0,0,0,0.08)" height="864"/>
+  <rect x="1152" y="0" width="2" fill="rgba(0,0,0,0.08)" height="864"/>
+  <!-- Bold accent block top-left -->
+  <rect x="0" y="0" width="128" height="120" fill="#CC0000"/>
+  <!-- Typography guide lines -->
+  <line x1="128" y1="200" x2="1408" y2="200" stroke="rgba(0,0,0,0.05)" stroke-width="1"/>
+  <line x1="128" y1="280" x2="1408" y2="280" stroke="rgba(0,0,0,0.05)" stroke-width="1"/>
+  <line x1="128" y1="360" x2="1408" y2="360" stroke="rgba(0,0,0,0.05)" stroke-width="1"/>
+</svg>

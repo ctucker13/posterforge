@@ -260,6 +260,11 @@ async function renderBlock(
     return Math.max(0.24, Math.min(box.h, text.length / 360 + 0.2));
   }
 
+  if (block.type === "generated_image") {
+    renderPlaceholderVisual(slide, pptx, block.slot_id, "image slot", colors, box);
+    return box.h;
+  }
+
   const visual = visualMap.get(block.visual_id);
   if (!visual) {
     renderPlaceholderVisual(slide, pptx, block.visual_id, "missing visual", colors, box);

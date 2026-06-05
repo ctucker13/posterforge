@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 864">
+  <rect width="1536" height="864" fill="#1B4F72"/>
+  <!-- White horizontal bands -->
+  <rect x="0" y="108" width="1536" height="6" fill="rgba(255,255,255,0.15)"/>
+  <rect x="0" y="750" width="1536" height="6" fill="rgba(255,255,255,0.15)"/>
+  <!-- Header bar -->
+  <rect x="0" y="0" width="1536" height="108" fill="rgba(0,0,0,0.25)"/>
+  <!-- Wayfinding arrow shapes -->
+  <g fill="rgba(255,255,255,0.08)">
+    <polygon points="200,350 340,280 340,420"/>
+    <polygon points="1336,350 1196,280 1196,420"/>
+    <polygon points="768,200 838,350 698,350"/>
+    <polygon points="768,664 838,514 698,514"/>
+  </g>
+  <!-- Colour bar strips -->
+  <rect x="0" y="856" width="256" height="8" fill="#E63946"/>
+  <rect x="256" y="856" width="256" height="8" fill="#F4A261"/>
+  <rect x="512" y="856" width="256" height="8" fill="#2A9D8F"/>
+  <rect x="768" y="856" width="256" height="8" fill="#E9C46A"/>
+  <rect x="1024" y="856" width="256" height="8" fill="#264653"/>
+  <rect x="1280" y="856" width="256" height="8" fill="#E76F51"/>
+  <!-- Icon grid -->
+  <g fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2">
+    <circle cx="384" cy="432" r="40"/>
+    <circle cx="768" cy="432" r="40"/>
+    <circle cx="1152" cy="432" r="40"/>
+  </g>
+</svg>

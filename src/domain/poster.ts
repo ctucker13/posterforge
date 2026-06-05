@@ -118,9 +118,34 @@ export interface PosterSectionLayout {
   hidden?: boolean | undefined;
 }
 
+export interface ContentRegion {
+  id: string;
+  x: string;
+  y: string;
+  width: string;
+  height: string;
+  type: "text" | "chart" | "metric" | "diagram-node" | "image";
+}
+
+export interface GeneratedImageSlot {
+  id: string;
+  role: "background" | "hero_illustration" | "section_art";
+  /** Stem written by image-gen CLI (e.g. "blueprint-bg-12345"). Derives URL at render time. */
+  assetId?: string | null | undefined;
+  outputFormat?: "png" | "webp" | undefined;
+  /** Direct URL override — used when assetId is absent or for externally-hosted images. */
+  url?: string | undefined;
+  prompt?: string | undefined;
+  seed?: number | undefined;
+  width_px?: number | undefined;
+  height_px?: number | undefined;
+  contentRegions?: ContentRegion[] | undefined;
+}
+
 export type PosterBlock =
   | { type: "text"; text: string; claim_ids?: string[] | undefined }
-  | { type: "visual_ref"; visual_id: string; caption?: string | undefined };
+  | { type: "visual_ref"; visual_id: string; caption?: string | undefined }
+  | { type: "generated_image"; slot_id: string; objectPosition?: string | undefined };
 
 export interface PosterAsset {
   id: string;
@@ -173,6 +198,7 @@ export interface PosterProject {
   sections: PosterSection[];
   visuals: PosterVisual[];
   assets?: PosterAsset[] | undefined;
+  imageSlots?: GeneratedImageSlot[] | undefined;
   references?: Record<string, unknown>[] | undefined;
   traces?: PosterTraceEvent[] | undefined;
   qaResults?: PosterQaIssue[] | undefined;

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 864">
+  <rect width="1536" height="864" fill="#0d1f0d"/>
+  <defs>
+    <pattern id="pcb" width="96" height="96" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="48" x2="96" y2="48" stroke="rgba(0,220,70,0.1)" stroke-width="1"/>
+      <line x1="48" y1="0" x2="48" y2="96" stroke="rgba(0,220,70,0.1)" stroke-width="1"/>
+      <circle cx="48" cy="48" r="4" fill="none" stroke="rgba(0,220,70,0.18)" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1536" height="864" fill="url(#pcb)"/>
+  <g fill="none" stroke="rgba(0,220,70,0.28)" stroke-width="2" stroke-linecap="round">
+    <polyline points="96,432 240,432 240,192 480,192"/>
+    <polyline points="480,192 528,192 528,96 768,96"/>
+    <polyline points="1440,432 1296,432 1296,672 1056,672"/>
+    <polyline points="1056,672 1008,672 1008,768 768,768"/>
+    <polyline points="768,96 768,192 960,192 960,432 1296,432"/>
+    <polyline points="240,432 240,624 480,624 480,768 768,768"/>
+  </g>
+  <g fill="rgba(0,220,70,0.4)">
+    <circle cx="96" cy="432" r="6"/><circle cx="480" cy="192" r="6"/>
+    <circle cx="768" cy="96" r="6"/><circle cx="1440" cy="432" r="6"/>
+    <circle cx="1056" cy="672" r="6"/><circle cx="768" cy="768" r="6"/>
+    <circle cx="960" cy="192" r="6"/>
+  </g>
+  <g fill="none" stroke="rgba(0,220,70,0.15)" stroke-width="1">
+    <rect x="192" y="144" width="96" height="96" rx="4"/>
+    <rect x="672" y="48" width="96" height="96" rx="4"/>
+    <rect x="960" y="384" width="96" height="96" rx="4"/>
+    <rect x="432" y="576" width="96" height="96" rx="4"/>
+  </g>
+</svg>

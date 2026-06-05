@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 864">
+  <rect width="1536" height="864" fill="#FAF9F6"/>
+  <defs>
+    <pattern id="math-grid" width="72" height="72" patternUnits="userSpaceOnUse">
+      <path d="M 72 0 L 0 0 0 72" fill="none" stroke="rgba(0,0,0,0.05)" stroke-width="0.75"/>
+    </pattern>
+  </defs>
+  <rect width="1536" height="864" fill="url(#math-grid)"/>
+  <!-- Coordinate axes -->
+  <line x1="768" y1="0" x2="768" y2="864" stroke="rgba(0,0,0,0.12)" stroke-width="1"/>
+  <line x1="0" y1="432" x2="1536" y2="432" stroke="rgba(0,0,0,0.12)" stroke-width="1"/>
+  <!-- Subtle curve — sine wave -->
+  <path d="M 0,432 C 96,312 192,312 288,432 S 480,552 576,432 S 768,312 864,432 S 1056,552 1152,432 S 1344,312 1440,432 S 1536,432 1536,432"
+        fill="none" stroke="rgba(100,60,200,0.12)" stroke-width="2"/>
+  <!-- Golden ratio spiral hint -->
+  <path d="M 768,432 Q 960,432 960,240 Q 960,48 576,48 Q 192,48 192,432 Q 192,816 960,816 Q 1728,816 1728,0"
+        fill="none" stroke="rgba(180,120,0,0.08)" stroke-width="1.5"/>
+  <!-- Margin rules -->
+  <rect x="60" y="0" width="1" height="864" fill="rgba(0,0,0,0.06)"/>
+  <rect x="1476" y="0" width="1" height="864" fill="rgba(0,0,0,0.06)"/>
+  <!-- Tick marks on axes -->
+  <g stroke="rgba(0,0,0,0.1)" stroke-width="1">
+    <line x1="360" y1="428" x2="360" y2="436"/><line x1="504" y1="428" x2="504" y2="436"/>
+    <line x1="648" y1="428" x2="648" y2="436"/><line x1="768" y1="428" x2="768" y2="436"/>
+    <line x1="888" y1="428" x2="888" y2="436"/><line x1="1032" y1="428" x2="1032" y2="436"/>
+    <line x1="764" y1="216" x2="772" y2="216"/><line x1="764" y1="360" x2="772" y2="360"/>
+    <line x1="764" y1="504" x2="772" y2="504"/><line x1="764" y1="648" x2="772" y2="648"/>
+  </g>
+</svg>

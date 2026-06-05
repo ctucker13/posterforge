@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 864">
+  <rect width="1536" height="864" fill="#F0F4F8"/>
+  <!-- Metro line traces -->
+  <g stroke-width="8" fill="none" stroke-linecap="round">
+    <polyline points="0,216 384,216 576,432 960,432 1152,216 1536,216" stroke="#E63946"/>
+    <polyline points="0,432 288,432 480,624 1056,624 1248,432 1536,432" stroke="#2196F3"/>
+    <polyline points="0,648 192,648 384,432 768,432 960,648 1536,648" stroke="#4CAF50"/>
+    <polyline points="192,0 192,216 384,432 384,864" stroke="#FF9800"/>
+    <polyline points="960,0 960,216 1152,432 1152,864" stroke="#9C27B0"/>
+  </g>
+  <!-- Station dots -->
+  <g fill="white" stroke-width="4">
+    <circle cx="384" cy="216" r="10" stroke="#E63946"/>
+    <circle cx="576" cy="432" r="10" stroke="#E63946"/>
+    <circle cx="960" cy="432" r="10" stroke="#2196F3"/>
+    <circle cx="480" cy="624" r="10" stroke="#2196F3"/>
+    <circle cx="768" cy="432" r="10" stroke="#4CAF50"/>
+    <circle cx="384" cy="432" r="14" stroke="#444" stroke-width="5"/>
+    <circle cx="960" cy="432" r="14" stroke="#444" stroke-width="5"/>
+  </g>
+</svg>

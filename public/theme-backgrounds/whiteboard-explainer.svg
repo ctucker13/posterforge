@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 864">
+  <rect width="1536" height="864" fill="#FFFEF5"/>
+  <defs>
+    <pattern id="ruled" width="1536" height="40" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="39" x2="1536" y2="39" stroke="rgba(180,180,210,0.35)" stroke-width="1"/>
+    </pattern>
+    <pattern id="dots" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="20" cy="20" r="1" fill="rgba(180,180,210,0.25)"/>
+    </pattern>
+  </defs>
+  <rect width="1536" height="864" fill="url(#ruled)"/>
+  <rect width="1536" height="864" fill="url(#dots)"/>
+  <!-- Margin line -->
+  <line x1="96" y1="0" x2="96" y2="864" stroke="rgba(220,140,140,0.45)" stroke-width="1.5"/>
+  <!-- Hole punch marks -->
+  <g fill="none" stroke="rgba(180,180,210,0.4)" stroke-width="1.5">
+    <circle cx="40" cy="160" r="12"/>
+    <circle cx="40" cy="432" r="12"/>
+    <circle cx="40" cy="704" r="12"/>
+  </g>
+  <!-- Sketch arrow motifs (corner) -->
+  <g fill="none" stroke="rgba(37,99,235,0.18)" stroke-width="2" stroke-linecap="round">
+    <path d="M 1400,40 L 1480,40 L 1480,120"/>
+    <path d="M 1460,40 L 1480,40 L 1480,60"/>
+    <!-- Arrow head -->
+    <polyline points="1470,110 1480,120 1490,110"/>
+  </g>
+</svg>

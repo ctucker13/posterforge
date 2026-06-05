@@ -12,6 +12,7 @@ import { QaPanel } from "./components/QaPanel";
 import { SourceSearchPanel } from "./components/SourceSearchPanel";
 import { SectionRevisionDiff } from "./components/SectionRevisionDiff";
 import { ThemePicker } from "./components/ThemePicker";
+import { AssetPicker } from "./components/AssetPicker";
 import { TracePanel } from "./components/TracePanel";
 import { generateOutline, generatePoster, generationTrace, regenerateSection, type GenerationOptions } from "./domain/generator";
 import { migratePosterProject } from "./domain/migration";
@@ -347,6 +348,21 @@ export default function App() {
             </label>
 
             <ThemePicker selectedTheme={theme} selectedPalette={palette} onThemeChange={handleThemeChange} onPaletteChange={handlePaletteChange} />
+
+            <details className="asset-picker-disclosure">
+              <summary>Background asset</summary>
+              <AssetPicker
+                selectedTheme={theme}
+                selectedAssetId={poster.assets?.find((a) => a.role === "background")?.id}
+                onSelect={(asset) => {
+                  const nextPoster = {
+                    ...poster,
+                    assets: [asset, ...(poster.assets ?? []).filter((a) => a.role !== "background")],
+                  };
+                  handlePosterStateChange(nextPoster);
+                }}
+              />
+            </details>
 
             <div className="source-options" aria-label="Source mode">
               <button className={sourceMode === "mock" ? "selected" : ""} type="button" onClick={() => setSourceMode("mock")}>

@@ -1,6 +1,8 @@
-import { Palette } from "lucide-react";
+import { Palette, Search } from "lucide-react";
 import { useState } from "react";
 import { palettes, themes } from "../themes";
+
+const CATEGORIES = Array.from(new Set(Object.values(themes).map((t) => t.category).filter(Boolean))) as string[];
 
 export function ThemePicker({
   selectedTheme,
@@ -13,12 +15,54 @@ export function ThemePicker({
   onThemeChange: (theme: string) => void;
   onPaletteChange: (palette: string) => void;
 }) {
+  const [query, setQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [showOverride, setShowOverride] = useState(false);
+
+  const allThemes = Object.values(themes);
+  const filtered = allThemes.filter((theme) => {
+    const matchesQuery =
+      !query ||
+      theme.name.toLowerCase().includes(query.toLowerCase()) ||
+      theme.description.toLowerCase().includes(query.toLowerCase());
+    const matchesCategory = !activeCategory || theme.category === activeCategory;
+    return matchesQuery && matchesCategory;
+  });
 
   return (
     <div className="theme-picker">
+      <div className="theme-picker-search">
+        <Search size={14} />
+        <input
+          type="search"
+          placeholder={`Search ${allThemes.length} themes…`}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+      </div>
+
+      <div className="theme-category-filters">
+        <button
+          type="button"
+          className={activeCategory === null ? "selected" : ""}
+          onClick={() => setActiveCategory(null)}
+        >
+          All
+        </button>
+        {CATEGORIES.map((cat) => (
+          <button
+            type="button"
+            key={cat}
+            className={activeCategory === cat ? "selected" : ""}
+            onClick={() => setActiveCategory(activeCategory === cat ? null : cat)}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
       <div className="theme-card-grid">
-        {Object.values(themes).map((theme) => {
+        {filtered.map((theme) => {
           const paletteId = theme.palette ?? "clean-blue";
           const palette = palettes[paletteId] ?? Object.values(palettes)[0];
           if (!palette) return null;
@@ -45,6 +89,9 @@ export function ThemePicker({
             </button>
           );
         })}
+        {filtered.length === 0 && (
+          <p className="theme-picker-empty">No themes match "{query}"</p>
+        )}
       </div>
 
       <button className="palette-override-toggle" type="button" onClick={() => setShowOverride((current) => !current)}>

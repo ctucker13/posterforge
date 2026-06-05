@@ -27,7 +27,7 @@ export function SectionNavigator({
       {expanded ? (
         <div className="section-navigator-list" role="list">
           {sections.map((section, index) => {
-            const hasContent = section.blocks.some((block) => block.type === "visual_ref" || block.text.trim().length > 0);
+            const hasContent = section.blocks.some((block) => block.type === "visual_ref" || block.type === "generated_image" || (block.type === "text" && block.text.trim().length > 0));
             const hasIssue = sectionIssues.has(section.id);
             const status = section.layout?.hidden || !hasContent ? "muted" : hasIssue ? "warning" : "ready";
             return (

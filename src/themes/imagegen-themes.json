@@ -1,0 +1,3128 @@
+{
+  "schemaVersion": "imagegen-themes/v2",
+  "generatedAt": "2026-06-05T01:10:02.356843+00:00",
+  "themes": [
+    {
+      "id": "comic-research-showcase",
+      "name": "Comic Research Showcase",
+      "description": "Comic Research Showcase theme for academic data science posters, using editorial comic research panels with confident ink outlines, clean halftone energy, playful but academic.",
+      "palette": "comic-research-showcase",
+      "motifs": [
+        "comic panels",
+        "speech-callout shapes",
+        "bold ink borders",
+        "halftone bursts"
+      ],
+      "imagePromptPrefix": "editorial comic research panels with confident ink outlines, clean halftone energy, playful but academic; motifs: comic panels, speech-callout shapes, bold ink borders, halftone bursts; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "storytelling",
+      "collection": "first-30",
+      "bestFor": [
+        "project demos",
+        "LLM workflows",
+        "teaching posters"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "bold annotation-friendly charts with thick axes and comic callout highlights",
+      "diagramStyle": "panel-by-panel process diagrams with simple arrows",
+      "iconStyle": "Use comic panels, speech-callout shapes as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle storytelling texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "friendly"
+    },
+    {
+      "id": "nature-journal-scientific-field-notes",
+      "name": "Nature Journal / Scientific Field Notes",
+      "description": "Nature Journal / Scientific Field Notes theme for academic data science posters, using naturalist field notebook with botanical sketches, soft paper texture, labelled-specimen composition without readable labels.",
+      "palette": "nature-journal-scientific-field-notes",
+      "motifs": [
+        "botanical linework",
+        "field-note boxes",
+        "map fragments",
+        "specimen cards"
+      ],
+      "imagePromptPrefix": "naturalist field notebook with botanical sketches, soft paper texture, labelled-specimen composition without readable labels; motifs: botanical linework, field-note boxes, map fragments, specimen cards; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "scientific",
+      "collection": "first-30",
+      "bestFor": [
+        "ecology",
+        "research notes",
+        "exploratory analysis"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "soft line charts with natural ink and muted fills",
+      "diagramStyle": "field-note flow diagrams with hand-drawn but legible geometry",
+      "iconStyle": "Use botanical linework, field-note boxes as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle scientific texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "scholarly"
+    },
+    {
+      "id": "minimalist-conference-poster",
+      "name": "Minimalist Conference Poster",
+      "description": "Minimalist Conference Poster theme for academic data science posters, using restrained conference poster visual system with strong whitespace, precise grid, crisp professional hierarchy.",
+      "palette": "minimalist-conference-poster",
+      "motifs": [
+        "thin rules",
+        "spacious cards",
+        "numbered findings",
+        "subtle gradients"
+      ],
+      "imagePromptPrefix": "restrained conference poster visual system with strong whitespace, precise grid, crisp professional hierarchy; motifs: thin rules, spacious cards, numbered findings, subtle gradients; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "academic",
+      "collection": "first-30",
+      "bestFor": [
+        "formal research",
+        "conference submissions",
+        "technical summaries"
+      ],
+      "backgroundStrategy": "svg",
+      "htmlTokens": {
+        "radius": "10px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "minimal axes, large labels, very high contrast",
+      "diagramStyle": "simple block architecture with precise alignment",
+      "iconStyle": "Use thin rules, spacious cards as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle academic texture layer; low contrast; must not reduce readability.",
+      "density": "low",
+      "formality": "formal"
+    },
+    {
+      "id": "futuristic-ai-lab",
+      "name": "Futuristic AI Lab",
+      "description": "Futuristic AI Lab theme for academic data science posters, using dark futuristic AI lab dashboard aesthetic with luminous network forms and clean research instrumentation.",
+      "palette": "futuristic-ai-lab",
+      "motifs": [
+        "neural nodes",
+        "glass panels",
+        "data streams",
+        "thin neon rules"
+      ],
+      "imagePromptPrefix": "dark futuristic AI lab dashboard aesthetic with luminous network forms and clean research instrumentation; motifs: neural nodes, glass panels, data streams, thin neon rules; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "technology",
+      "collection": "first-30",
+      "bestFor": [
+        "AI systems",
+        "agentic workflows",
+        "model evaluation"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "dark charts with cyan accents and luminous key points",
+      "diagramStyle": "network and pipeline diagrams with glowing nodes",
+      "iconStyle": "Use neural nodes, glass panels as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle technology texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "technical"
+    },
+    {
+      "id": "retro-computing-terminal",
+      "name": "Retro Computing Terminal",
+      "description": "Retro Computing Terminal theme for academic data science posters, using vintage green-screen computing terminal, CRT glow, grid panels, command-console atmosphere without real commands.",
+      "palette": "retro-computing-terminal",
+      "motifs": [
+        "scanlines",
+        "terminal frames",
+        "pixel corners",
+        "monospace blocks"
+      ],
+      "imagePromptPrefix": "vintage green-screen computing terminal, CRT glow, grid panels, command-console atmosphere without real commands; motifs: scanlines, terminal frames, pixel corners, monospace blocks; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "technology",
+      "collection": "first-30",
+      "bestFor": [
+        "systems posters",
+        "MLOps",
+        "retro demos"
+      ],
+      "backgroundStrategy": "svg-hybrid",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "monochrome green charts with terminal-grid styling",
+      "diagramStyle": "ASCII-inspired boxes but rendered cleanly in CSS",
+      "iconStyle": "Use scanlines, terminal frames as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle technology texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "technical"
+    },
+    {
+      "id": "blueprint-engineering",
+      "name": "Blueprint Engineering",
+      "description": "Blueprint Engineering theme for academic data science posters, using engineering blueprint poster with white technical linework, grids, measurement accents, schematic discipline.",
+      "palette": "blueprint-engineering",
+      "motifs": [
+        "blueprint grids",
+        "technical callouts",
+        "dimension lines",
+        "schematic boxes"
+      ],
+      "imagePromptPrefix": "engineering blueprint poster with white technical linework, grids, measurement accents, schematic discipline; motifs: blueprint grids, technical callouts, dimension lines, schematic boxes; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "engineering",
+      "collection": "first-30",
+      "bestFor": [
+        "architecture",
+        "pipelines",
+        "infrastructure"
+      ],
+      "backgroundStrategy": "svg",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "technical line charts on grid backgrounds",
+      "diagramStyle": "blueprint-style system diagrams with measured spacing",
+      "iconStyle": "Use blueprint grids, technical callouts as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle engineering texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "formal"
+    },
+    {
+      "id": "magazine-feature-spread",
+      "name": "Magazine Feature Spread",
+      "description": "Magazine Feature Spread theme for academic data science posters, using premium magazine feature layout with editorial photography-like ambience, feature story framing, generous margins.",
+      "palette": "magazine-feature-spread",
+      "motifs": [
+        "pull-quote panels",
+        "feature cards",
+        "photo crops",
+        "editorial dividers"
+      ],
+      "imagePromptPrefix": "premium magazine feature layout with editorial photography-like ambience, feature story framing, generous margins; motifs: pull-quote panels, feature cards, photo crops, editorial dividers; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "editorial",
+      "collection": "first-30",
+      "bestFor": [
+        "case studies",
+        "impact stories",
+        "stakeholder posters"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "publication-style charts with strong captions",
+      "diagramStyle": "editorial explainer diagrams with feature-card hierarchy",
+      "iconStyle": "Use pull-quote panels, feature cards as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle editorial texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "polished"
+    },
+    {
+      "id": "infographic-dashboard",
+      "name": "Infographic Dashboard",
+      "description": "Infographic Dashboard theme for academic data science posters, using clean infographic dashboard system with metric cards, simple map shapes, and readable analytics rhythm.",
+      "palette": "infographic-dashboard",
+      "motifs": [
+        "metric tiles",
+        "donut accents",
+        "trend strips",
+        "map panels"
+      ],
+      "imagePromptPrefix": "clean infographic dashboard system with metric cards, simple map shapes, and readable analytics rhythm; motifs: metric tiles, donut accents, trend strips, map panels; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "analytics",
+      "collection": "first-30",
+      "bestFor": [
+        "business analytics",
+        "KPI reports",
+        "product metrics"
+      ],
+      "backgroundStrategy": "svg",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "dashboard charts with large values and restrained colour",
+      "diagramStyle": "card-based data pipeline diagrams",
+      "iconStyle": "Use metric tiles, donut accents as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle analytics texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "professional"
+    },
+    {
+      "id": "bauhaus-data-poster",
+      "name": "Bauhaus Data Poster",
+      "description": "Bauhaus Data Poster theme for academic data science posters, using Bauhaus modernist poster with primary geometry, asymmetric grid, bold blocks, playful discipline.",
+      "palette": "bauhaus-data-poster",
+      "motifs": [
+        "circles",
+        "rectangles",
+        "primary colour blocks",
+        "grid gutters"
+      ],
+      "imagePromptPrefix": "Bauhaus modernist poster with primary geometry, asymmetric grid, bold blocks, playful discipline; motifs: circles, rectangles, primary colour blocks, grid gutters; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "design",
+      "collection": "first-30",
+      "bestFor": [
+        "design-forward demos",
+        "education",
+        "visual summaries"
+      ],
+      "backgroundStrategy": "svg",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "geometric charts with bold simple shapes",
+      "diagramStyle": "modular diagrams with primary-shape nodes",
+      "iconStyle": "Use circles, rectangles as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle design texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "creative"
+    },
+    {
+      "id": "cyberpunk-data-city",
+      "name": "Cyberpunk Data City",
+      "description": "Cyberpunk Data City theme for academic data science posters, using noir cyberpunk city data streams, magenta-cyan glow, high-tech atmosphere for decorative backgrounds.",
+      "palette": "cyberpunk-data-city",
+      "motifs": [
+        "neon skyline",
+        "data rain",
+        "dark panels",
+        "glow borders"
+      ],
+      "imagePromptPrefix": "noir cyberpunk city data streams, magenta-cyan glow, high-tech atmosphere for decorative backgrounds; motifs: neon skyline, data rain, dark panels, glow borders; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "technology",
+      "collection": "first-30",
+      "bestFor": [
+        "AI demos",
+        "security",
+        "streaming analytics"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.1rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "dark neon charts with strong contrast",
+      "diagramStyle": "city-grid network maps and pipeline routes",
+      "iconStyle": "Use neon skyline, data rain as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle technology texture layer; low contrast; must not reduce readability.",
+      "density": "high",
+      "formality": "dramatic"
+    },
+    {
+      "id": "space-mission-control",
+      "name": "Space Mission Control",
+      "description": "Space Mission Control theme for academic data science posters, using mission control dashboard aesthetic with orbital diagrams, status panels, space navigation calm.",
+      "palette": "space-mission-control",
+      "motifs": [
+        "orbital rings",
+        "status modules",
+        "trajectory arcs",
+        "mission grids"
+      ],
+      "imagePromptPrefix": "mission control dashboard aesthetic with orbital diagrams, status panels, space navigation calm; motifs: orbital rings, status modules, trajectory arcs, mission grids; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "engineering",
+      "collection": "first-30",
+      "bestFor": [
+        "monitoring",
+        "robotics",
+        "forecasting"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "mission telemetry charts with clean status badges",
+      "diagramStyle": "orbital/system diagrams with traceable flows",
+      "iconStyle": "Use orbital rings, status modules as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle engineering texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "technical"
+    },
+    {
+      "id": "medical-research-poster",
+      "name": "Medical Research Poster",
+      "description": "Medical Research Poster theme for academic data science posters, using clinical research poster style, clean medical blue palette, calm evidence-led composition.",
+      "palette": "medical-research-poster",
+      "motifs": [
+        "clinical cards",
+        "soft anatomy abstractions",
+        "clean tables",
+        "subtle crosses"
+      ],
+      "imagePromptPrefix": "clinical research poster style, clean medical blue palette, calm evidence-led composition; motifs: clinical cards, soft anatomy abstractions, clean tables, subtle crosses; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "health",
+      "collection": "first-30",
+      "bestFor": [
+        "health data",
+        "clinical ML",
+        "risk stratification"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "clean clinical charts with conservative colour",
+      "diagramStyle": "patient-flow or model-flow diagrams with plain icons",
+      "iconStyle": "Use clinical cards, soft anatomy abstractions as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle health texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "formal"
+    },
+    {
+      "id": "newspaper-data-investigation",
+      "name": "Newspaper Data Investigation",
+      "description": "Newspaper Data Investigation theme for academic data science posters, using investigative newspaper feature with archival paper texture, clear evidence framing, restrained red accents.",
+      "palette": "newspaper-data-investigation",
+      "motifs": [
+        "headline rules",
+        "newspaper columns",
+        "archive photos",
+        "evidence boxes"
+      ],
+      "imagePromptPrefix": "investigative newspaper feature with archival paper texture, clear evidence framing, restrained red accents; motifs: headline rules, newspaper columns, archive photos, evidence boxes; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "editorial",
+      "collection": "first-30",
+      "bestFor": [
+        "audit trails",
+        "data journalism",
+        "explainability"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.1rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "newspaper-style line charts with red highlights",
+      "diagramStyle": "evidence-chain diagrams with source cards",
+      "iconStyle": "Use headline rules, newspaper columns as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle editorial texture layer; low contrast; must not reduce readability.",
+      "density": "high",
+      "formality": "serious"
+    },
+    {
+      "id": "museum-exhibit-panel",
+      "name": "Museum Exhibit Panel",
+      "description": "Museum Exhibit Panel theme for academic data science posters, using museum exhibit panel with dark casework, gold labels, artifact layout, scholarly atmosphere.",
+      "palette": "museum-exhibit-panel",
+      "motifs": [
+        "exhibit plaques",
+        "artifact frames",
+        "map medallions",
+        "spotlight panels"
+      ],
+      "imagePromptPrefix": "museum exhibit panel with dark casework, gold labels, artifact layout, scholarly atmosphere; motifs: exhibit plaques, artifact frames, map medallions, spotlight panels; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "historical",
+      "collection": "first-30",
+      "bestFor": [
+        "historical data",
+        "archives",
+        "research exhibits"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "exhibit-style charts in framed panels",
+      "diagramStyle": "gallery wall process diagrams",
+      "iconStyle": "Use exhibit plaques, artifact frames as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle historical texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "scholarly"
+    },
+    {
+      "id": "whiteboard-explainer",
+      "name": "Whiteboard Explainer",
+      "description": "Whiteboard Explainer theme for academic data science posters, using clean whiteboard explainer with sketched arrows, simple icons, friendly step-by-step structure.",
+      "palette": "whiteboard-explainer",
+      "motifs": [
+        "marker arrows",
+        "sketch icons",
+        "numbered steps",
+        "light doodles"
+      ],
+      "imagePromptPrefix": "clean whiteboard explainer with sketched arrows, simple icons, friendly step-by-step structure; motifs: marker arrows, sketch icons, numbered steps, light doodles; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "education",
+      "collection": "first-30",
+      "bestFor": [
+        "teaching",
+        "architecture explainers",
+        "workshops"
+      ],
+      "backgroundStrategy": "svg-hybrid",
+      "htmlTokens": {
+        "radius": "10px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "simple sketched charts with clear HTML labels",
+      "diagramStyle": "hand-drawn style flowcharts rendered cleanly",
+      "iconStyle": "Use marker arrows, sketch icons as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle education texture layer; low contrast; must not reduce readability.",
+      "density": "low",
+      "formality": "friendly"
+    },
+    {
+      "id": "product-launch-startup-pitch",
+      "name": "Product Launch / Startup Pitch",
+      "description": "Product Launch / Startup Pitch theme for academic data science posters, using modern startup launch deck aesthetic, crisp product screen framing, growth metrics atmosphere.",
+      "palette": "product-launch-startup-pitch",
+      "motifs": [
+        "hero product cards",
+        "rounded panels",
+        "growth arrows",
+        "clean badges"
+      ],
+      "imagePromptPrefix": "modern startup launch deck aesthetic, crisp product screen framing, growth metrics atmosphere; motifs: hero product cards, rounded panels, growth arrows, clean badges; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "business",
+      "collection": "first-30",
+      "bestFor": [
+        "product analytics",
+        "MVP demos",
+        "stakeholder updates"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "startup KPI cards and clean trend lines",
+      "diagramStyle": "product architecture diagrams with rounded cards",
+      "iconStyle": "Use hero product cards, rounded panels as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle business texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "polished"
+    },
+    {
+      "id": "academic-chalkboard",
+      "name": "Academic Chalkboard",
+      "description": "Academic Chalkboard theme for academic data science posters, using classic chalkboard academic style with formulas implied as decorative chalk texture, lecture-room clarity.",
+      "palette": "academic-chalkboard",
+      "motifs": [
+        "chalk strokes",
+        "grid sketches",
+        "formula ghosts",
+        "chalk dust"
+      ],
+      "imagePromptPrefix": "classic chalkboard academic style with formulas implied as decorative chalk texture, lecture-room clarity; motifs: chalk strokes, grid sketches, formula ghosts, chalk dust; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "education",
+      "collection": "first-30",
+      "bestFor": [
+        "teaching ML",
+        "math intuition",
+        "workshops"
+      ],
+      "backgroundStrategy": "svg-hybrid",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "chalk-like charts with HTML-rendered labels",
+      "diagramStyle": "chalkboard derivation diagrams with clean SVG labels",
+      "iconStyle": "Use chalk strokes, grid sketches as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle education texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "academic"
+    },
+    {
+      "id": "isometric-cloud-architecture",
+      "name": "Isometric Cloud Architecture",
+      "description": "Isometric Cloud Architecture theme for academic data science posters, using isometric cloud architecture with soft technical blocks, data stores, services, and pipelines.",
+      "palette": "isometric-cloud-architecture",
+      "motifs": [
+        "isometric cubes",
+        "cloud nodes",
+        "service tiles",
+        "data pipes"
+      ],
+      "imagePromptPrefix": "isometric cloud architecture with soft technical blocks, data stores, services, and pipelines; motifs: isometric cubes, cloud nodes, service tiles, data pipes; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "technology",
+      "collection": "first-30",
+      "bestFor": [
+        "cloud systems",
+        "MLOps",
+        "platform engineering"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "modern architecture metrics cards",
+      "diagramStyle": "isometric system diagrams with clean HTML labels",
+      "iconStyle": "Use isometric cubes, cloud nodes as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle technology texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "technical"
+    },
+    {
+      "id": "vintage-science-fair",
+      "name": "Vintage Science Fair",
+      "description": "Vintage Science Fair theme for academic data science posters, using vintage science fair board with warm paper, retro apparatus illustration, handmade but tidy structure.",
+      "palette": "vintage-science-fair",
+      "motifs": [
+        "aged paper",
+        "lab apparatus",
+        "ribbon headers",
+        "hand-cut cards"
+      ],
+      "imagePromptPrefix": "vintage science fair board with warm paper, retro apparatus illustration, handmade but tidy structure; motifs: aged paper, lab apparatus, ribbon headers, hand-cut cards; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "historical",
+      "collection": "first-30",
+      "bestFor": [
+        "education",
+        "student projects",
+        "retrospectives"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "retro bar charts with warm ink",
+      "diagramStyle": "simple experiment-flow diagrams",
+      "iconStyle": "Use aged paper, lab apparatus as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle historical texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "friendly"
+    },
+    {
+      "id": "luxury-monochrome",
+      "name": "Luxury Monochrome",
+      "description": "Luxury Monochrome theme for academic data science posters, using luxury monochrome academic poster, black panels, elegant gold accents, minimal premium restraint.",
+      "palette": "luxury-monochrome",
+      "motifs": [
+        "gold rules",
+        "black cards",
+        "thin serif details",
+        "spotlight gradients"
+      ],
+      "imagePromptPrefix": "luxury monochrome academic poster, black panels, elegant gold accents, minimal premium restraint; motifs: gold rules, black cards, thin serif details, spotlight gradients; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "premium",
+      "collection": "first-30",
+      "bestFor": [
+        "executive summaries",
+        "formal showcases",
+        "award posters"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "10px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "monochrome charts with gold highlight series",
+      "diagramStyle": "elegant linear diagrams with thin gold rules",
+      "iconStyle": "Use gold rules, black cards as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle premium texture layer; low contrast; must not reduce readability.",
+      "density": "low",
+      "formality": "formal"
+    },
+    {
+      "id": "data-garden",
+      "name": "Data Garden",
+      "description": "Data Garden theme for academic data science posters, using organic data garden with growing vines, seed-to-insight metaphor, soft ecological warmth.",
+      "palette": "data-garden",
+      "motifs": [
+        "vines",
+        "growth stages",
+        "leaf icons",
+        "garden paths"
+      ],
+      "imagePromptPrefix": "organic data garden with growing vines, seed-to-insight metaphor, soft ecological warmth; motifs: vines, growth stages, leaf icons, garden paths; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "organic",
+      "collection": "first-30",
+      "bestFor": [
+        "sustainability",
+        "growth analytics",
+        "learning journeys"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "growth charts with botanical accents",
+      "diagramStyle": "seed-to-bloom process diagrams",
+      "iconStyle": "Use vines, growth stages as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle organic texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "friendly"
+    },
+    {
+      "id": "circuit-board-systems",
+      "name": "Circuit Board Systems",
+      "description": "Circuit Board Systems theme for academic data science posters, using circuit-board systems aesthetic with traces, chips, signal paths, green tech glow.",
+      "palette": "circuit-board-systems",
+      "motifs": [
+        "PCB traces",
+        "chip blocks",
+        "signal nodes",
+        "routing paths"
+      ],
+      "imagePromptPrefix": "circuit-board systems aesthetic with traces, chips, signal paths, green tech glow; motifs: PCB traces, chip blocks, signal nodes, routing paths; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "technology",
+      "collection": "first-30",
+      "bestFor": [
+        "embedded systems",
+        "AI pipelines",
+        "infrastructure"
+      ],
+      "backgroundStrategy": "svg",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.1rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "signal-style charts on dark grids",
+      "diagramStyle": "circuit-routing architecture diagrams",
+      "iconStyle": "Use PCB traces, chip blocks as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle technology texture layer; low contrast; must not reduce readability.",
+      "density": "high",
+      "formality": "technical"
+    },
+    {
+      "id": "paper-collage-zine",
+      "name": "Paper Collage / Zine",
+      "description": "Paper Collage / Zine theme for academic data science posters, using paper collage zine style with torn edges, sticky notes, layered research artifacts, handmade energy.",
+      "palette": "paper-collage-zine",
+      "motifs": [
+        "torn paper",
+        "sticky notes",
+        "tape strips",
+        "cutout charts"
+      ],
+      "imagePromptPrefix": "paper collage zine style with torn edges, sticky notes, layered research artifacts, handmade energy; motifs: torn paper, sticky notes, tape strips, cutout charts; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "editorial",
+      "collection": "first-30",
+      "bestFor": [
+        "creative research",
+        "workshops",
+        "mixed evidence"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.1rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "collage charts with clean HTML values",
+      "diagramStyle": "layered evidence-board diagrams",
+      "iconStyle": "Use torn paper, sticky notes as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle editorial texture layer; low contrast; must not reduce readability.",
+      "density": "high",
+      "formality": "creative"
+    },
+    {
+      "id": "clean-corporate-analytics",
+      "name": "Clean Corporate Analytics",
+      "description": "Clean Corporate Analytics theme for academic data science posters, using clean corporate analytics poster with polished dashboards, neutral cards, business-ready hierarchy.",
+      "palette": "clean-corporate-analytics",
+      "motifs": [
+        "KPI cards",
+        "rounded panels",
+        "subtle shadows",
+        "trend strips"
+      ],
+      "imagePromptPrefix": "clean corporate analytics poster with polished dashboards, neutral cards, business-ready hierarchy; motifs: KPI cards, rounded panels, subtle shadows, trend strips; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "business",
+      "collection": "first-30",
+      "bestFor": [
+        "business intelligence",
+        "analytics teams",
+        "executive demos"
+      ],
+      "backgroundStrategy": "svg",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "clean KPI dashboard charts",
+      "diagramStyle": "enterprise workflow diagrams with tidy cards",
+      "iconStyle": "Use KPI cards, rounded panels as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle business texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "professional"
+    },
+    {
+      "id": "fantasy-map-quest-board",
+      "name": "Fantasy Map / Quest Board",
+      "description": "Fantasy Map / Quest Board theme for academic data science posters, using fantasy quest map metaphor for research journey, parchment, landmarks, routes, achievement markers.",
+      "palette": "fantasy-map-quest-board",
+      "motifs": [
+        "quest paths",
+        "map pins",
+        "compass roses",
+        "achievement badges"
+      ],
+      "imagePromptPrefix": "fantasy quest map metaphor for research journey, parchment, landmarks, routes, achievement markers; motifs: quest paths, map pins, compass roses, achievement badges; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "storytelling",
+      "collection": "first-30",
+      "bestFor": [
+        "learning journeys",
+        "agent workflows",
+        "gamified demos"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.1rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "quest-progress charts with clear HTML values",
+      "diagramStyle": "map-route process diagrams",
+      "iconStyle": "Use quest paths, map pins as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle storytelling texture layer; low contrast; must not reduce readability.",
+      "density": "high",
+      "formality": "playful"
+    },
+    {
+      "id": "oceanographic-research",
+      "name": "Oceanographic Research",
+      "description": "Oceanographic Research theme for academic data science posters, using oceanographic research poster with bathymetry lines, currents, deep blue panels, scientific calm.",
+      "palette": "oceanographic-research",
+      "motifs": [
+        "contour maps",
+        "wave lines",
+        "current arrows",
+        "instrument panels"
+      ],
+      "imagePromptPrefix": "oceanographic research poster with bathymetry lines, currents, deep blue panels, scientific calm; motifs: contour maps, wave lines, current arrows, instrument panels; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "scientific",
+      "collection": "first-30",
+      "bestFor": [
+        "environmental data",
+        "geospatial analytics",
+        "time series"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "blue scientific charts with contour accents",
+      "diagramStyle": "current-flow system diagrams",
+      "iconStyle": "Use contour maps, wave lines as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle scientific texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "scholarly"
+    },
+    {
+      "id": "robotics-lab-notebook",
+      "name": "Robotics Lab Notebook",
+      "description": "Robotics Lab Notebook theme for academic data science posters, using robotics lab notebook with mechanical diagrams, calibration plots, notebook paper, precise engineering sketches.",
+      "palette": "robotics-lab-notebook",
+      "motifs": [
+        "robot arm schematics",
+        "calibration grids",
+        "lab notes",
+        "measurement arrows"
+      ],
+      "imagePromptPrefix": "robotics lab notebook with mechanical diagrams, calibration plots, notebook paper, precise engineering sketches; motifs: robot arm schematics, calibration grids, lab notes, measurement arrows; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "engineering",
+      "collection": "first-30",
+      "bestFor": [
+        "robotics",
+        "automation",
+        "experiments"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "calibration plots and diagnostic charts",
+      "diagramStyle": "mechanical control-loop diagrams",
+      "iconStyle": "Use robot arm schematics, calibration grids as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle engineering texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "technical"
+    },
+    {
+      "id": "neural-network-glassmorphism",
+      "name": "Neural Network Glassmorphism",
+      "description": "Neural Network Glassmorphism theme for academic data science posters, using glassmorphism neural interface with translucent panels, soft gradients, intelligent calm.",
+      "palette": "neural-network-glassmorphism",
+      "motifs": [
+        "frosted glass cards",
+        "neural nodes",
+        "soft glow",
+        "layered gradients"
+      ],
+      "imagePromptPrefix": "glassmorphism neural interface with translucent panels, soft gradients, intelligent calm; motifs: frosted glass cards, neural nodes, soft glow, layered gradients; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "technology",
+      "collection": "first-30",
+      "bestFor": [
+        "LLM apps",
+        "recommendation systems",
+        "AI UX"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "soft dashboard charts in translucent cards",
+      "diagramStyle": "node-link diagrams with glass cards",
+      "iconStyle": "Use frosted glass cards, neural nodes as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle technology texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "modern"
+    },
+    {
+      "id": "industrial-data-factory",
+      "name": "Industrial Data Factory",
+      "description": "Industrial Data Factory theme for academic data science posters, using industrial data factory metaphor with conveyor lines, machines, production metrics, rugged clarity.",
+      "palette": "industrial-data-factory",
+      "motifs": [
+        "conveyor belts",
+        "factory modules",
+        "pipework",
+        "status lights"
+      ],
+      "imagePromptPrefix": "industrial data factory metaphor with conveyor lines, machines, production metrics, rugged clarity; motifs: conveyor belts, factory modules, pipework, status lights; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "engineering",
+      "collection": "first-30",
+      "bestFor": [
+        "ETL",
+        "data engineering",
+        "MLOps"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.1rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "factory status charts and throughput bars",
+      "diagramStyle": "pipeline-as-factory diagrams",
+      "iconStyle": "Use conveyor belts, factory modules as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle engineering texture layer; low contrast; must not reduce readability.",
+      "density": "high",
+      "formality": "technical"
+    },
+    {
+      "id": "elegant-mathematical-atlas",
+      "name": "Elegant Mathematical Atlas",
+      "description": "Elegant Mathematical Atlas theme for academic data science posters, using elegant mathematical atlas with contour surfaces, matrices, precise diagrams, scholarly white space.",
+      "palette": "elegant-mathematical-atlas",
+      "motifs": [
+        "contour plots",
+        "matrix grids",
+        "geometric surfaces",
+        "thin annotations"
+      ],
+      "imagePromptPrefix": "elegant mathematical atlas with contour surfaces, matrices, precise diagrams, scholarly white space; motifs: contour plots, matrix grids, geometric surfaces, thin annotations; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "academic",
+      "collection": "first-30",
+      "bestFor": [
+        "math-heavy ML",
+        "statistics",
+        "research theory"
+      ],
+      "backgroundStrategy": "svg-hybrid",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "elegant mathematical charts with clean labels",
+      "diagramStyle": "formal theorem-to-system diagrams",
+      "iconStyle": "Use contour plots, matrix grids as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle academic texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "formal"
+    },
+    {
+      "id": "art-deco-analytics",
+      "name": "Art Deco Analytics",
+      "description": "Art Deco Analytics theme for academic data science posters, using art deco analytics poster with geometric gold frames, symmetrical luxury composition, roaring-twenties elegance.",
+      "palette": "art-deco-analytics",
+      "motifs": [
+        "gold fan geometry",
+        "stepped frames",
+        "sunburst lines",
+        "black-gold panels"
+      ],
+      "imagePromptPrefix": "art deco analytics poster with geometric gold frames, symmetrical luxury composition, roaring-twenties elegance; motifs: gold fan geometry, stepped frames, sunburst lines, black-gold panels; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "premium",
+      "collection": "second-30",
+      "bestFor": [
+        "executive analytics",
+        "premium showcases",
+        "finance demos"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "gold-accent charts in dark frames",
+      "diagramStyle": "symmetrical modular diagrams with deco borders",
+      "iconStyle": "Use gold fan geometry, stepped frames as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle premium texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "formal"
+    },
+    {
+      "id": "swiss-grid-modernism",
+      "name": "Swiss Grid Modernism",
+      "description": "Swiss Grid Modernism theme for academic data science posters, using Swiss international grid design, typography-led poster, clean alignment, precise modularity.",
+      "palette": "swiss-grid-modernism",
+      "motifs": [
+        "strict grid",
+        "red-blue accents",
+        "thin rules",
+        "typographic blocks"
+      ],
+      "imagePromptPrefix": "Swiss international grid design, typography-led poster, clean alignment, precise modularity; motifs: strict grid, red-blue accents, thin rules, typographic blocks; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "design",
+      "collection": "second-30",
+      "bestFor": [
+        "formal academic posters",
+        "clean data stories",
+        "conference work"
+      ],
+      "backgroundStrategy": "svg",
+      "htmlTokens": {
+        "radius": "10px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "strict grid charts with minimal colour",
+      "diagramStyle": "rectilinear system diagrams",
+      "iconStyle": "Use strict grid, red-blue accents as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle design texture layer; low contrast; must not reduce readability.",
+      "density": "low",
+      "formality": "formal"
+    },
+    {
+      "id": "origami-research-foldout",
+      "name": "Origami Research Foldout",
+      "description": "Origami Research Foldout theme for academic data science posters, using origami foldout research visual with folded paper planes, faceted panels, delicate shadows.",
+      "palette": "origami-research-foldout",
+      "motifs": [
+        "folded paper",
+        "crease lines",
+        "faceted cards",
+        "paper tabs"
+      ],
+      "imagePromptPrefix": "origami foldout research visual with folded paper planes, faceted panels, delicate shadows; motifs: folded paper, crease lines, faceted cards, paper tabs; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "design",
+      "collection": "second-30",
+      "bestFor": [
+        "process narratives",
+        "method comparisons",
+        "teaching"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "charts embedded in folded-card sections",
+      "diagramStyle": "foldout step diagrams",
+      "iconStyle": "Use folded paper, crease lines as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle design texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "polished"
+    },
+    {
+      "id": "stained-glass-data-mosaic",
+      "name": "Stained Glass Data Mosaic",
+      "description": "Stained Glass Data Mosaic theme for academic data science posters, using stained-glass data mosaic with jewel tones, leaded outlines, luminous academic patterning.",
+      "palette": "stained-glass-data-mosaic",
+      "motifs": [
+        "mosaic cells",
+        "leaded outlines",
+        "jewel panels",
+        "radial medallions"
+      ],
+      "imagePromptPrefix": "stained-glass data mosaic with jewel tones, leaded outlines, luminous academic patterning; motifs: mosaic cells, leaded outlines, jewel panels, radial medallions; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "artistic",
+      "collection": "second-30",
+      "bestFor": [
+        "public engagement",
+        "health outcomes",
+        "community data"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.1rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "mosaic-inspired categorical charts",
+      "diagramStyle": "segmented mosaic flow diagrams",
+      "iconStyle": "Use mosaic cells, leaded outlines as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle artistic texture layer; low contrast; must not reduce readability.",
+      "density": "high",
+      "formality": "creative"
+    },
+    {
+      "id": "film-storyboard-study",
+      "name": "Film Storyboard Study",
+      "description": "Film Storyboard Study theme for academic data science posters, using film storyboard research study with scene panels, timeline strips, director-note composition.",
+      "palette": "film-storyboard-study",
+      "motifs": [
+        "storyboard frames",
+        "scene strips",
+        "timeline markers",
+        "film grain"
+      ],
+      "imagePromptPrefix": "film storyboard research study with scene panels, timeline strips, director-note composition; motifs: storyboard frames, scene strips, timeline markers, film grain; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "storytelling",
+      "collection": "second-30",
+      "bestFor": [
+        "user journeys",
+        "experiments",
+        "case studies"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "sequence charts with storyboard captions in HTML",
+      "diagramStyle": "scene-by-scene process diagrams",
+      "iconStyle": "Use storyboard frames, scene strips as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle storytelling texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "creative"
+    },
+    {
+      "id": "intelligence-briefing-dossier",
+      "name": "Intelligence Briefing Dossier",
+      "description": "Intelligence Briefing Dossier theme for academic data science posters, using confidential intelligence briefing dossier, red stamps, folder paper, analytical evidence board.",
+      "palette": "intelligence-briefing-dossier",
+      "motifs": [
+        "dossier folders",
+        "red stamps",
+        "map overlays",
+        "classified-style cards"
+      ],
+      "imagePromptPrefix": "confidential intelligence briefing dossier, red stamps, folder paper, analytical evidence board; motifs: dossier folders, red stamps, map overlays, classified-style cards; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "security",
+      "collection": "second-30",
+      "bestFor": [
+        "risk models",
+        "security analytics",
+        "audits"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.1rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "briefing charts with evidence highlights",
+      "diagramStyle": "investigation flow diagrams",
+      "iconStyle": "Use dossier folders, red stamps as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle security texture layer; low contrast; must not reduce readability.",
+      "density": "high",
+      "formality": "serious"
+    },
+    {
+      "id": "library-archive-catalog",
+      "name": "Library Archive Catalog",
+      "description": "Library Archive Catalog theme for academic data science posters, using library archive catalog with index cards, catalog drawers, typed record aesthetics.",
+      "palette": "library-archive-catalog",
+      "motifs": [
+        "index cards",
+        "catalog tabs",
+        "archive boxes",
+        "date stamps"
+      ],
+      "imagePromptPrefix": "library archive catalog with index cards, catalog drawers, typed record aesthetics; motifs: index cards, catalog tabs, archive boxes, date stamps; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "historical",
+      "collection": "second-30",
+      "bestFor": [
+        "literature reviews",
+        "source-grounded projects",
+        "metadata analysis"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "archival charts with typed-card labels",
+      "diagramStyle": "source catalog relationship diagrams",
+      "iconStyle": "Use index cards, catalog tabs as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle historical texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "scholarly"
+    },
+    {
+      "id": "metro-map-systems-poster",
+      "name": "Metro Map Systems Poster",
+      "description": "Metro Map Systems Poster theme for academic data science posters, using metro-map systems poster with coloured transit lines, interchange nodes, route logic.",
+      "palette": "metro-map-systems-poster",
+      "motifs": [
+        "metro lines",
+        "station nodes",
+        "route labels as HTML",
+        "interchange circles"
+      ],
+      "imagePromptPrefix": "metro-map systems poster with coloured transit lines, interchange nodes, route logic; motifs: metro lines, station nodes, route labels as HTML, interchange circles; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "systems",
+      "collection": "second-30",
+      "bestFor": [
+        "system architecture",
+        "pipelines",
+        "process flows"
+      ],
+      "backgroundStrategy": "svg",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "route-line charts and path comparisons",
+      "diagramStyle": "metro-line architecture diagrams",
+      "iconStyle": "Use metro lines, station nodes as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle systems texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "technical"
+    },
+    {
+      "id": "laboratory-label-sheet",
+      "name": "Laboratory Label Sheet",
+      "description": "Laboratory Label Sheet theme for academic data science posters, using laboratory label sheet with specimen cards, precise forms, reagent-like visual order.",
+      "palette": "laboratory-label-sheet",
+      "motifs": [
+        "specimen labels",
+        "QR placeholder boxes",
+        "sample cards",
+        "lab grid"
+      ],
+      "imagePromptPrefix": "laboratory label sheet with specimen cards, precise forms, reagent-like visual order; motifs: specimen labels, QR placeholder boxes, sample cards, lab grid; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "scientific",
+      "collection": "second-30",
+      "bestFor": [
+        "bioinformatics",
+        "experiments",
+        "classification"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "clinical/lab charts with specimen-card framing",
+      "diagramStyle": "sample-to-result workflows",
+      "iconStyle": "Use specimen labels, QR placeholder boxes as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle scientific texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "formal"
+    },
+    {
+      "id": "earth-observation-atlas",
+      "name": "Earth Observation Atlas",
+      "description": "Earth Observation Atlas theme for academic data science posters, using earth observation atlas with satellite-map textures, terrain overlays, remote sensing panels.",
+      "palette": "earth-observation-atlas",
+      "motifs": [
+        "satellite tiles",
+        "contour overlays",
+        "map legends as HTML",
+        "raster grids"
+      ],
+      "imagePromptPrefix": "earth observation atlas with satellite-map textures, terrain overlays, remote sensing panels; motifs: satellite tiles, contour overlays, map legends as HTML, raster grids; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "geospatial",
+      "collection": "second-30",
+      "bestFor": [
+        "geospatial ML",
+        "climate",
+        "remote sensing"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.1rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "map-adjacent charts with terrain accents",
+      "diagramStyle": "satellite-to-model pipelines",
+      "iconStyle": "Use satellite tiles, contour overlays as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle geospatial texture layer; low contrast; must not reduce readability.",
+      "density": "high",
+      "formality": "scholarly"
+    },
+    {
+      "id": "japanese-woodblock-analytics",
+      "name": "Japanese Woodblock Analytics",
+      "description": "Japanese Woodblock Analytics theme for academic data science posters, using Japanese woodblock-inspired analytics with wave forms, flat colour, textured paper, respectful design abstraction.",
+      "palette": "japanese-woodblock-analytics",
+      "motifs": [
+        "wave forms",
+        "flat colour blocks",
+        "paper grain",
+        "framed vignettes"
+      ],
+      "imagePromptPrefix": "Japanese woodblock-inspired analytics with wave forms, flat colour, textured paper, respectful design abstraction; motifs: wave forms, flat colour blocks, paper grain, framed vignettes; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "artistic",
+      "collection": "second-30",
+      "bestFor": [
+        "forecasting",
+        "seasonality",
+        "public engagement"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "flat-colour charts with wave accents",
+      "diagramStyle": "layered process panels",
+      "iconStyle": "Use wave forms, flat colour blocks as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle artistic texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "creative"
+    },
+    {
+      "id": "scandinavian-soft-minimal",
+      "name": "Scandinavian Soft Minimal",
+      "description": "Scandinavian Soft Minimal theme for academic data science posters, using Scandinavian soft minimal poster with warm neutrals, gentle cards, calm accessible design.",
+      "palette": "scandinavian-soft-minimal",
+      "motifs": [
+        "soft cards",
+        "rounded modules",
+        "warm neutrals",
+        "simple icons"
+      ],
+      "imagePromptPrefix": "Scandinavian soft minimal poster with warm neutrals, gentle cards, calm accessible design; motifs: soft cards, rounded modules, warm neutrals, simple icons; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "design",
+      "collection": "second-30",
+      "bestFor": [
+        "wellbeing data",
+        "education",
+        "internal summaries"
+      ],
+      "backgroundStrategy": "svg-hybrid",
+      "htmlTokens": {
+        "radius": "10px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "quiet charts with generous spacing",
+      "diagramStyle": "simple rounded block diagrams",
+      "iconStyle": "Use soft cards, rounded modules as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle design texture layer; low contrast; must not reduce readability.",
+      "density": "low",
+      "formality": "professional"
+    },
+    {
+      "id": "courtroom-evidence-exhibit",
+      "name": "Courtroom Evidence Exhibit",
+      "description": "Courtroom Evidence Exhibit theme for academic data science posters, using courtroom evidence exhibit with exhibit tags, pinned charts, case-board clarity.",
+      "palette": "courtroom-evidence-exhibit",
+      "motifs": [
+        "exhibit tags",
+        "evidence pins",
+        "case folders",
+        "verdict badges as HTML"
+      ],
+      "imagePromptPrefix": "courtroom evidence exhibit with exhibit tags, pinned charts, case-board clarity; motifs: exhibit tags, evidence pins, case folders, verdict badges as HTML; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "evidence",
+      "collection": "second-30",
+      "bestFor": [
+        "audits",
+        "model risk",
+        "explainability"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.1rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "evidence charts with exhibit-card framing",
+      "diagramStyle": "argument/evidence chain diagrams",
+      "iconStyle": "Use exhibit tags, evidence pins as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle evidence texture layer; low contrast; must not reduce readability.",
+      "density": "high",
+      "formality": "serious"
+    },
+    {
+      "id": "weather-bureau-forecast-board",
+      "name": "Weather Bureau Forecast Board",
+      "description": "Weather Bureau Forecast Board theme for academic data science posters, using weather bureau forecast board with contour maps, pressure lines, clean forecast panels.",
+      "palette": "weather-bureau-forecast-board",
+      "motifs": [
+        "isobars",
+        "weather map contours",
+        "forecast cards",
+        "front lines"
+      ],
+      "imagePromptPrefix": "weather bureau forecast board with contour maps, pressure lines, clean forecast panels; motifs: isobars, weather map contours, forecast cards, front lines; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "scientific",
+      "collection": "second-30",
+      "bestFor": [
+        "time series",
+        "forecasting",
+        "environmental data"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "forecast charts with confidence bands",
+      "diagramStyle": "weather-system process diagrams",
+      "iconStyle": "Use isobars, weather map contours as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle scientific texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "technical"
+    },
+    {
+      "id": "transit-wayfinding-poster",
+      "name": "Transit Wayfinding Poster",
+      "description": "Transit Wayfinding Poster theme for academic data science posters, using transit wayfinding poster with signage arrows, route modules, accessibility-oriented clarity.",
+      "palette": "transit-wayfinding-poster",
+      "motifs": [
+        "arrows",
+        "route icons",
+        "signage panels",
+        "line maps"
+      ],
+      "imagePromptPrefix": "transit wayfinding poster with signage arrows, route modules, accessibility-oriented clarity; motifs: arrows, route icons, signage panels, line maps; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "systems",
+      "collection": "second-30",
+      "bestFor": [
+        "operations analytics",
+        "flows",
+        "user journeys"
+      ],
+      "backgroundStrategy": "svg",
+      "htmlTokens": {
+        "radius": "10px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "wayfinding-style flow charts",
+      "diagramStyle": "signage-led process maps",
+      "iconStyle": "Use arrows, route icons as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle systems texture layer; low contrast; must not reduce readability.",
+      "density": "low",
+      "formality": "professional"
+    },
+    {
+      "id": "illuminated-manuscript-research",
+      "name": "Illuminated Manuscript Research",
+      "description": "Illuminated Manuscript Research theme for academic data science posters, using illuminated manuscript research poster with decorative borders, marginalia-inspired motifs, scholarly manuscript warmth.",
+      "palette": "illuminated-manuscript-research",
+      "motifs": [
+        "illuminated borders",
+        "drop-cap shapes",
+        "gold flourishes",
+        "manuscript panels"
+      ],
+      "imagePromptPrefix": "illuminated manuscript research poster with decorative borders, marginalia-inspired motifs, scholarly manuscript warmth; motifs: illuminated borders, drop-cap shapes, gold flourishes, manuscript panels; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "historical",
+      "collection": "second-30",
+      "bestFor": [
+        "humanities data",
+        "archives",
+        "heritage AI"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.1rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "formal charts inside manuscript frames",
+      "diagramStyle": "manuscript-style evidence paths",
+      "iconStyle": "Use illuminated borders, drop-cap shapes as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle historical texture layer; low contrast; must not reduce readability.",
+      "density": "high",
+      "formality": "scholarly"
+    },
+    {
+      "id": "classroom-bulletin-board",
+      "name": "Classroom Bulletin Board",
+      "description": "Classroom Bulletin Board theme for academic data science posters, using classroom bulletin board with pinned notes, paper cards, approachable teaching energy.",
+      "palette": "classroom-bulletin-board",
+      "motifs": [
+        "push pins",
+        "note cards",
+        "paper tabs",
+        "classroom labels as HTML"
+      ],
+      "imagePromptPrefix": "classroom bulletin board with pinned notes, paper cards, approachable teaching energy; motifs: push pins, note cards, paper tabs, classroom labels as HTML; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "education",
+      "collection": "second-30",
+      "bestFor": [
+        "education analytics",
+        "student projects",
+        "workshops"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.1rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "bulletin-card charts with bright accents",
+      "diagramStyle": "pinned process cards",
+      "iconStyle": "Use push pins, note cards as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle education texture layer; low contrast; must not reduce readability.",
+      "density": "high",
+      "formality": "friendly"
+    },
+    {
+      "id": "low-poly-geometric-science",
+      "name": "Low-Poly Geometric Science",
+      "description": "Low-Poly Geometric Science theme for academic data science posters, using low-poly geometric science poster with faceted surfaces, modern polygonal abstractions, crisp panels.",
+      "palette": "low-poly-geometric-science",
+      "motifs": [
+        "faceted polygons",
+        "triangulated backgrounds",
+        "geometric shards",
+        "low-poly gradients"
+      ],
+      "imagePromptPrefix": "low-poly geometric science poster with faceted surfaces, modern polygonal abstractions, crisp panels; motifs: faceted polygons, triangulated backgrounds, geometric shards, low-poly gradients; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "design",
+      "collection": "second-30",
+      "bestFor": [
+        "AI models",
+        "computer vision",
+        "scientific explainers"
+      ],
+      "backgroundStrategy": "svg",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "faceted accent charts with clean labels",
+      "diagramStyle": "polygonal system diagrams",
+      "iconStyle": "Use faceted polygons, triangulated backgrounds as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle design texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "modern"
+    },
+    {
+      "id": "patent-diagram-poster",
+      "name": "Patent Diagram Poster",
+      "description": "Patent Diagram Poster theme for academic data science posters, using patent diagram poster with black technical line art, figure callouts, invention-style clarity.",
+      "palette": "patent-diagram-poster",
+      "motifs": [
+        "patent linework",
+        "figure labels as HTML",
+        "numbered callouts",
+        "technical margins"
+      ],
+      "imagePromptPrefix": "patent diagram poster with black technical line art, figure callouts, invention-style clarity; motifs: patent linework, figure labels as HTML, numbered callouts, technical margins; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "engineering",
+      "collection": "second-30",
+      "bestFor": [
+        "algorithms",
+        "system design",
+        "architecture"
+      ],
+      "backgroundStrategy": "svg",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "line charts styled as patent figures",
+      "diagramStyle": "exploded technical diagrams",
+      "iconStyle": "Use patent linework, figure labels as HTML as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle engineering texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "formal"
+    },
+    {
+      "id": "holographic-lab-report",
+      "name": "Holographic Lab Report",
+      "description": "Holographic Lab Report theme for academic data science posters, using holographic lab report with translucent luminous panels, spectral gradients, advanced research atmosphere.",
+      "palette": "holographic-lab-report",
+      "motifs": [
+        "holographic panels",
+        "spectral rings",
+        "transparent overlays",
+        "light beams"
+      ],
+      "imagePromptPrefix": "holographic lab report with translucent luminous panels, spectral gradients, advanced research atmosphere; motifs: holographic panels, spectral rings, transparent overlays, light beams; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "technology",
+      "collection": "second-30",
+      "bestFor": [
+        "AI demos",
+        "advanced analytics",
+        "future UX"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "luminous dark charts with clear contrast",
+      "diagramStyle": "holographic system layers",
+      "iconStyle": "Use holographic panels, spectral rings as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle technology texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "modern"
+    },
+    {
+      "id": "sustainable-eco-design",
+      "name": "Sustainable Eco-Design",
+      "description": "Sustainable Eco-Design theme for academic data science posters, using sustainable eco-design poster with recycled paper, circular economy icons, soft botanical geometry.",
+      "palette": "sustainable-eco-design",
+      "motifs": [
+        "recycled paper",
+        "leaf icons",
+        "circular arrows",
+        "eco badges"
+      ],
+      "imagePromptPrefix": "sustainable eco-design poster with recycled paper, circular economy icons, soft botanical geometry; motifs: recycled paper, leaf icons, circular arrows, eco badges; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "organic",
+      "collection": "second-30",
+      "bestFor": [
+        "sustainability",
+        "supply chain",
+        "impact"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "eco-impact charts with clear green palette",
+      "diagramStyle": "circular lifecycle diagrams",
+      "iconStyle": "Use recycled paper, leaf icons as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle organic texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "professional"
+    },
+    {
+      "id": "detective-pinboard-analysis",
+      "name": "Detective Pinboard Analysis",
+      "description": "Detective Pinboard Analysis theme for academic data science posters, using detective pinboard analysis with string connections, evidence photos as abstract cards, investigative flow.",
+      "palette": "detective-pinboard-analysis",
+      "motifs": [
+        "red string",
+        "photo cards",
+        "evidence tags",
+        "pin clusters"
+      ],
+      "imagePromptPrefix": "detective pinboard analysis with string connections, evidence photos as abstract cards, investigative flow; motifs: red string, photo cards, evidence tags, pin clusters; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "storytelling",
+      "collection": "second-30",
+      "bestFor": [
+        "root cause analysis",
+        "fraud analytics",
+        "explainability"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.1rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "evidence charts pinned to board cards",
+      "diagramStyle": "connection-map reasoning diagrams",
+      "iconStyle": "Use red string, photo cards as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle storytelling texture layer; low contrast; must not reduce readability.",
+      "density": "high",
+      "formality": "dramatic"
+    },
+    {
+      "id": "elegant-thesis-monograph",
+      "name": "Elegant Thesis Monograph",
+      "description": "Elegant Thesis Monograph theme for academic data science posters, using elegant thesis monograph with book spreads, serif hierarchy, understated academic gravitas.",
+      "palette": "elegant-thesis-monograph",
+      "motifs": [
+        "book margins",
+        "chapter rules",
+        "footnote zones",
+        "paper texture"
+      ],
+      "imagePromptPrefix": "elegant thesis monograph with book spreads, serif hierarchy, understated academic gravitas; motifs: book margins, chapter rules, footnote zones, paper texture; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "academic",
+      "collection": "second-30",
+      "bestFor": [
+        "PhD posters",
+        "formal research",
+        "literature-heavy projects"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "10px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "publication-style charts with subtle accents",
+      "diagramStyle": "formal chapter-to-method diagrams",
+      "iconStyle": "Use book margins, chapter rules as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle academic texture layer; low contrast; must not reduce readability.",
+      "density": "low",
+      "formality": "formal"
+    },
+    {
+      "id": "patchwork-data-quilt",
+      "name": "Patchwork Data Quilt",
+      "description": "Patchwork Data Quilt theme for academic data science posters, using patchwork data quilt with textile squares, stitched grid metaphor, warm data-story patterning.",
+      "palette": "patchwork-data-quilt",
+      "motifs": [
+        "quilt blocks",
+        "stitch lines",
+        "fabric textures",
+        "modular patches"
+      ],
+      "imagePromptPrefix": "patchwork data quilt with textile squares, stitched grid metaphor, warm data-story patterning; motifs: quilt blocks, stitch lines, fabric textures, modular patches; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "artistic",
+      "collection": "second-30",
+      "bestFor": [
+        "community data",
+        "mixed methods",
+        "categorical analysis"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.1rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "small-multiple charts in quilt-like modules",
+      "diagramStyle": "patchwork evidence maps",
+      "iconStyle": "Use quilt blocks, stitch lines as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle artistic texture layer; low contrast; must not reduce readability.",
+      "density": "high",
+      "formality": "creative"
+    },
+    {
+      "id": "terracotta-tile-infographic",
+      "name": "Terracotta Tile Infographic",
+      "description": "Terracotta Tile Infographic theme for academic data science posters, using terracotta tile infographic with ceramic borders, warm Mediterranean geometry, patterned data frames.",
+      "palette": "terracotta-tile-infographic",
+      "motifs": [
+        "tile borders",
+        "ceramic motifs",
+        "warm grids",
+        "ornamental dividers"
+      ],
+      "imagePromptPrefix": "terracotta tile infographic with ceramic borders, warm Mediterranean geometry, patterned data frames; motifs: tile borders, ceramic motifs, warm grids, ornamental dividers; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "artistic",
+      "collection": "second-30",
+      "bestFor": [
+        "water/urban data",
+        "public sector",
+        "cultural analytics"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "warm infographics with tile-framed panels",
+      "diagramStyle": "tile-grid process diagrams",
+      "iconStyle": "Use tile borders, ceramic motifs as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle artistic texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "polished"
+    },
+    {
+      "id": "pop-up-book-research",
+      "name": "Pop-Up Book Research",
+      "description": "Pop-Up Book Research theme for academic data science posters, using pop-up book research poster with layered paper landscapes, dimensional storytelling, playful but clean.",
+      "palette": "pop-up-book-research",
+      "motifs": [
+        "paper layers",
+        "pop-up tabs",
+        "folded scenery",
+        "story panels"
+      ],
+      "imagePromptPrefix": "pop-up book research poster with layered paper landscapes, dimensional storytelling, playful but clean; motifs: paper layers, pop-up tabs, folded scenery, story panels; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "storytelling",
+      "collection": "second-30",
+      "bestFor": [
+        "education",
+        "geospatial stories",
+        "public engagement"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.1rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "playful layered charts with clear labels",
+      "diagramStyle": "paper-layer process diagrams",
+      "iconStyle": "Use paper layers, pop-up tabs as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle storytelling texture layer; low contrast; must not reduce readability.",
+      "density": "high",
+      "formality": "friendly"
+    },
+    {
+      "id": "archaeological-dig-report",
+      "name": "Archaeological Dig Report",
+      "description": "Archaeological Dig Report theme for academic data science posters, using archaeological dig report with stratigraphy layers, artifact cards, aged map paper, field research mood.",
+      "palette": "archaeological-dig-report",
+      "motifs": [
+        "stratigraphy layers",
+        "artifact sketches",
+        "site grids",
+        "dig tags"
+      ],
+      "imagePromptPrefix": "archaeological dig report with stratigraphy layers, artifact cards, aged map paper, field research mood; motifs: stratigraphy layers, artifact sketches, site grids, dig tags; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "historical",
+      "collection": "second-30",
+      "bestFor": [
+        "historical analysis",
+        "field research",
+        "archival ML"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.35rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "earth-tone charts with layer motifs",
+      "diagramStyle": "stratified evidence diagrams",
+      "iconStyle": "Use stratigraphy layers, artifact sketches as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle historical texture layer; low contrast; must not reduce readability.",
+      "density": "medium",
+      "formality": "scholarly"
+    },
+    {
+      "id": "sports-analytics-broadcast-board",
+      "name": "Sports Analytics Broadcast Board",
+      "description": "Sports Analytics Broadcast Board theme for academic data science posters, using sports analytics broadcast board with court/field overlays, live stat panels, energetic commentary style.",
+      "palette": "sports-analytics-broadcast-board",
+      "motifs": [
+        "scoreboard cards",
+        "court lines",
+        "tracking dots",
+        "broadcast panels"
+      ],
+      "imagePromptPrefix": "sports analytics broadcast board with court/field overlays, live stat panels, energetic commentary style; motifs: scoreboard cards, court lines, tracking dots, broadcast panels; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "analytics",
+      "collection": "second-30",
+      "bestFor": [
+        "sports analytics",
+        "real-time dashboards",
+        "forecasting demos"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.1rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "broadcast stat charts with strong highlight metrics",
+      "diagramStyle": "play-diagram style system flows",
+      "iconStyle": "Use scoreboard cards, court lines as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle analytics texture layer; low contrast; must not reduce readability.",
+      "density": "high",
+      "formality": "energetic"
+    },
+    {
+      "id": "blacklight-fluorescent-lab",
+      "name": "Blacklight Fluorescent Lab",
+      "description": "Blacklight Fluorescent Lab theme for academic data science posters, using blacklight fluorescent lab with glowing microscopy forms, ultraviolet palette, high-energy science ambience.",
+      "palette": "blacklight-fluorescent-lab",
+      "motifs": [
+        "fluorescent cells",
+        "UV glow",
+        "microscopy circles",
+        "neon grids"
+      ],
+      "imagePromptPrefix": "blacklight fluorescent lab with glowing microscopy forms, ultraviolet palette, high-energy science ambience; motifs: fluorescent cells, UV glow, microscopy circles, neon grids; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "scientific",
+      "collection": "second-30",
+      "bestFor": [
+        "bioinformatics",
+        "microbiome",
+        "creative science"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.1rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "dark fluorescent charts with strict contrast",
+      "diagramStyle": "glowing cell-network diagrams",
+      "iconStyle": "Use fluorescent cells, UV glow as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle scientific texture layer; low contrast; must not reduce readability.",
+      "density": "high",
+      "formality": "creative"
+    },
+    {
+      "id": "festival-programme-data-story",
+      "name": "Festival Programme Data Story",
+      "description": "Festival Programme Data Story theme for academic data science posters, using festival programme data story with colourful schedule cards, bunting motifs, community event warmth.",
+      "palette": "festival-programme-data-story",
+      "motifs": [
+        "programme cards",
+        "bunting flags",
+        "ticket shapes",
+        "event panels"
+      ],
+      "imagePromptPrefix": "festival programme data story with colourful schedule cards, bunting motifs, community event warmth; motifs: programme cards, bunting flags, ticket shapes, event panels; academic data science poster asset; preserve whitespace for HTML overlays",
+      "category": "editorial",
+      "collection": "second-30",
+      "bestFor": [
+        "arts data",
+        "community insights",
+        "public dashboards"
+      ],
+      "backgroundStrategy": "raster",
+      "htmlTokens": {
+        "radius": "14px",
+        "borderWidth": "1px",
+        "shadow": "0 10px 30px rgba(15,23,42,.12)",
+        "sectionPadding": "1.1rem",
+        "titleScale": "clamp(2.4rem, 4vw, 5rem)"
+      },
+      "typography": {
+        "heading": "Aptos Display, Inter, system-ui, sans-serif",
+        "body": "Aptos, Inter, system-ui, sans-serif",
+        "mono": "JetBrains Mono, ui-monospace, SFMono-Regular, monospace"
+      },
+      "chartStyle": "programme-style charts with friendly cards",
+      "diagramStyle": "timeline/event flow diagrams",
+      "iconStyle": "Use programme cards, bunting flags as simple SVG/CSS motifs; labels remain HTML.",
+      "textureStyle": "Subtle editorial texture layer; low contrast; must not reduce readability.",
+      "density": "high",
+      "formality": "friendly"
+    }
+  ],
+  "palettes": [
+    {
+      "id": "comic-research-showcase",
+      "name": "Comic Research Showcase",
+      "colors": {
+        "primary": "#101820",
+        "accent": "#FEE715",
+        "accentDark": "#E94F37",
+        "softAccent": "#FFD1A9",
+        "background": "#FFFFFF",
+        "panel": "#111111",
+        "ink": "#111111"
+      }
+    },
+    {
+      "id": "nature-journal-scientific-field-notes",
+      "name": "Nature Journal / Scientific Field Notes",
+      "colors": {
+        "primary": "#31452D",
+        "accent": "#8A9A5B",
+        "accentDark": "#D6A75A",
+        "softAccent": "#DAD0B8",
+        "background": "#F7F1DF",
+        "panel": "#2C261D",
+        "ink": "#2C261D"
+      }
+    },
+    {
+      "id": "minimalist-conference-poster",
+      "name": "Minimalist Conference Poster",
+      "colors": {
+        "primary": "#172033",
+        "accent": "#2F80ED",
+        "accentDark": "#A7C7E7",
+        "softAccent": "#E5E7EB",
+        "background": "#FFFFFF",
+        "panel": "#111827",
+        "ink": "#111827"
+      }
+    },
+    {
+      "id": "futuristic-ai-lab",
+      "name": "Futuristic AI Lab",
+      "colors": {
+        "primary": "#061827",
+        "accent": "#00D1FF",
+        "accentDark": "#7C3AED",
+        "softAccent": "#163247",
+        "background": "#0B1020",
+        "panel": "#E6F7FF",
+        "ink": "#E6F7FF"
+      }
+    },
+    {
+      "id": "retro-computing-terminal",
+      "name": "Retro Computing Terminal",
+      "colors": {
+        "primary": "#061307",
+        "accent": "#39FF14",
+        "accentDark": "#1E7F22",
+        "softAccent": "#0E2A0E",
+        "background": "#020602",
+        "panel": "#D3FFD3",
+        "ink": "#D3FFD3"
+      }
+    },
+    {
+      "id": "blueprint-engineering",
+      "name": "Blueprint Engineering",
+      "colors": {
+        "primary": "#0B3A67",
+        "accent": "#4DA3FF",
+        "accentDark": "#B7D9FF",
+        "softAccent": "#7FB3D5",
+        "background": "#EAF5FF",
+        "panel": "#08233D",
+        "ink": "#08233D"
+      }
+    },
+    {
+      "id": "magazine-feature-spread",
+      "name": "Magazine Feature Spread",
+      "colors": {
+        "primary": "#1D3557",
+        "accent": "#E63946",
+        "accentDark": "#F1FAEE",
+        "softAccent": "#D7DEE8",
+        "background": "#FFFFFF",
+        "panel": "#111827",
+        "ink": "#111827"
+      }
+    },
+    {
+      "id": "infographic-dashboard",
+      "name": "Infographic Dashboard",
+      "colors": {
+        "primary": "#153E75",
+        "accent": "#2F80ED",
+        "accentDark": "#F2994A",
+        "softAccent": "#E2E8F0",
+        "background": "#F8FAFC",
+        "panel": "#0F172A",
+        "ink": "#0F172A"
+      }
+    },
+    {
+      "id": "bauhaus-data-poster",
+      "name": "Bauhaus Data Poster",
+      "colors": {
+        "primary": "#111111",
+        "accent": "#E63900",
+        "accentDark": "#0057B8",
+        "softAccent": "#F4C430",
+        "background": "#F2E9D8",
+        "panel": "#111111",
+        "ink": "#111111"
+      }
+    },
+    {
+      "id": "cyberpunk-data-city",
+      "name": "Cyberpunk Data City",
+      "colors": {
+        "primary": "#0B0615",
+        "accent": "#FF2BD6",
+        "accentDark": "#00E5FF",
+        "softAccent": "#2C1247",
+        "background": "#120022",
+        "panel": "#F4E8FF",
+        "ink": "#F4E8FF"
+      }
+    },
+    {
+      "id": "space-mission-control",
+      "name": "Space Mission Control",
+      "colors": {
+        "primary": "#07111F",
+        "accent": "#18D6A3",
+        "accentDark": "#5CC8FF",
+        "softAccent": "#1E2D44",
+        "background": "#0B1528",
+        "panel": "#EAF9FF",
+        "ink": "#EAF9FF"
+      }
+    },
+    {
+      "id": "medical-research-poster",
+      "name": "Medical Research Poster",
+      "colors": {
+        "primary": "#0F3D5E",
+        "accent": "#2F80ED",
+        "accentDark": "#8BD3DD",
+        "softAccent": "#DDEEF2",
+        "background": "#F7FBFC",
+        "panel": "#111827",
+        "ink": "#111827"
+      }
+    },
+    {
+      "id": "newspaper-data-investigation",
+      "name": "Newspaper Data Investigation",
+      "colors": {
+        "primary": "#1C1C1C",
+        "accent": "#B42318",
+        "accentDark": "#D4A373",
+        "softAccent": "#D8D0C0",
+        "background": "#F6F0E6",
+        "panel": "#111111",
+        "ink": "#111111"
+      }
+    },
+    {
+      "id": "museum-exhibit-panel",
+      "name": "Museum Exhibit Panel",
+      "colors": {
+        "primary": "#2F2519",
+        "accent": "#C9A227",
+        "accentDark": "#8D6E63",
+        "softAccent": "#4B3A2A",
+        "background": "#14110E",
+        "panel": "#F7EEDC",
+        "ink": "#F7EEDC"
+      }
+    },
+    {
+      "id": "whiteboard-explainer",
+      "name": "Whiteboard Explainer",
+      "colors": {
+        "primary": "#1F2937",
+        "accent": "#2563EB",
+        "accentDark": "#F59E0B",
+        "softAccent": "#E5E7EB",
+        "background": "#FFFFFF",
+        "panel": "#111827",
+        "ink": "#111827"
+      }
+    },
+    {
+      "id": "product-launch-startup-pitch",
+      "name": "Product Launch / Startup Pitch",
+      "colors": {
+        "primary": "#12263A",
+        "accent": "#2563EB",
+        "accentDark": "#22C55E",
+        "softAccent": "#E5F0FF",
+        "background": "#FFFFFF",
+        "panel": "#0F172A",
+        "ink": "#0F172A"
+      }
+    },
+    {
+      "id": "academic-chalkboard",
+      "name": "Academic Chalkboard",
+      "colors": {
+        "primary": "#132A20",
+        "accent": "#F8F1D4",
+        "accentDark": "#D9A441",
+        "softAccent": "#31503F",
+        "background": "#0B1D16",
+        "panel": "#F8F1D4",
+        "ink": "#F8F1D4"
+      }
+    },
+    {
+      "id": "isometric-cloud-architecture",
+      "name": "Isometric Cloud Architecture",
+      "colors": {
+        "primary": "#1E3A5F",
+        "accent": "#3B82F6",
+        "accentDark": "#38BDF8",
+        "softAccent": "#D7E6F5",
+        "background": "#F4F8FB",
+        "panel": "#0F172A",
+        "ink": "#0F172A"
+      }
+    },
+    {
+      "id": "vintage-science-fair",
+      "name": "Vintage Science Fair",
+      "colors": {
+        "primary": "#4A2E1F",
+        "accent": "#B7791F",
+        "accentDark": "#E2B66A",
+        "softAccent": "#CDB48C",
+        "background": "#F3E4C8",
+        "panel": "#2F2418",
+        "ink": "#2F2418"
+      }
+    },
+    {
+      "id": "luxury-monochrome",
+      "name": "Luxury Monochrome",
+      "colors": {
+        "primary": "#050505",
+        "accent": "#D6B25E",
+        "accentDark": "#6B7280",
+        "softAccent": "#1F1F1F",
+        "background": "#0E0E0E",
+        "panel": "#F8F8F2",
+        "ink": "#F8F8F2"
+      }
+    },
+    {
+      "id": "data-garden",
+      "name": "Data Garden",
+      "colors": {
+        "primary": "#2F5D3A",
+        "accent": "#7CB342",
+        "accentDark": "#D7A86E",
+        "softAccent": "#DDE8C8",
+        "background": "#F5F7E8",
+        "panel": "#1F3323",
+        "ink": "#1F3323"
+      }
+    },
+    {
+      "id": "circuit-board-systems",
+      "name": "Circuit Board Systems",
+      "colors": {
+        "primary": "#081C15",
+        "accent": "#39FF14",
+        "accentDark": "#A3E635",
+        "softAccent": "#143D2A",
+        "background": "#03120C",
+        "panel": "#E6FFE6",
+        "ink": "#E6FFE6"
+      }
+    },
+    {
+      "id": "paper-collage-zine",
+      "name": "Paper Collage / Zine",
+      "colors": {
+        "primary": "#2D2A26",
+        "accent": "#E76F51",
+        "accentDark": "#2A9D8F",
+        "softAccent": "#D9C9A3",
+        "background": "#F5E8C7",
+        "panel": "#1F1B16",
+        "ink": "#1F1B16"
+      }
+    },
+    {
+      "id": "clean-corporate-analytics",
+      "name": "Clean Corporate Analytics",
+      "colors": {
+        "primary": "#0F2A43",
+        "accent": "#0EA5E9",
+        "accentDark": "#10B981",
+        "softAccent": "#E2E8F0",
+        "background": "#FFFFFF",
+        "panel": "#0F172A",
+        "ink": "#0F172A"
+      }
+    },
+    {
+      "id": "fantasy-map-quest-board",
+      "name": "Fantasy Map / Quest Board",
+      "colors": {
+        "primary": "#3D2C1E",
+        "accent": "#C0842D",
+        "accentDark": "#4F7A3A",
+        "softAccent": "#BFA886",
+        "background": "#F0DFC0",
+        "panel": "#24190F",
+        "ink": "#24190F"
+      }
+    },
+    {
+      "id": "oceanographic-research",
+      "name": "Oceanographic Research",
+      "colors": {
+        "primary": "#063B5B",
+        "accent": "#0EA5E9",
+        "accentDark": "#38BDF8",
+        "softAccent": "#A7D8E8",
+        "background": "#E6F7FA",
+        "panel": "#071B2C",
+        "ink": "#071B2C"
+      }
+    },
+    {
+      "id": "robotics-lab-notebook",
+      "name": "Robotics Lab Notebook",
+      "colors": {
+        "primary": "#2B2B2B",
+        "accent": "#2563EB",
+        "accentDark": "#F59E0B",
+        "softAccent": "#D6D3C8",
+        "background": "#F9F7F0",
+        "panel": "#111827",
+        "ink": "#111827"
+      }
+    },
+    {
+      "id": "neural-network-glassmorphism",
+      "name": "Neural Network Glassmorphism",
+      "colors": {
+        "primary": "#32236F",
+        "accent": "#A78BFA",
+        "accentDark": "#60A5FA",
+        "softAccent": "#C7D2FE",
+        "background": "#EEF2FF",
+        "panel": "#F8FAFC",
+        "ink": "#F8FAFC"
+      }
+    },
+    {
+      "id": "industrial-data-factory",
+      "name": "Industrial Data Factory",
+      "colors": {
+        "primary": "#25313B",
+        "accent": "#F59E0B",
+        "accentDark": "#64748B",
+        "softAccent": "#CBD5E1",
+        "background": "#E9EEF2",
+        "panel": "#101820",
+        "ink": "#101820"
+      }
+    },
+    {
+      "id": "elegant-mathematical-atlas",
+      "name": "Elegant Mathematical Atlas",
+      "colors": {
+        "primary": "#1F2937",
+        "accent": "#8B5CF6",
+        "accentDark": "#C4B5FD",
+        "softAccent": "#E5E0D8",
+        "background": "#FAFAF7",
+        "panel": "#111827",
+        "ink": "#111827"
+      }
+    },
+    {
+      "id": "art-deco-analytics",
+      "name": "Art Deco Analytics",
+      "colors": {
+        "primary": "#101820",
+        "accent": "#D4AF37",
+        "accentDark": "#1F6F8B",
+        "softAccent": "#3D2B1F",
+        "background": "#050505",
+        "panel": "#F8F3E6",
+        "ink": "#F8F3E6"
+      }
+    },
+    {
+      "id": "swiss-grid-modernism",
+      "name": "Swiss Grid Modernism",
+      "colors": {
+        "primary": "#111827",
+        "accent": "#E11D48",
+        "accentDark": "#2563EB",
+        "softAccent": "#D1D5DB",
+        "background": "#F7F7F5",
+        "panel": "#111827",
+        "ink": "#111827"
+      }
+    },
+    {
+      "id": "origami-research-foldout",
+      "name": "Origami Research Foldout",
+      "colors": {
+        "primary": "#243B53",
+        "accent": "#3B82F6",
+        "accentDark": "#F97316",
+        "softAccent": "#D7E3F0",
+        "background": "#F8FAFC",
+        "panel": "#111827",
+        "ink": "#111827"
+      }
+    },
+    {
+      "id": "stained-glass-data-mosaic",
+      "name": "Stained Glass Data Mosaic",
+      "colors": {
+        "primary": "#1E1B4B",
+        "accent": "#F59E0B",
+        "accentDark": "#06B6D4",
+        "softAccent": "#4C1D95",
+        "background": "#0B1026",
+        "panel": "#FFF7ED",
+        "ink": "#FFF7ED"
+      }
+    },
+    {
+      "id": "film-storyboard-study",
+      "name": "Film Storyboard Study",
+      "colors": {
+        "primary": "#2B2118",
+        "accent": "#B45309",
+        "accentDark": "#6B7280",
+        "softAccent": "#CBB89D",
+        "background": "#F4E8D0",
+        "panel": "#111111",
+        "ink": "#111111"
+      }
+    },
+    {
+      "id": "intelligence-briefing-dossier",
+      "name": "Intelligence Briefing Dossier",
+      "colors": {
+        "primary": "#2A1F14",
+        "accent": "#B91C1C",
+        "accentDark": "#D6A75A",
+        "softAccent": "#C7B08A",
+        "background": "#F3E8D0",
+        "panel": "#1C130C",
+        "ink": "#1C130C"
+      }
+    },
+    {
+      "id": "library-archive-catalog",
+      "name": "Library Archive Catalog",
+      "colors": {
+        "primary": "#3B2F2F",
+        "accent": "#8B5A2B",
+        "accentDark": "#C9A66B",
+        "softAccent": "#CDBE9D",
+        "background": "#EFE3C8",
+        "panel": "#241A14",
+        "ink": "#241A14"
+      }
+    },
+    {
+      "id": "metro-map-systems-poster",
+      "name": "Metro Map Systems Poster",
+      "colors": {
+        "primary": "#102A43",
+        "accent": "#E63946",
+        "accentDark": "#2A9D8F",
+        "softAccent": "#DDE7F0",
+        "background": "#F8FAFC",
+        "panel": "#111827",
+        "ink": "#111827"
+      }
+    },
+    {
+      "id": "laboratory-label-sheet",
+      "name": "Laboratory Label Sheet",
+      "colors": {
+        "primary": "#1E3A5F",
+        "accent": "#2563EB",
+        "accentDark": "#94A3B8",
+        "softAccent": "#E2E8F0",
+        "background": "#F8FAFC",
+        "panel": "#0F172A",
+        "ink": "#0F172A"
+      }
+    },
+    {
+      "id": "earth-observation-atlas",
+      "name": "Earth Observation Atlas",
+      "colors": {
+        "primary": "#123524",
+        "accent": "#E76F51",
+        "accentDark": "#2A9D8F",
+        "softAccent": "#BFD8C2",
+        "background": "#E8F3E8",
+        "panel": "#102018",
+        "ink": "#102018"
+      }
+    },
+    {
+      "id": "japanese-woodblock-analytics",
+      "name": "Japanese Woodblock Analytics",
+      "colors": {
+        "primary": "#1F3A5F",
+        "accent": "#C2410C",
+        "accentDark": "#E7C16B",
+        "softAccent": "#D8C49A",
+        "background": "#F5E6C8",
+        "panel": "#1F2937",
+        "ink": "#1F2937"
+      }
+    },
+    {
+      "id": "scandinavian-soft-minimal",
+      "name": "Scandinavian Soft Minimal",
+      "colors": {
+        "primary": "#2F4858",
+        "accent": "#7FB069",
+        "accentDark": "#F4A261",
+        "softAccent": "#E6E1D8",
+        "background": "#FAF7F0",
+        "panel": "#1F2937",
+        "ink": "#1F2937"
+      }
+    },
+    {
+      "id": "courtroom-evidence-exhibit",
+      "name": "Courtroom Evidence Exhibit",
+      "colors": {
+        "primary": "#2B2118",
+        "accent": "#B45309",
+        "accentDark": "#DC2626",
+        "softAccent": "#C8B58F",
+        "background": "#F6E7C8",
+        "panel": "#1A130D",
+        "ink": "#1A130D"
+      }
+    },
+    {
+      "id": "weather-bureau-forecast-board",
+      "name": "Weather Bureau Forecast Board",
+      "colors": {
+        "primary": "#143A5A",
+        "accent": "#0EA5E9",
+        "accentDark": "#EF4444",
+        "softAccent": "#BFD7E8",
+        "background": "#EAF6FB",
+        "panel": "#0F172A",
+        "ink": "#0F172A"
+      }
+    },
+    {
+      "id": "transit-wayfinding-poster",
+      "name": "Transit Wayfinding Poster",
+      "colors": {
+        "primary": "#111827",
+        "accent": "#005EB8",
+        "accentDark": "#FFB81C",
+        "softAccent": "#D1D5DB",
+        "background": "#F8FAFC",
+        "panel": "#111827",
+        "ink": "#111827"
+      }
+    },
+    {
+      "id": "illuminated-manuscript-research",
+      "name": "Illuminated Manuscript Research",
+      "colors": {
+        "primary": "#4A1D1F",
+        "accent": "#C9A227",
+        "accentDark": "#2563EB",
+        "softAccent": "#D9C49A",
+        "background": "#F7E6C4",
+        "panel": "#2A1512",
+        "ink": "#2A1512"
+      }
+    },
+    {
+      "id": "classroom-bulletin-board",
+      "name": "Classroom Bulletin Board",
+      "colors": {
+        "primary": "#3B2F2F",
+        "accent": "#F97316",
+        "accentDark": "#2563EB",
+        "softAccent": "#D6BFA8",
+        "background": "#FFF7ED",
+        "panel": "#1F2937",
+        "ink": "#1F2937"
+      }
+    },
+    {
+      "id": "low-poly-geometric-science",
+      "name": "Low-Poly Geometric Science",
+      "colors": {
+        "primary": "#263238",
+        "accent": "#00ACC1",
+        "accentDark": "#FF7043",
+        "softAccent": "#CBD5E1",
+        "background": "#EEF2F3",
+        "panel": "#111827",
+        "ink": "#111827"
+      }
+    },
+    {
+      "id": "patent-diagram-poster",
+      "name": "Patent Diagram Poster",
+      "colors": {
+        "primary": "#1F2937",
+        "accent": "#2563EB",
+        "accentDark": "#64748B",
+        "softAccent": "#D7D2C6",
+        "background": "#F8F6EF",
+        "panel": "#111827",
+        "ink": "#111827"
+      }
+    },
+    {
+      "id": "holographic-lab-report",
+      "name": "Holographic Lab Report",
+      "colors": {
+        "primary": "#0B1026",
+        "accent": "#38BDF8",
+        "accentDark": "#A78BFA",
+        "softAccent": "#1E293B",
+        "background": "#111827",
+        "panel": "#E0F2FE",
+        "ink": "#E0F2FE"
+      }
+    },
+    {
+      "id": "sustainable-eco-design",
+      "name": "Sustainable Eco-Design",
+      "colors": {
+        "primary": "#214E34",
+        "accent": "#6AA84F",
+        "accentDark": "#D9A441",
+        "softAccent": "#DDE8C8",
+        "background": "#F5F7E8",
+        "panel": "#18331F",
+        "ink": "#18331F"
+      }
+    },
+    {
+      "id": "detective-pinboard-analysis",
+      "name": "Detective Pinboard Analysis",
+      "colors": {
+        "primary": "#2B2118",
+        "accent": "#B91C1C",
+        "accentDark": "#D6A75A",
+        "softAccent": "#CDB48C",
+        "background": "#F2E5C8",
+        "panel": "#111111",
+        "ink": "#111111"
+      }
+    },
+    {
+      "id": "elegant-thesis-monograph",
+      "name": "Elegant Thesis Monograph",
+      "colors": {
+        "primary": "#2B2B2B",
+        "accent": "#8B5CF6",
+        "accentDark": "#C9A66B",
+        "softAccent": "#DED8C8",
+        "background": "#FAF7F0",
+        "panel": "#111827",
+        "ink": "#111827"
+      }
+    },
+    {
+      "id": "patchwork-data-quilt",
+      "name": "Patchwork Data Quilt",
+      "colors": {
+        "primary": "#374151",
+        "accent": "#E11D48",
+        "accentDark": "#0EA5E9",
+        "softAccent": "#E7D7C1",
+        "background": "#FFF7ED",
+        "panel": "#1F2937",
+        "ink": "#1F2937"
+      }
+    },
+    {
+      "id": "terracotta-tile-infographic",
+      "name": "Terracotta Tile Infographic",
+      "colors": {
+        "primary": "#7C2D12",
+        "accent": "#D97706",
+        "accentDark": "#0F766E",
+        "softAccent": "#E5B899",
+        "background": "#FFF1E6",
+        "panel": "#2A160F",
+        "ink": "#2A160F"
+      }
+    },
+    {
+      "id": "pop-up-book-research",
+      "name": "Pop-Up Book Research",
+      "colors": {
+        "primary": "#1F3A5F",
+        "accent": "#F97316",
+        "accentDark": "#22C55E",
+        "softAccent": "#D7C4A8",
+        "background": "#FFF7ED",
+        "panel": "#111827",
+        "ink": "#111827"
+      }
+    },
+    {
+      "id": "archaeological-dig-report",
+      "name": "Archaeological Dig Report",
+      "colors": {
+        "primary": "#4A3520",
+        "accent": "#B7791F",
+        "accentDark": "#6B705C",
+        "softAccent": "#CDB790",
+        "background": "#EFE0C2",
+        "panel": "#24180F",
+        "ink": "#24180F"
+      }
+    },
+    {
+      "id": "sports-analytics-broadcast-board",
+      "name": "Sports Analytics Broadcast Board",
+      "colors": {
+        "primary": "#061827",
+        "accent": "#F59E0B",
+        "accentDark": "#22C55E",
+        "softAccent": "#1E293B",
+        "background": "#0B1220",
+        "panel": "#F8FAFC",
+        "ink": "#F8FAFC"
+      }
+    },
+    {
+      "id": "blacklight-fluorescent-lab",
+      "name": "Blacklight Fluorescent Lab",
+      "colors": {
+        "primary": "#09021A",
+        "accent": "#A3FF12",
+        "accentDark": "#FF2BD6",
+        "softAccent": "#2C1247",
+        "background": "#120022",
+        "panel": "#F4E8FF",
+        "ink": "#F4E8FF"
+      }
+    },
+    {
+      "id": "festival-programme-data-story",
+      "name": "Festival Programme Data Story",
+      "colors": {
+        "primary": "#1F2937",
+        "accent": "#F97316",
+        "accentDark": "#14B8A6",
+        "softAccent": "#FBD5B5",
+        "background": "#FFF7ED",
+        "panel": "#111827",
+        "ink": "#111827"
+      }
+    }
+  ]
+}

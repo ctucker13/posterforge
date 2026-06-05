@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 864">
+  <defs>
+    <linearGradient id="lpg-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1A1A2E"/>
+      <stop offset="100%" stop-color="#16213E"/>
+    </linearGradient>
+  </defs>
+  <rect width="1536" height="864" fill="url(#lpg-bg)"/>
+  <!-- Low-poly triangles -->
+  <g opacity="0.7">
+    <polygon points="0,0 384,0 192,216" fill="#0F3460" opacity="0.8"/>
+    <polygon points="384,0 768,0 576,288" fill="#533483" opacity="0.6"/>
+    <polygon points="768,0 1152,0 960,216" fill="#E94560" opacity="0.4"/>
+    <polygon points="1152,0 1536,0 1536,288 1344,216" fill="#0F3460" opacity="0.7"/>
+    <polygon points="0,0 192,216 0,432" fill="#533483" opacity="0.5"/>
+    <polygon points="192,216 576,288 384,432" fill="#E94560" opacity="0.3"/>
+    <polygon points="576,288 960,216 768,432" fill="#0F3460" opacity="0.6"/>
+    <polygon points="960,216 1344,216 1152,432" fill="#533483" opacity="0.4"/>
+    <polygon points="1344,216 1536,288 1536,432 1344,432" fill="#E94560" opacity="0.5"/>
+    <polygon points="0,432 384,432 192,648" fill="#E94560" opacity="0.4"/>
+    <polygon points="384,432 768,432 576,648" fill="#0F3460" opacity="0.6"/>
+    <polygon points="768,432 1152,432 960,648" fill="#533483" opacity="0.5"/>
+    <polygon points="1152,432 1536,432 1344,648" fill="#E94560" opacity="0.3"/>
+    <polygon points="0,648 192,648 0,864" fill="#0F3460" opacity="0.7"/>
+    <polygon points="192,648 576,648 384,864" fill="#533483" opacity="0.5"/>
+    <polygon points="576,648 960,648 768,864" fill="#E94560" opacity="0.4"/>
+    <polygon points="960,648 1344,648 1152,864" fill="#0F3460" opacity="0.6"/>
+    <polygon points="1344,648 1536,648 1536,864" fill="#533483" opacity="0.5"/>
+  </g>
+  <!-- Edge lines -->
+  <g stroke="rgba(255,255,255,0.08)" stroke-width="1" fill="none">
+    <polyline points="0,0 192,216 576,288 960,216 1344,216 1536,288"/>
+    <polyline points="0,432 192,648 576,648 960,648 1344,648 1536,648"/>
+    <polyline points="192,216 384,432 576,648"/>
+    <polyline points="960,216 1152,432 1344,648"/>
+  </g>
+</svg>

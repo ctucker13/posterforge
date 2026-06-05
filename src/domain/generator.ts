@@ -1,5 +1,6 @@
 import type {
   EvidenceItem,
+  GeneratedImageSlot,
   PosterBlock,
   PosterClaim,
   PosterOutline,
@@ -14,6 +15,7 @@ import type {
   TraceEvent,
   TrustLevel,
 } from "./poster";
+import { getThemeDensity, SECTION_ART_CONTENT_REGIONS } from "../layouts/buildLayoutSpec";
 import { examplePoster } from "../data/examplePoster";
 import { buildClaimMap } from "./evidence";
 import { buildMockSourcePackage, createReferencesFromSources } from "../sources/mockConnectors";
@@ -296,6 +298,7 @@ function isPosterBlock(value: unknown): value is PosterBlock {
   const block = value as Record<string, unknown>;
   if (block.type === "text") return typeof block.text === "string";
   if (block.type === "visual_ref") return typeof block.visual_id === "string";
+  if (block.type === "generated_image") return typeof block.slot_id === "string";
   return false;
 }
 
@@ -360,6 +363,7 @@ export async function generatePoster(
   );
   const claimMap = buildClaimMap(examplePoster.claims, sections, sourcePackage.evidence);
 
+  const contentSections = sections.filter((s) => s.type !== "hero" && s.type !== "background");
   return {
     ...examplePoster,
     metadata: {
@@ -382,6 +386,7 @@ export async function generatePoster(
     claimMap,
     references: createReferencesFromSources(sourcePackage.sources),
     sections,
+    imageSlots: buildStandardImageSlots(contentSections.map((s) => s.id), options.theme),
   };
 }
 
@@ -441,6 +446,7 @@ function generateFromRealSources(options: GenerationOptions): PosterProject {
     sections,
     visuals,
     assets: [],
+    imageSlots: buildStandardImageSlots(sections.filter((s) => s.type !== "hero").map((s) => s.id), options.theme),
     traces: [],
     qaResults: [],
     references: createReferencesFromSources(sources),
@@ -784,6 +790,35 @@ function deriveHeroText(prompt: string, summaries: SourceSummary[]): string {
   const first = summaries[0]?.summary ?? "";
   if (first.length >= 40) return clip(first, 280);
   return prompt.trim() || "A source-grounded poster generated from attached project evidence.";
+}
+
+// ── Image slot helpers ────────────────────────────────────────────────────────
+
+function buildStandardImageSlots(sectionIds: string[], themeId: string, canvasW = 1536, canvasH = 864): GeneratedImageSlot[] {
+  const density = getThemeDensity(themeId);
+  const slots: GeneratedImageSlot[] = [
+    { id: "slot_bg", role: "background", outputFormat: "webp", width_px: canvasW, height_px: canvasH },
+  ];
+  if (density !== "low") {
+    slots.push({
+      id: "slot_hero_illus",
+      role: "hero_illustration",
+      outputFormat: "png",
+      width_px: canvasW,
+      height_px: Math.round(canvasH * 0.4),
+    });
+  }
+  for (const sectionId of sectionIds.slice(0, 3)) {
+    slots.push({
+      id: `slot_art_${sectionId}`,
+      role: "section_art",
+      outputFormat: "png",
+      width_px: 720,
+      height_px: 480,
+      contentRegions: SECTION_ART_CONTENT_REGIONS.map((r) => ({ ...r })),
+    });
+  }
+  return slots;
 }
 
 // ── Text/value utilities ──────────────────────────────────────────────────────

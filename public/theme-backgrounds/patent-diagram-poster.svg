@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 864">
+  <rect width="1536" height="864" fill="#FEFEF8"/>
+  <defs>
+    <pattern id="patent-grid" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M 48 0 L 0 0 0 48" fill="none" stroke="rgba(0,0,0,0.04)" stroke-width="0.5"/>
+    </pattern>
+  </defs>
+  <rect width="1536" height="864" fill="url(#patent-grid)"/>
+  <!-- Patent border -->
+  <rect x="24" y="24" width="1488" height="816" fill="none" stroke="rgba(0,0,0,0.5)" stroke-width="2"/>
+  <rect x="32" y="32" width="1472" height="800" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="1"/>
+  <!-- Fig labels -->
+  <text x="768" y="56" text-anchor="middle" font-family="serif" font-size="14" fill="rgba(0,0,0,0.35)" letter-spacing="2">FIG. 1</text>
+  <!-- Reference lines -->
+  <g stroke="rgba(0,0,0,0.15)" stroke-width="1" stroke-dasharray="6,4">
+    <line x1="200" y1="200" x2="400" y2="200"/>
+    <line x1="200" y1="400" x2="400" y2="400"/>
+    <line x1="1136" y1="200" x2="1336" y2="200"/>
+    <line x1="1136" y1="600" x2="1336" y2="600"/>
+  </g>
+  <!-- Reference numerals -->
+  <g font-family="serif" font-size="13" fill="rgba(0,0,0,0.4)">
+    <text x="410" y="204">10</text><text x="410" y="404">12</text>
+    <text x="1096" y="204">14</text><text x="1096" y="604">16</text>
+  </g>
+  <!-- Footer -->
+  <rect x="24" y="820" width="1488" height="44" fill="none" stroke="rgba(0,0,0,0.3)" stroke-width="1"/>
+  <text x="60" y="846" font-family="serif" font-size="11" fill="rgba(0,0,0,0.4)">PATENT DIAGRAM — ACADEMIC RESEARCH POSTER</text>
+</svg>

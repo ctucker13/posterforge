@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
-import { ArrowDown, ArrowUp, CheckCircle2, Eye, EyeOff, MousePointer2 } from "lucide-react";
+import { ArrowDown, ArrowUp, CheckCircle2, Eye, EyeOff, MousePointer2, Plus } from "lucide-react";
 import type { PosterBlock, PosterProject, PosterSection, PosterSectionLayout, PosterVisual } from "../domain/poster";
 import type { PosterCanvasItemKind } from "./PosterCanvas";
 import { parseBlockId } from "./posterUtils";
 import { VisualRegistryPanel } from "./VisualRegistryPanel";
+import { VisualPicker } from "./VisualPicker";
+import { VisualDataEditor } from "./VisualDataEditor";
+import { getVisual } from "../visuals/visualRegistry";
+import type { VisualDefinition } from "../visuals/visualRegistry";
 import {
   parseCodeBlockData,
   parseConfusionMatrixData,
@@ -31,6 +35,32 @@ export function PosterInspector({ poster, selectedId, selectedKind, onPosterChan
   const selectedSection = selectedKind === "section" ? poster.sections.find((section) => section.id === selectedId) : undefined;
   const selectedBlock = selectedKind === "block" && selectedId ? findTextBlock(poster, selectedId) : undefined;
   const selectedVisual = selectedKind === "visual" ? poster.visuals.find((visual) => visual.id === selectedId) : undefined;
+  const [showVisualPicker, setShowVisualPicker] = useState(false);
+
+  function handlePickVisual(definition: VisualDefinition) {
+    const newVisual: PosterVisual = {
+      id: `visual-${Date.now()}`,
+      type: definition.id,
+      title: definition.name,
+      data: structuredClone(definition.defaultData) as Record<string, unknown>,
+    };
+    // Prefer the currently selected section; fall back to first visible non-hero section
+    const NON_CONTENT_TYPES = new Set(["hero", "background"]);
+    const fallbackSection = poster.sections.find(
+      (s) => !s.layout?.hidden && !NON_CONTENT_TYPES.has(s.type),
+    ) ?? poster.sections.find((s) => !s.layout?.hidden) ?? poster.sections[0];
+    const targetSectionId = selectedSection?.id ?? fallbackSection?.id;
+    onPosterChange({
+      ...poster,
+      visuals: [...poster.visuals, newVisual],
+      sections: poster.sections.map((section) =>
+        section.id === targetSectionId
+          ? { ...section, blocks: [...section.blocks, { type: "visual_ref" as const, visual_id: newVisual.id }] }
+          : section,
+      ),
+    });
+    setShowVisualPicker(false);
+  }
 
   function updateSection(sectionId: string, updater: (section: PosterSection) => PosterSection) {
     onPosterChange({
@@ -97,8 +127,12 @@ export function PosterInspector({ poster, selectedId, selectedKind, onPosterChan
     <section className="poster-inspector tool-panel" aria-label="Poster selection inspector">
       <div className="panel-header">
         <h2>Canvas Inspector</h2>
-        <span>{selectedKind ?? "none"}</span>
+        <button className="panel-header-action" type="button" onClick={() => setShowVisualPicker(true)} title="Add visual">
+          <Plus size={15} /> Add visual
+        </button>
       </div>
+
+      {showVisualPicker && <VisualPicker onSelect={handlePickVisual} onClose={() => setShowVisualPicker(false)} />}
 
       {!selectedId ? (
         <div className="inspector-empty-state">
@@ -287,6 +321,17 @@ function VisualEditor({ visual, onSave }: { visual: PosterVisual; onSave: (data:
 
   if (["ai_image", "generated_background", "generated_comic_panel"].includes(visual.type)) {
     return <GeneratedVisualEditor visual={visual} onSave={onSave} />;
+  }
+
+  // Fallback: use VisualDataEditor for any registry-defined chart/diagram type
+  const regDef = getVisual(visual.type);
+  if (regDef && regDef.editableFields.length > 0) {
+    return (
+      <VisualDataEditor
+        visual={visual}
+        onChange={(updated) => onSave(updated.data ?? {})}
+      />
+    );
   }
 
   return null;

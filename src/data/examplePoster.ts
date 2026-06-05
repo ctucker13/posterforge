@@ -116,6 +116,7 @@ export const examplePoster: PosterProject = {
           claim_ids: ["claim_002"],
           text: "The QA loop checks source links, poster readability, visual integrity, and export readiness before final handoff.",
         },
+        { type: "generated_image", slot_id: "slot_art_qa" },
       ],
     },
     {
@@ -289,6 +290,34 @@ export const examplePoster: PosterProject = {
         width_px: 1800,
         height_px: 1200,
       },
+    },
+  ],
+  imageSlots: [
+    { id: "slot_bg", role: "background", outputFormat: "webp", width_px: 1536, height_px: 864 },
+    { id: "slot_hero_illus", role: "hero_illustration", outputFormat: "png", width_px: 1536, height_px: 346 },
+    {
+      id: "slot_art_qa",
+      role: "section_art",
+      outputFormat: "png",
+      width_px: 720,
+      height_px: 480,
+      contentRegions: [
+        { id: "title", x: "5%",  y: "5%",  width: "90%", height: "15%", type: "text" },
+        { id: "body",  x: "5%",  y: "22%", width: "58%", height: "55%", type: "text" },
+        { id: "chart", x: "65%", y: "22%", width: "30%", height: "55%", type: "chart" },
+      ],
+    },
+    {
+      id: "slot_art_delivery_plan",
+      role: "section_art",
+      outputFormat: "png",
+      width_px: 720,
+      height_px: 480,
+      contentRegions: [
+        { id: "title", x: "5%",  y: "5%",  width: "90%", height: "15%", type: "text" },
+        { id: "body",  x: "5%",  y: "22%", width: "58%", height: "55%", type: "text" },
+        { id: "chart", x: "65%", y: "22%", width: "30%", height: "55%", type: "chart" },
+      ],
     },
   ],
   assets: [

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 864" width="1536" height="864">
+  <rect width="1536" height="864" fill="#003580"/>
+  <defs>
+    <pattern id="grid-minor" width="48" height="48" patternUnits="userSpaceOnUse">
+      <path d="M 48 0 L 0 0 0 48" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+    </pattern>
+    <pattern id="grid-major" width="240" height="240" patternUnits="userSpaceOnUse">
+      <rect width="240" height="240" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="1536" height="864" fill="url(#grid-minor)"/>
+  <rect width="1536" height="864" fill="url(#grid-major)"/>
+  <g stroke="rgba(255,255,255,0.45)" stroke-width="1" fill="none">
+    <line x1="60" y1="40" x2="60" y2="80"/><line x1="40" y1="60" x2="80" y2="60"/>
+    <circle cx="60" cy="60" r="3" fill="rgba(255,255,255,0.45)"/>
+    <line x1="1476" y1="40" x2="1476" y2="80"/><line x1="1456" y1="60" x2="1496" y2="60"/>
+    <circle cx="1476" cy="60" r="3" fill="rgba(255,255,255,0.45)"/>
+    <line x1="60" y1="784" x2="60" y2="824"/><line x1="40" y1="804" x2="80" y2="804"/>
+    <circle cx="60" cy="804" r="3" fill="rgba(255,255,255,0.45)"/>
+    <line x1="1476" y1="784" x2="1476" y2="824"/><line x1="1456" y1="804" x2="1496" y2="804"/>
+    <circle cx="1476" cy="804" r="3" fill="rgba(255,255,255,0.45)"/>
+  </g>
+  <rect x="0" y="0" width="1536" height="3" fill="rgba(255,255,255,0.35)"/>
+  <rect x="0" y="861" width="1536" height="3" fill="rgba(255,255,255,0.35)"/>
+  <rect x="0" y="0" width="3" height="864" fill="rgba(255,255,255,0.2)"/>
+  <rect x="1533" y="0" width="3" height="864" fill="rgba(255,255,255,0.2)"/>
+  <text x="1480" y="848" font-family="monospace" font-size="10" fill="rgba(255,255,255,0.3)" text-anchor="end">1536 × 864 — BLUEPRINT ENGINEERING</text>
+</svg>

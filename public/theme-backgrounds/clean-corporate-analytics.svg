@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 864">
+  <rect width="1536" height="864" fill="#FFFFFF"/>
+  <!-- Sidebar accent -->
+  <rect x="0" y="0" width="8" height="864" fill="#1E3A5F"/>
+  <!-- Top bar -->
+  <rect x="0" y="0" width="1536" height="72" fill="#1E3A5F"/>
+  <!-- Subtle section dividers -->
+  <line x1="8" y1="240" x2="1536" y2="240" stroke="#E5EAF0" stroke-width="1"/>
+  <line x1="8" y1="480" x2="1536" y2="480" stroke="#E5EAF0" stroke-width="1"/>
+  <line x1="8" y1="720" x2="1536" y2="720" stroke="#E5EAF0" stroke-width="1"/>
+  <!-- Column guides -->
+  <line x1="396" y1="72" x2="396" y2="720" stroke="#E5EAF0" stroke-width="1"/>
+  <line x1="784" y1="72" x2="784" y2="720" stroke="#E5EAF0" stroke-width="1"/>
+  <line x1="1172" y1="72" x2="1172" y2="720" stroke="#E5EAF0" stroke-width="1"/>
+  <!-- Footer band -->
+  <rect x="0" y="820" width="1536" height="44" fill="#F4F6F9"/>
+  <rect x="8" y="820" width="3" height="44" fill="#2E86AB"/>
+</svg>

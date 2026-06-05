@@ -43,5 +43,6 @@ function getSectionText(section: PosterSection) {
 
 function formatBlock(block: PosterBlock) {
   if (block.type === "text") return block.text;
+  if (block.type === "generated_image") return `[Image slot: ${block.slot_id}]`;
   return `Visual: ${block.visual_id}`;
 }

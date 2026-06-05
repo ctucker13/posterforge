@@ -1,3 +1,5 @@
+import imagegenThemesRaw from "./imagegen-themes.json";
+
 export interface PosterPalette {
   id: string;
   name: string;
@@ -21,12 +23,17 @@ export interface PosterTheme {
   motifs: string[];
   imagePromptPrefix: string;
   logoUrl?: string;
+  category?: string;
+  collection?: string;
+  bestFor?: string[];
 }
 
 export type Palette = PosterPalette;
 export type ThemeDefinition = PosterTheme;
 
-export const palettes: Record<string, PosterPalette> = {
+// ── Built-in themes (take precedence over image-gen registry) ────────────────
+
+const builtinPalettes: Record<string, PosterPalette> = {
   "natwest-group": {
     id: "natwest-group",
     name: "NatWest Group",
@@ -76,7 +83,7 @@ export const palettes: Record<string, PosterPalette> = {
   },
 };
 
-export const themes: Record<string, PosterTheme> = {
+const builtinThemes: Record<string, PosterTheme> = {
   "natwest-group": {
     id: "natwest-group",
     name: "NatWest Group",
@@ -115,8 +122,88 @@ export const themes: Record<string, PosterTheme> = {
   },
 };
 
+// ── Image-gen 60-theme registry ──────────────────────────────────────────────
+
+interface ImagegenThemeEntry {
+  id: string;
+  name: string;
+  description: string;
+  palette: string;
+  motifs: string[];
+  imagePromptPrefix: string;
+  category?: string;
+  collection?: string;
+  bestFor?: string[];
+}
+
+interface ImagegenPaletteEntry {
+  id: string;
+  name: string;
+  colors: {
+    primary: string;
+    accent: string;
+    accentDark?: string | null;
+    softAccent?: string | null;
+    background: string;
+    panel: string;
+    ink: string;
+  };
+}
+
+const imagegenThemes: Record<string, PosterTheme> = {};
+const imagegenPalettes: Record<string, PosterPalette> = {};
+
+for (const t of imagegenThemesRaw.themes as ImagegenThemeEntry[]) {
+  imagegenThemes[t.id] = {
+    id: t.id,
+    name: t.name,
+    description: t.description,
+    palette: t.id,
+    motifs: t.motifs,
+    imagePromptPrefix: t.imagePromptPrefix,
+    ...(t.category != null && { category: t.category }),
+    ...(t.collection != null && { collection: t.collection }),
+    ...(t.bestFor != null && { bestFor: t.bestFor }),
+  };
+}
+
+for (const p of imagegenThemesRaw.palettes as ImagegenPaletteEntry[]) {
+  imagegenPalettes[p.id] = {
+    id: p.id,
+    name: p.name,
+    colors: {
+      primary: p.colors.primary,
+      accent: p.colors.accent,
+      ...(p.colors.accentDark != null && { accentDark: p.colors.accentDark }),
+      ...(p.colors.softAccent != null && { softAccent: p.colors.softAccent }),
+      background: p.colors.background,
+      panel: p.colors.panel,
+      ink: p.colors.ink,
+    },
+  };
+}
+
+// ── Merged exports (built-in themes override image-gen on ID collision) ───────
+
+export const palettes: Record<string, PosterPalette> = {
+  ...imagegenPalettes,
+  ...builtinPalettes,
+};
+
+export const themes: Record<string, PosterTheme> = {
+  ...imagegenThemes,
+  ...builtinThemes,
+};
+
 export function resolvePalette(themeId: string, paletteOverride?: string | undefined): PosterPalette {
   const theme = themes[themeId] ?? themes["clean-academic"];
   const paletteId = paletteOverride ?? theme?.palette ?? "clean-blue";
-  return palettes[paletteId] ?? palettes["clean-blue"] ?? { id: "clean-blue", name: "Clean Blue", colors: { primary: "#17324D", accent: "#2176AE", background: "#F3F7FA", panel: "#FFFFFF", ink: "#122232" } };
+  return (
+    palettes[paletteId] ??
+    palettes["clean-blue"] ?? {
+      id: "clean-blue",
+      name: "Clean Blue",
+      colors: { primary: "#17324D", accent: "#2176AE", background: "#F3F7FA", panel: "#FFFFFF", ink: "#122232" },
+    }
+  );
 }

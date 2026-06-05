@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 864">
+  <rect width="1536" height="864" fill="#0D0D0D"/>
+  <defs>
+    <pattern id="scanlines" width="1536" height="4" patternUnits="userSpaceOnUse">
+      <rect width="1536" height="2" fill="rgba(0,255,80,0.04)"/>
+      <rect y="2" width="1536" height="2" fill="rgba(0,0,0,0.08)"/>
+    </pattern>
+  </defs>
+  <rect width="1536" height="864" fill="url(#scanlines)"/>
+  <!-- CRT phosphor glow effect -->
+  <radialGradient id="crt-glow" cx="50%" cy="50%" r="60%">
+    <stop offset="0%" stop-color="rgba(0,255,80,0.06)"/>
+    <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+  </radialGradient>
+  <rect width="1536" height="864" fill="url(#crt-glow)"/>
+  <!-- Corner bracket marks -->
+  <g stroke="rgba(0,255,80,0.5)" stroke-width="2" fill="none" stroke-linecap="square">
+    <polyline points="40,80 40,40 80,40"/>
+    <polyline points="1456,40 1496,40 1496,80"/>
+    <polyline points="40,784 40,824 80,824"/>
+    <polyline points="1496,784 1496,824 1456,824"/>
+  </g>
+  <!-- Prompt cursor blink simulation -->
+  <rect x="116" y="96" width="12" height="22" fill="rgba(0,255,80,0.7)"/>
+  <!-- Horizontal rule -->
+  <line x1="40" y1="136" x2="1496" y2="136" stroke="rgba(0,255,80,0.3)" stroke-width="1"/>
+  <!-- Status bar bottom -->
+  <rect x="0" y="840" width="1536" height="24" fill="rgba(0,255,80,0.12)"/>
+  <text x="40" y="856" font-family="monospace" font-size="12" fill="rgba(0,255,80,0.6)">READY.</text>
+</svg>

@@ -1,12 +1,15 @@
-import { type CSSProperties, type KeyboardEvent, type ClipboardEvent } from "react";
+import { type CSSProperties, type KeyboardEvent, type ClipboardEvent, useEffect, useState } from "react";
 import { DndContext, closestCenter, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, arrayMove, useSortable, rectSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { AlertTriangle, ArrowDown, ArrowUp, Eye, EyeOff, FileCheck2, GripVertical, Image, Link2, Pencil, RotateCcw, Trash2 } from "lucide-react";
-import type { PosterBlock, PosterClaim, PosterProject, PosterSource, QaIssue } from "../domain/poster";
+import type { ContentRegion, GeneratedImageSlot, PosterBlock, PosterClaim, PosterProject, PosterSource, QaIssue } from "../domain/poster";
+import type { AssetSidecar } from "../layouts/buildLayoutSpec";
 import { isFeaturedSection, resolveLayoutTemplate } from "../layouts";
 import { resolvePalette } from "../themes";
 import { VisualRenderer } from "../renderers/VisualRenderer";
+import { backgroundStrategyForTheme } from "../layouts/buildLayoutSpec";
+import { ThemeMotifLayer } from "./ThemeMotifLayer";
 
 export type PosterCanvasItemKind = "section" | "block" | "visual";
 
@@ -24,6 +27,9 @@ export interface PosterCanvasProps {
   onMoveSection?: ((sectionId: string, direction: -1 | 1) => void) | undefined;
   onToggleHideSection?: ((sectionId: string) => void) | undefined;
   onDeleteSection?: ((sectionId: string) => void) | undefined;
+  onGenerateImageSlot?: ((slotId: string) => void) | undefined;
+  onUpdateImageSlotPosition?: ((slotId: string, objectPosition: string) => void) | undefined;
+  onImageSlotSidecarLoaded?: ((slotId: string, patch: { seed?: number; contentRegions?: ContentRegion[] }) => void) | undefined;
 }
 
 export function PosterCanvas({
@@ -40,13 +46,19 @@ export function PosterCanvas({
   onMoveSection,
   onToggleHideSection,
   onDeleteSection,
+  onGenerateImageSlot,
+  onUpdateImageSlotPosition,
+  onImageSlotSidecarLoaded,
 }: PosterCanvasProps) {
   const palette = resolvePalette(poster.theme, poster.palette);
   const layout = resolveLayoutTemplate(poster.layout);
+  const backgroundAsset = poster.assets?.find((a) => a.role === "background" && a.url);
   const outputFrame = getA0PreviewFrame(poster.format.orientation);
   const visuals = new Map(poster.visuals.map((visual) => [visual.id, visual]));
   const sources = new Map(poster.sources.map((source) => [source.id, source]));
   const claims = new Map(poster.claims.map((claim) => [claim.id, claim]));
+  const imageSlots = new Map((poster.imageSlots ?? []).map((slot) => [slot.id, slot]));
+  const bgStrategy = backgroundStrategyForTheme(poster.theme);
   const sections = getOrderedSections(poster);
   const canvasSections = mode === "edit" ? sections : sections.filter((section) => !section.layout?.hidden);
   const qaIssuesByLocation = groupQaIssuesByLocation(qaIssues);
@@ -173,7 +185,7 @@ export function PosterCanvas({
               {section.title}
             </h3>
             {section.blocks.map((block, index) =>
-              renderBlock(block, index, section.id, visuals, claims, sources, mode, selectedId, qaIssuesByLocation, onSelectItem, onUpdateTextBlock),
+              renderBlock(block, index, section.id, visuals, claims, sources, imageSlots, mode, selectedId, qaIssuesByLocation, onSelectItem, onUpdateTextBlock, onGenerateImageSlot, onUpdateImageSlotPosition, onImageSlotSidecarLoaded),
             )}
               </>
             )}
@@ -202,6 +214,7 @@ export function PosterCanvas({
         className={`poster poster-output-frame poster-${poster.theme} poster-layout-${layout.cssClass}`}
         style={
           {
+            position: "relative",
             "--theme-primary": palette.colors.primary,
             "--theme-accent": palette.colors.accent,
             "--theme-bg": palette.colors.background,
@@ -210,6 +223,9 @@ export function PosterCanvas({
           } as CSSProperties
         }
       >
+        {(bgStrategy === "svg" || bgStrategy === "svg-hybrid") && (
+          <ThemeMotifLayer themeId={poster.theme} mode="full-background" />
+        )}
         <header className="poster-hero" data-poster-id="hero" data-poster-kind="hero">
           <div>
             <p className="poster-kicker">{layout.name} · {poster.audience}</p>
@@ -232,9 +248,14 @@ export function PosterCanvas({
               {poster.subtitle}
             </p>
           </div>
-          <div className={`hero-asset${poster.logo ? " hero-asset-logo" : ""}`} aria-label={poster.logo ? "Organisation logo" : "Generated image asset placeholder"}>
+          <div
+            className={`hero-asset${poster.logo ? " hero-asset-logo" : backgroundAsset ? " hero-asset-image" : ""}`}
+            aria-label={poster.logo ? "Organisation logo" : backgroundAsset ? "Poster background asset" : "Generated image asset placeholder"}
+          >
             {poster.logo ? (
               <img className="hero-logo" src={poster.logo} alt="Organisation logo" />
+            ) : backgroundAsset?.url ? (
+              <img className="hero-bg-image" src={backgroundAsset.url} alt={backgroundAsset.title ?? "Poster background"} />
             ) : (
               <>
                 <Image size={42} />
@@ -348,11 +369,15 @@ function renderBlock(
   visuals: Map<string, PosterProject["visuals"][number]>,
   claims: Map<string, PosterClaim>,
   sources: Map<string, PosterSource>,
+  imageSlots: Map<string, GeneratedImageSlot>,
   mode: PosterCanvasProps["mode"],
   selectedId?: string,
   qaIssuesByLocation?: Map<string, QaIssue[]>,
   onSelectItem?: PosterCanvasProps["onSelectItem"],
   onUpdateTextBlock?: PosterCanvasProps["onUpdateTextBlock"],
+  onGenerateImageSlot?: PosterCanvasProps["onGenerateImageSlot"],
+  onUpdateImageSlotPosition?: PosterCanvasProps["onUpdateImageSlotPosition"],
+  onImageSlotSidecarLoaded?: PosterCanvasProps["onImageSlotSidecarLoaded"],
 ) {
   const blockId = `${sectionId}:block:${index}`;
   const selected = selectedId === blockId;
@@ -387,6 +412,23 @@ function renderBlock(
           </div>
         ) : null}
       </div>
+    );
+  }
+
+  if (block.type === "generated_image") {
+    const slot = imageSlots.get(block.slot_id);
+    return (
+      <GeneratedImageBlock
+        key={blockId}
+        blockId={blockId}
+        slot={slot}
+        slotId={block.slot_id}
+        objectPosition={block.objectPosition}
+        mode={mode}
+        onGenerate={onGenerateImageSlot}
+        onUpdatePosition={onUpdateImageSlotPosition}
+        onSidecarLoaded={onImageSlotSidecarLoaded}
+      />
     );
   }
 
@@ -451,4 +493,151 @@ function handleSingleLineEditKeyDown(event: KeyboardEvent<HTMLElement>) {
     event.preventDefault();
     event.currentTarget.blur();
   }
+}
+
+function GeneratedImageBlock({
+  blockId,
+  slot,
+  slotId,
+  objectPosition,
+  mode,
+  onGenerate,
+  onUpdatePosition,
+  onSidecarLoaded,
+}: {
+  blockId: string;
+  slot: GeneratedImageSlot | undefined;
+  slotId: string;
+  objectPosition?: string | undefined;
+  mode: PosterCanvasProps["mode"];
+  onGenerate?: ((slotId: string) => void) | undefined;
+  onUpdatePosition?: ((slotId: string, objectPosition: string) => void) | undefined;
+  onSidecarLoaded?: PosterCanvasProps["onImageSlotSidecarLoaded"];
+}) {
+  const roleLabel =
+    slot?.role === "background" ? "Background"
+    : slot?.role === "hero_illustration" ? "Hero art"
+    : "Section art";
+
+  // Gap 3: derive effective URL — assetId takes precedence over direct url field
+  const assetId = slot?.assetId;
+  const fmt = slot?.outputFormat ?? "webp";
+  const effectiveUrl = assetId ? `/generated-assets/${assetId}.${fmt}` : slot?.url;
+
+  // Gap 3: fetch sidecar when assetId is present and seed/contentRegions haven't been loaded yet
+  const needsSidecar = Boolean(assetId && slot?.seed === undefined);
+  useEffect(() => {
+    if (!assetId || !needsSidecar) return;
+    let cancelled = false;
+    fetch(`/generated-assets/${assetId}.json`)
+      .then((r) => r.json())
+      .then((sidecar: AssetSidecar) => {
+        if (cancelled) return;
+        const patch: { seed?: number; contentRegions?: ContentRegion[] } = {};
+        if (sidecar.seed !== undefined) patch.seed = sidecar.seed;
+        if (sidecar.contentRegions?.length) patch.contentRegions = sidecar.contentRegions as ContentRegion[];
+        if (Object.keys(patch).length > 0) onSidecarLoaded?.(slotId, patch);
+      })
+      .catch(() => { /* sidecar not yet written — normal before first generation */ });
+    return () => { cancelled = true; };
+  }, [assetId, needsSidecar, slotId, onSidecarLoaded]);
+
+  // Gap 1: content regions from slot (populated from sidecar or defaults)
+  const contentRegions = slot?.contentRegions ?? [];
+
+  if (effectiveUrl) {
+    let dragStart: { x: number; y: number; ox: number; oy: number } | null = null;
+
+    const parsePos = (pos: string | undefined): { ox: number; oy: number } => {
+      const parts = (pos ?? "50% 50%").split(" ");
+      return { ox: parseFloat(parts[0] ?? "50"), oy: parseFloat(parts[1] ?? "50") };
+    };
+
+    const handlePointerDown = (e: React.PointerEvent<HTMLImageElement>) => {
+      if (mode !== "edit") return;
+      e.stopPropagation();
+      e.currentTarget.setPointerCapture(e.pointerId);
+      const { ox, oy } = parsePos(objectPosition);
+      dragStart = { x: e.clientX, y: e.clientY, ox, oy };
+    };
+
+    const handlePointerMove = (e: React.PointerEvent<HTMLImageElement>) => {
+      if (!dragStart) return;
+      const rect = e.currentTarget.parentElement?.getBoundingClientRect();
+      if (!rect) return;
+      const dx = ((e.clientX - dragStart.x) / rect.width) * 100;
+      const dy = ((e.clientY - dragStart.y) / rect.height) * 100;
+      const newOx = Math.max(0, Math.min(100, dragStart.ox - dx));
+      const newOy = Math.max(0, Math.min(100, dragStart.oy - dy));
+      e.currentTarget.style.objectPosition = `${newOx.toFixed(1)}% ${newOy.toFixed(1)}%`;
+    };
+
+    const handlePointerUp = (e: React.PointerEvent<HTMLImageElement>) => {
+      if (!dragStart) return;
+      const rect = e.currentTarget.parentElement?.getBoundingClientRect();
+      if (rect) {
+        const dx = ((e.clientX - dragStart.x) / rect.width) * 100;
+        const dy = ((e.clientY - dragStart.y) / rect.height) * 100;
+        const { ox, oy } = dragStart;
+        const newOx = Math.max(0, Math.min(100, ox - dx));
+        const newOy = Math.max(0, Math.min(100, oy - dy));
+        onUpdatePosition?.(slotId, `${newOx.toFixed(1)}% ${newOy.toFixed(1)}%`);
+      }
+      dragStart = null;
+    };
+
+    return (
+      <div className="generated-image-block generated-image-loaded" data-block-id={blockId}>
+        <img
+          src={effectiveUrl}
+          alt={roleLabel}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            objectPosition: objectPosition ?? "50% 50%",
+            display: "block",
+            cursor: mode === "edit" ? "grab" : "default",
+          }}
+          draggable={false}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+        />
+        {/* Gap 1: content region overlays */}
+        {contentRegions.map((region) => (
+          <div
+            key={region.id}
+            className={`image-content-region image-content-region-${region.type}`}
+            style={{ position: "absolute", left: region.x, top: region.y, width: region.width, height: region.height }}
+            data-region-type={region.type}
+            aria-hidden="true"
+          />
+        ))}
+        {/* Gap 3: regenerate buttons shown when seed is known */}
+        {slot?.seed !== undefined && mode === "edit" ? (
+          <div className="image-slot-actions">
+            <button type="button" className="image-slot-btn" onClick={() => onGenerate?.(slotId)}>
+              <RotateCcw size={11} /> Regen
+            </button>
+            <button type="button" className="image-slot-btn" onClick={() => onGenerate?.(`${slotId}:exact`)}>
+              <RotateCcw size={11} /> Exact
+            </button>
+          </div>
+        ) : null}
+      </div>
+    );
+  }
+
+  return (
+    <div className="generated-image-block generated-image-placeholder" data-block-id={blockId}>
+      <Image size={28} />
+      <span>{roleLabel}</span>
+      {mode === "edit" ? (
+        <button type="button" className="image-slot-generate-btn" onClick={() => onGenerate?.(slotId)}>
+          Generate image
+        </button>
+      ) : null}
+    </div>
+  );
 }
