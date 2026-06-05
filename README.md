@@ -8,7 +8,7 @@ The core product direction is a schema-driven poster compiler, not "LLM directly
 user prompt + sources
   -> poster project spec
   -> source documents and evidence
-  -> visual assets
+  -> visual assets (deterministic + AI-generated)
   -> browser-native HTML poster canvas
   -> QA loop
   -> A0 print PDF
@@ -19,14 +19,30 @@ user prompt + sources
 
 The `PosterProject` / `poster.json` spec is the source of truth. The React HTML/CSS poster canvas is the canonical visual renderer. PDF, PPTX, PNG, images, traces, QA results, and bundles are generated outputs.
 
+## Environment
+
+Copy `.env.example` to `.env.local` and fill in your values:
+
+```bash
+cp .env.example .env.local
+```
+
+| Variable | Required | Description |
+|---|---|---|
+| `VITE_OPENAI_API_KEY` | Yes (for AI features) | OpenAI API key for poster generation and in-canvas image generation |
+| `VITE_OPENAI_MODEL` | No | Chat model for poster generation (default: `gpt-4o`) |
+| `VITE_OPENAI_IMAGE_MODEL` | No | Image model for in-canvas generation (default: `gpt-image-2`) |
+| `VITE_IMAGEGEN_URL` | No | Route in-canvas image generation to a self-hosted service instead of calling OpenAI directly. POST `{ model, prompt, size, output_format, background }`, expect `{ b64_json }` back. |
+
 ## Commands
 
 ```bash
 npm install
 npm run dev
 npm run build
+npm run test:run
 npm run image:plan -- --visual vis_generated_panel
-OPENAI_API_KEY=... npm run image:generate -- --visual vis_generated_panel --model gpt-image-1.5
+OPENAI_API_KEY=... npm run image:generate -- --visual vis_generated_panel --model gpt-image-2
 npx playwright install chromium
 npm run export:check -- --poster spec/example-poster.json
 npm run export:pdf -- --poster spec/example-poster.json
@@ -36,21 +52,22 @@ npm run export:pptx:html -- --poster public/generated-assets/poster_demo_fraud_m
 
 `npm run dev` starts Vite on `0.0.0.0`.
 
-`npm run image:plan` writes prompt metadata without calling OpenAI. `npm run image:generate` calls the OpenAI Images API from Node, saves the PNG and metadata under `public/generated-assets/`, and writes an updated importable poster JSON. The sample spec keeps image asset model names configurable; the current OpenAI image-generation docs list `gpt-image-1.5`, `gpt-image-1`, and `gpt-image-1-mini`, so pass `--model gpt-image-1.5` if a future placeholder model name is rejected.
+`npm run image:plan` writes prompt metadata without calling OpenAI. `npm run image:generate` calls the OpenAI Images API from Node, saves the image and sidecar JSON under `public/generated-assets/`, and writes an updated importable poster JSON.
 
-`npm run export:check` renders poster JSON through the shared React poster canvas and writes a layout QA report without producing the final PDF. It checks clipping, section overlap, elements outside the A0 canvas, zero-size regions, and missing image assets.
+`npm run export:check` renders poster JSON through the shared React poster canvas and writes a layout QA report without producing the final PDF.
 
-`npm run export:pdf` runs the same layout preflight, writes a static HTML export document, and creates a print-ready A0 PDF with Playwright. For landscape posters the output is `1189mm x 841mm`; for portrait posters it is `841mm x 1189mm`. The script writes the layout QA report beside the PDF.
+`npm run export:pdf` runs layout preflight, writes a static HTML export document, and creates a print-ready A0 PDF with Playwright. Landscape output is `1189mm × 841mm`; portrait is `841mm × 1189mm`.
 
-`npm run export:screen` renders the same A0 poster composition into a single 1920x1080 PDF page for virtual poster sessions. Aspect ratio is preserved and the poster is letterboxed using the poster background colour.
+`npm run export:screen` renders the A0 poster into a single 1920×1080 PDF page for virtual poster sessions.
 
-`npm run export:pptx:html` is now a compatibility path. It captures the HTML poster canvas and places that capture into an actual A0-sized PPTX slide. It is useful when a PowerPoint file is required, but the browser-native HTML canvas and A0 PDF are the fidelity targets.
+`npm run export:pptx:html` is a compatibility path that captures the HTML poster canvas into an A0-sized PPTX slide.
 
 ## Current Stack
 
-- Vite
-- React
-- TypeScript
+- Vite + React + TypeScript
+- Recharts (bar, line, area, pie, scatter, histogram charts)
+- KaTeX / react-katex (equation rendering)
+- Mermaid (flow diagram rendering)
 - lucide-react
 - @dnd-kit
 - jszip
@@ -58,55 +75,62 @@ npm run export:pptx:html -- --poster public/generated-assets/poster_demo_fraud_m
 - PptxGenJS
 - npm
 
-Python is intentionally not the app core. It can be added later with `uv` for data science helpers such as Pandas summaries, sklearn metrics, SHAP, notebook processing, or statistical analysis.
+Python is intentionally not the app core. It can be added later with `uv` for data science helpers.
 
 ## Current Features
 
+### Poster Generation
 - Mode-based workspace for Generate, Edit, Review, and Export.
-- Prompt-driven poster generation flow with an outline confirmation step before full generation.
-- Typed `PosterProject` model with metadata, sources, source documents, evidence, claim map, sections, visuals, assets, traces, QA results, and references.
-- Runtime `PosterProject` validation for JSON import, including nested shape and cross-reference checks.
+- Prompt-driven poster generation with an outline confirmation step before full generation.
+- LLM-backed generation (via `VITE_OPENAI_API_KEY`) with deterministic fallback when no key is set.
+- Real-source generation path: attach Confluence, GitLab, web, or local file sources and the generator derives sections, visuals, and claims from evidence extracted from those documents.
+- Typed `PosterProject` model with metadata, sources, source documents, evidence, claim map, sections, visuals, assets, image slots, traces, QA results, and references.
+- Runtime `PosterProject` validation for JSON import with nested shape and cross-reference checks.
 - Schema migration chain for legacy imported posters.
-- Mock source package for Confluence, GitLab, research paper, and web-page style sources.
-- Mock source connector capability metadata and a clear acquisition/interpretation boundary.
-- Source mode warning when Web or Local modes are selected while search results are still mock-backed.
-- Evidence panel showing source summaries, source type/trust badges, claim confidence, poster locations, and linked evidence snippets.
+
+### Visual Renderers
+- Full Recharts renderers for bar chart, line chart, area chart, pie/donut, scatter plot, histogram, and heatmap.
+- KaTeX renderer for LaTeX equations (inline and display mode).
+- Mermaid renderer for flow diagrams (lazy-loaded, SSR-safe).
+- SVG renderer for network graphs with circular layout and directional edges.
+- HTML table renderer for data tables.
+- Deterministic renderers for confusion matrix, Sankey-style flow, timeline, Gantt, metric card, and code block.
+- Visual registry (`src/visuals/visualRegistry.ts`) with 15 typed visual definitions, default data, and editable field schemas.
+- VisualPicker modal with category tabs (All / Charts / Diagrams / Equations / Tables) and mini previews.
+- VisualDataEditor with live editable fields (text, number, boolean, array-of-strings, array-of-numbers, textarea).
+- Error boundary on every renderer — one broken visual cannot crash the poster.
+
+### In-Canvas Image Generation
+- `GeneratedImageSlot` domain type tracking `assetId`, `outputFormat`, `seed`, `contentRegions`, and dimensions.
+- `generated_image` block type in sections: renders a placeholder with a "Generate image" button until generated, then a draggable image.
+- In-browser image generation via `src/services/imageGen.ts`: calls OpenAI `gpt-image-2` (or `VITE_OPENAI_IMAGE_MODEL`) directly, or POSTs to `VITE_IMAGEGEN_URL` if set for server-side key management.
+- "Regen" and "Regen (exact)" buttons — exact mode appends a composition-preservation instruction to the prompt and uses the stored seed.
+- Pointer-drag pan on generated images to adjust `objectPosition` without regenerating.
+- Sidecar JSON loading: when `assetId` is set, the canvas fetches `/generated-assets/{assetId}.json` to populate `seed` and `contentRegions` from the image-gen CLI's output.
+- Content region overlays (title/body/chart zones) shown in edit mode over generated images.
+- Theme background strategy derived from `src/themes/imagegen-themes.json`: SVG and svg-hybrid themes (16 themes) fill immediately from `public/theme-backgrounds/`; raster themes (44 themes) use the generate button.
+- `ThemeMotifLayer` wired to the canvas article for SVG/svg-hybrid themes.
+- Standard slots (`background`, `hero_illustration`, `section_art`) initialised on poster creation; `hero_illustration` skipped for low-density themes (7 themes).
+- `buildLayoutSpec` produces a `layout-spec.json` for the `image-gen` CLI (`posterforge-assets generate-for-layout`).
+
+### Canvas and Editor
+- Shared `PosterCanvas` component used by preview, editor, and A0 PDF export.
+- `EditablePosterCanvas` wraps the canvas with full in-canvas generation state: slot generation queue, progress indicators, sidecar callback, and image position updates wired through `onPosterChange`.
+- Continuous zoom controls, fit snapping, section focus zoom, layout check overlay, minimap, and virtual 16:9 preview mode.
+- Drag-to-reorder sections, section visibility toggle, span/emphasis controls, selected-section toolbar.
+- Cmd+K text block revision flow with accept/reject diff.
+- VisualPicker wired into the Canvas Inspector "Add visual" button.
+
+### Themes
+- 60 themes defined in `imagegen-themes.json` with `backgroundStrategy`, `density`, `htmlTokens`, `typography`, `chartStyle`, `diagramStyle`, and image prompt prefixes.
 - Theme and palette separation with swatch-based theme selection and opt-in palette override.
 - NatWest Group theme and palette scoped to explicit selection.
-- Typed layout templates:
-  - three-column academic
-  - results-first
-  - timeline/process
-  - dashboard poster
-  - comic-strip narrative
-  - case-study poster
-- Visual registry grouped by purpose:
-  - model performance
-  - explainability
-  - flow/process
-  - scientific/technical
-  - data quality
-  - other/generated assets
-- Typed visual data parsers for deterministic renderer inputs.
-- Lightweight deterministic renderers/placeholders for confusion matrix, Sankey-style flow, table, timeline, Gantt, metric card, Mermaid source, math source, code block, and generated asset slots.
-- Typed visual inspector controls for metric cards, tables, source/code/math visuals, confusion matrices, and generated image prompts, with JSON repair fallback.
-- Aspect-ratio-aware generated image placeholders with nearest OpenAI Images API size labels.
-- GPT Image asset planning/generation script for non-factual backgrounds, comic panels, and section art, with prompt/model/theme/palette metadata preserved.
-- Derived renderer summaries for confusion matrix metrics, Sankey flow shares, and Gantt timeline segments.
-- Structured trace UI showing observable work, not hidden reasoning.
-- QA panel with actionable issues, canvas navigation, renderer data-shape checks, print/virtual output-intent checks, preview density risks, and a simple safe auto-fix for generated references.
-- Poster JSON import, export, and reset.
-- Export job/artifact model with centralized readiness checks.
-- Shared React poster canvas used by preview, editor, and A0 PDF export.
-- Continuous zoom controls, fit snapping, section focus zoom, layout check overlay, minimap, and virtual 16:9 preview mode.
-- Structured browser editing controls for section order, visibility, span/emphasis, text block copy, drag-to-reorder, selected-section toolbar actions, and section regeneration review.
-- Cmd+K text block revision flow with accept/reject diff.
-- Export capability panel with poster JSON, A0 PDF, virtual session PDF, PPTX compatibility snapshot, and project bundle ZIP available; editable HTML project and PNG marked as planned.
-- First-pass PptxGenJS compiler for one-slide editable poster export with native text, claim/source cards, lightweight native visual renderers, and generated image embedding when asset URLs are available.
-- Playwright-backed high-fidelity HTML render to PPTX export script with PNG capture and DOM measurement output.
-- Playwright-backed A0 PDF export script with static HTML output and DOM layout preflight.
-- HTML preview artifact descriptor for project bundles and export QA.
-- HTML poster preview.
+
+### QA and Export
+- QA panel with actionable issues, canvas navigation, renderer data-shape checks, print/virtual output-intent checks, preview density risks, and auto-fix for generated references.
+- Export capability panel: poster JSON, A0 PDF, virtual session PDF, PPTX snapshot, and project bundle ZIP.
+- First-pass PptxGenJS compiler for editable poster export with native text, claim/source cards, and generated image embedding.
+- Playwright-backed A0 PDF and screen PDF export scripts.
 
 ## Source-Grounding Rules
 
@@ -120,25 +144,34 @@ Python is intentionally not the app core. It can be added later with `uv` for da
 
 ```text
 src/
-  app/          app-level re-exports
-  components/   React UI panels
+  components/   React UI panels (PosterCanvas, EditablePosterCanvas, VisualPicker, VisualDataEditor, ThemeMotifLayer, …)
   data/         sample PosterProject data
-  domain/       poster types, generator, evidence helpers, compatibility re-exports
-  exports/      export model, readiness checks, JSON downloads, bundle manifest, preview descriptor
-  layouts/      typed layout template registry
+  domain/       poster types, generator, evidence helpers, validation
+  exports/      export model, readiness checks, JSON downloads, bundle manifest
+  layouts/      layout template registry, buildLayoutSpec
   qa/           QA rules and safe fixes
-  renderers/    deterministic visual renderers and placeholders
+  renderers/    deterministic and chart visual renderers (VisualRenderer)
+  services/     imageGen (in-browser image generation service)
   sources/      source connector interfaces and mock connectors
-  themes/       theme and palette definitions
-  visuals/      visual registry definitions
+  themes/       theme/palette definitions, imagegen-themes.json
+  visuals/      visual registry (visualRegistry.ts)
+
+public/
+  theme-backgrounds/   SVG backgrounds for 16 svg/svg-hybrid themes
+  generated-assets/    output dir for image-gen CLI (images + sidecar JSON)
+
+scripts/
+  generate-image-asset.mjs   Node CLI for offline/production image generation
 ```
 
 Supporting files:
 
 ```text
+.env.example
 spec/poster.schema.json
 spec/example-poster.json
 docs/architecture.md
+docs/plans/
 ```
 
 ## Near-Term Roadmap
@@ -153,32 +186,24 @@ docs/architecture.md
    - separate project results from literature claims
    - citation quality checks
 
-3. Improve deterministic renderers:
-   - Plotly charts
-   - Mermaid SVG rendering
-   - KaTeX or MathJax math rendering
-   - Shiki code highlighting
-   - richer table/timeline/Gantt renderers
-
-4. Strengthen QA:
-   - colour contrast
-   - chart clipping
+3. Strengthen QA:
+   - colour contrast checks
+   - chart clipping detection
    - QR scanability
-   - visual hierarchy
+   - visual hierarchy scoring
 
-5. Strengthen export implementations:
+4. Strengthen export implementations:
    - editable HTML project package
    - Playwright PNG preview export
-   - optional richer PptxGenJS compatibility export where practical
+   - optional richer PptxGenJS compatibility export
 
 ## Long-Term Roadmap
 
 - Browser-native editable poster project package.
 - Playwright PDF/PNG render checks.
-- Optional richer PptxGenJS PowerPoint compatibility compiler.
 - Confluence and GitLab source access through Kiro MCP.
 - Thin Kiro skill wrapper that calls the PosterForge engine.
-- Judge/improve mode later, including rubric scoring and improvement suggestions.
+- Judge/improve mode with rubric scoring and improvement suggestions.
 - Presenter notes and 60-second pitch generation.
 - Online and physical poster session support.
 - Human judging support, with humans as final decision-makers.
