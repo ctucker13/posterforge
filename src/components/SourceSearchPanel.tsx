@@ -1,79 +1,45 @@
 import { useMemo, useState } from "react";
-import { AlertTriangle, Database, FilePlus2, FileSearch, Globe2, Search } from "lucide-react";
+import { FilePlus2, FileSearch, Github, Globe2 } from "lucide-react";
 import type { PosterProject, SourceDocument } from "../domain/poster";
-import type { GenerationOptions } from "../domain/generator";
 import { buildClaimMap } from "../domain/evidence";
-import { createReferencesFromSources } from "../sources/mockConnectors";
-import { getMockSourceArtifacts, mockSourceConnectors } from "../sources/mockConnectors";
-import type { SourceConnector, SourceInterpretation, SourceSearchResult } from "../sources";
+import { createReferencesFromSources } from "../sources/sourceFixtures";
+import type { SourceInterpretation } from "../sources";
 import { fetchRepoFiles, parseRepoUrl, type RepoFile } from "../sources/repoConnectors";
 
 interface SourceSearchPanelProps {
   poster: PosterProject;
-  sourceMode: GenerationOptions["sourceMode"];
   onPosterChange: (poster: PosterProject) => void;
+  onUseExampleRepo?: () => void;
 }
 
-interface DecoratedSearchResult extends SourceSearchResult {
-  connectorName: string;
-}
+const GABECHOICE_REPO_URL = "https://github.com/ctucker13/gabechoice";
 
-type PanelMode = "search" | "url";
-
-export function SourceSearchPanel({ poster, sourceMode, onPosterChange }: SourceSearchPanelProps) {
-  const [mode, setMode] = useState<PanelMode>("search");
-
-  // keyword-search state
-  const [query, setQuery] = useState("fraud monitoring calibration");
-  const [connectorId, setConnectorId] = useState("all");
-  const [results, setResults] = useState<DecoratedSearchResult[]>([]);
-
-  // repo-url state
-  const [repoUrl, setRepoUrl] = useState("");
+export function SourceSearchPanel({ poster, onPosterChange, onUseExampleRepo }: SourceSearchPanelProps) {
+  const [repoUrl, setRepoUrl] = useState(GABECHOICE_REPO_URL);
   const [repoFiles, setRepoFiles] = useState<RepoFile[]>([]);
 
   // shared state
   const [selectedDocument, setSelectedDocument] = useState<SourceDocument | null>(poster.sourceDocuments?.[0] ?? null);
   const [selectedInterpretation, setSelectedInterpretation] = useState<SourceInterpretation | null>(null);
-  const [status, setStatus] = useState("Search mock connectors, or paste a GitHub / GitLab repo URL.");
+  const [status, setStatus] = useState("Use the GabeChoice example or paste another GitHub / GitLab repo URL.");
   const [isFetching, setIsFetching] = useState(false);
 
   const attachedSourceIds = useMemo(() => new Set(poster.sources.map((s) => s.id)), [poster.sources]);
 
-  // ── Keyword search ──────────────────────────────────────────────────────────
-
-  async function handleSearch() {
-    const connectors = getActiveConnectors(connectorId);
-    const connectorResults = await Promise.all(
-      connectors.map(async (connector) =>
-        (await connector.search(query)).map((result) => ({
-          ...result,
-          connectorName: connector.name,
-        })),
-      ),
-    );
-    const nextResults = connectorResults.flat();
-    setResults(nextResults);
-    setStatus(nextResults.length === 0 ? "No mock sources matched the query." : `${nextResults.length} result${nextResults.length === 1 ? "" : "s"} found.`);
-  }
-
-  async function handleFetch(result: DecoratedSearchResult) {
-    const connector = mockSourceConnectors.find((c) => c.id === result.ref.connectorId);
-    if (!connector) {
-      setStatus(`Connector '${result.ref.connectorId}' not available.`);
-      return;
-    }
-    const document = await connector.fetch(result.ref);
-    const interpretation = getMockSourceArtifacts(document.source.id) ?? null;
-    setSelectedDocument(document);
-    setSelectedInterpretation(interpretation);
-    setStatus(`Loaded ${document.title}.`);
-  }
-
   // ── Repo URL fetch ──────────────────────────────────────────────────────────
 
   async function handleRepoFetch() {
-    const parsed = parseRepoUrl(repoUrl);
+    await fetchRepoUrl(repoUrl);
+  }
+
+  async function handleExampleRepoFetch() {
+    onUseExampleRepo?.();
+    setRepoUrl(GABECHOICE_REPO_URL);
+    await fetchRepoUrl(GABECHOICE_REPO_URL);
+  }
+
+  async function fetchRepoUrl(url: string) {
+    const parsed = parseRepoUrl(url);
     if (!parsed) {
       setStatus("Enter a valid GitHub or GitLab repo URL (e.g. https://github.com/owner/repo).");
       return;
@@ -131,6 +97,31 @@ export function SourceSearchPanel({ poster, sourceMode, onPosterChange }: Source
     setStatus(`Attached ${interpretation.source.title}.`);
   }
 
+  function handleAttachAllRepoFiles() {
+    if (repoFiles.length === 0) {
+      setStatus("Fetch a repository before attaching all files.");
+      return;
+    }
+
+    const interpretations = repoFiles.map((file) => file.interpretation);
+    const sources = upsertById(poster.sources, interpretations.map((item) => item.source));
+    const sourceDocuments = upsertById(poster.sourceDocuments ?? [], interpretations.map((item) => item.sourceDocument));
+    const sourceSummaries = upsertByKey(poster.sourceSummaries ?? [], interpretations.map((item) => item.sourceSummary), "source_id");
+    const evidence = upsertById(poster.evidence ?? [], interpretations.flatMap((item) => item.evidence));
+    const claimMap = buildClaimMap(poster.claims, poster.sections, evidence);
+
+    onPosterChange({
+      ...poster,
+      sources,
+      sourceDocuments,
+      sourceSummaries,
+      evidence,
+      claimMap,
+      references: createReferencesFromSources(sources),
+    });
+    setStatus(`Attached ${repoFiles.length} repository file${repoFiles.length === 1 ? "" : "s"}. Generate will use these sources.`);
+  }
+
   // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
@@ -141,99 +132,50 @@ export function SourceSearchPanel({ poster, sourceMode, onPosterChange }: Source
       </div>
 
       <div className="source-search-body">
-        {sourceMode !== "mock" ? (
-          <div className="source-mode-warning" role="alert">
-            <AlertTriangle size={15} />
+        <button type="button" className="github-example-action" onClick={handleExampleRepoFetch} disabled={isFetching}>
+          <Github size={16} /> {isFetching ? "Fetching GabeChoice…" : "Use GabeChoice example"}
+        </button>
+
+        <div className="source-search-controls">
+          <label className="field">
             <span>
-              {sourceMode === "web" ? "Web" : "Local"} connector is not yet live. Search results are mock data. Real connector support is planned.
+              <Globe2 size={15} /> GitHub or GitLab repo URL
             </span>
-          </div>
-        ) : null}
+            <input
+              value={repoUrl}
+              onChange={(e) => setRepoUrl(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleRepoFetch()}
+              placeholder="https://github.com/owner/repo"
+            />
+          </label>
 
-        <div className="source-mode-toggle view-mode-toggle">
-          <button type="button" className={mode === "search" ? "active" : ""} onClick={() => setMode("search")}>
-            <Search size={13} /> Search
+          <button type="button" onClick={handleRepoFetch} disabled={isFetching}>
+            <Globe2 size={16} /> {isFetching ? "Fetching…" : "Fetch files"}
           </button>
-          <button type="button" className={mode === "url" ? "active" : ""} onClick={() => setMode("url")}>
-            <Globe2 size={13} /> Repo URL
-          </button>
+
+          {repoFiles.length > 0 ? (
+            <button type="button" onClick={handleAttachAllRepoFiles}>
+              <FilePlus2 size={16} /> Attach all files
+            </button>
+          ) : null}
         </div>
-
-        {mode === "search" ? (
-          <div className="source-search-controls">
-            <label className="field">
-              <span>
-                <Search size={15} /> Search query
-              </span>
-              <input value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSearch()} />
-            </label>
-
-            <label className="field">
-              <span>
-                <Database size={15} /> Connector
-              </span>
-              <select value={connectorId} onChange={(e) => setConnectorId(e.target.value)}>
-                <option value="all">All mock connectors</option>
-                {mockSourceConnectors.map((c) => (
-                  <option value={c.id} key={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <button type="button" onClick={handleSearch}>
-              <Search size={16} /> Search
-            </button>
-          </div>
-        ) : (
-          <div className="source-search-controls">
-            <label className="field">
-              <span>
-                <Globe2 size={15} /> GitHub or GitLab repo URL
-              </span>
-              <input
-                value={repoUrl}
-                onChange={(e) => setRepoUrl(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleRepoFetch()}
-                placeholder="https://github.com/owner/repo"
-              />
-            </label>
-
-            <button type="button" onClick={handleRepoFetch} disabled={isFetching}>
-              <Globe2 size={16} /> {isFetching ? "Fetching…" : "Fetch files"}
-            </button>
-          </div>
-        )}
 
         <div className="source-search-status">{status}</div>
 
-        {mode === "search" ? (
-          <div className="source-results">
-            {results.map((result) => (
-              <button type="button" key={`${result.ref.connectorId}-${result.ref.sourceId}`} onClick={() => handleFetch(result)}>
-                <span>{result.connectorName}</span>
-                <strong>{result.title}</strong>
-                <p>{result.snippet}</p>
-              </button>
-            ))}
-          </div>
-        ) : (
-          <div className="source-results">
-            {repoFiles.map((file) => (
-              <button
-                type="button"
-                key={file.path}
-                onClick={() => handleSelectRepoFile(file)}
-                className={selectedDocument?.id === file.interpretation.sourceDocument.id ? "selected" : ""}
-              >
-                <span>{file.interpretation.source.type}</span>
-                <strong>{file.path}</strong>
-                <p>{file.interpretation.sourceSummary.summary.slice(0, 120)}</p>
-              </button>
-            ))}
-          </div>
-        )}
+        <div className="source-results">
+          {repoFiles.map((file) => (
+            <button
+              type="button"
+              key={file.path}
+              onClick={() => handleSelectRepoFile(file)}
+              className={selectedDocument?.id === file.interpretation.sourceDocument.id ? "selected" : ""}
+            >
+              <span>{file.interpretation.source.type}</span>
+              <strong>{file.path}</strong>
+              <p>{file.interpretation.sourceSummary.summary.slice(0, 120)}</p>
+            </button>
+          ))}
+        </div>
 
         {selectedDocument ? (
           <article className="source-document-viewer">
@@ -259,11 +201,6 @@ export function SourceSearchPanel({ poster, sourceMode, onPosterChange }: Source
       </div>
     </section>
   );
-}
-
-function getActiveConnectors(connectorId: string): SourceConnector[] {
-  if (connectorId === "all") return mockSourceConnectors;
-  return mockSourceConnectors.filter((c) => c.id === connectorId);
 }
 
 function upsertById<Item extends { id: string }>(current: Item[], incoming: Item[]) {

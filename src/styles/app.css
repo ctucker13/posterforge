@@ -510,11 +510,11 @@ textarea {
 
 .theme-card-grid button {
   display: grid;
-  min-height: 86px;
+  min-height: 148px;
   gap: 6px;
   border: 1px solid #d8dee6;
   border-radius: 8px;
-  padding: 9px;
+  padding: 8px;
   color: #344054;
   text-align: left;
   background: #ffffff;
@@ -524,6 +524,41 @@ textarea {
 .theme-card-grid button.selected {
   border-width: 2px;
   background: #f8fafc;
+}
+
+.theme-preview {
+  position: relative;
+  min-height: 64px;
+  overflow: hidden;
+  border-radius: 6px;
+  border: 1px solid rgba(16, 24, 40, 0.1);
+  background-position: center;
+  background-size: cover;
+}
+
+.theme-preview::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, transparent 52%, rgba(16, 24, 40, 0.58)),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.14), transparent 44%);
+  pointer-events: none;
+}
+
+.theme-preview small {
+  position: absolute;
+  right: 6px;
+  bottom: 5px;
+  z-index: 1;
+  padding: 2px 6px;
+  border-radius: 999px;
+  color: #ffffff;
+  background: rgba(16, 24, 40, 0.68);
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1.2;
+  text-transform: uppercase;
 }
 
 .theme-card-grid strong {
@@ -724,6 +759,10 @@ textarea {
 }
 
 .poster-settings-disclosure {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  max-height: calc(100vh - 190px);
+  min-height: 0;
   overflow: hidden;
   border: 1px solid #d8dee6;
   border-radius: 8px;
@@ -752,10 +791,19 @@ textarea {
 }
 
 .poster-settings-disclosure .project-editor {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-height: 0;
   border: 0;
   border-top: 1px solid #e4e9ef;
   border-radius: 0;
   box-shadow: none;
+}
+
+.poster-settings-disclosure .project-editor-body {
+  max-height: calc(100vh - 320px);
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .workspace-tab-panel {
@@ -950,7 +998,8 @@ textarea {
 }
 
 .source-search-controls button,
-.source-document-header button {
+.source-document-header button,
+.github-example-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -962,6 +1011,20 @@ textarea {
   font-weight: 800;
   background: #ffffff;
   cursor: pointer;
+}
+
+.github-example-action {
+  width: 100%;
+  color: #24292f;
+  background: #f6f8fa;
+}
+
+.source-search-controls button:disabled,
+.source-document-header button:disabled,
+.github-example-action:disabled {
+  color: #98a2b3;
+  background: #f2f4f7;
+  cursor: not-allowed;
 }
 
 .source-search-status {
@@ -1582,32 +1645,6 @@ textarea {
   position: relative;
 }
 
-.poster-minimap {
-  position: absolute;
-  right: 12px;
-  bottom: 12px;
-  z-index: 20;
-  overflow: hidden;
-  border: 1px solid rgba(16, 24, 40, 0.22);
-  border-radius: 6px;
-  background: #ffffff;
-  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.18);
-  pointer-events: none;
-}
-
-.poster-minimap-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  transform-origin: top left;
-}
-
-.poster-minimap-viewport {
-  position: absolute;
-  border: 2px solid #0f766e;
-  background: rgba(15, 118, 110, 0.16);
-}
-
 .virtual-screen-frame {
   overflow: auto;
   flex-shrink: 0;
@@ -2195,6 +2232,7 @@ textarea {
   overflow: hidden;
   width: 100%;
   height: 100%;
+  contain: layout paint;
 }
 
 .poster-output-frame .matrix,
@@ -2253,6 +2291,60 @@ textarea {
   font-size: 34px;
 }
 
+.poster-output-frame .visual-header {
+  flex: 0 0 auto;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.poster-output-frame .visual-header h3 {
+  overflow-wrap: anywhere;
+}
+
+.poster-output-frame .visual-header span {
+  padding: 5px 10px;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.poster-output-frame .mermaid-diagram {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  place-items: center;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+  line-height: 1.15;
+}
+
+.poster-output-frame .mermaid-diagram svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.poster-output-frame .mermaid-diagram foreignObject,
+.poster-output-frame .mermaid-diagram .nodeLabel,
+.poster-output-frame .mermaid-diagram .label,
+.poster-output-frame .mermaid-diagram span,
+.poster-output-frame .mermaid-diagram p,
+.poster-output-frame .mermaid-diagram div {
+  max-width: none;
+  margin: 0;
+  overflow: visible;
+  font-size: 14px;
+  line-height: 1.15;
+  white-space: normal;
+}
+
+.poster-output-frame .mermaid-diagram .edgeLabel,
+.poster-output-frame .mermaid-diagram .edgeLabel p {
+  font-size: 12px;
+}
+
 .poster-output-frame .matrix-cell {
   min-height: 142px;
   padding: 24px;
@@ -2263,14 +2355,34 @@ textarea {
 }
 
 .poster-output-frame .flow-row {
-  grid-template-columns: minmax(260px, 1fr) minmax(260px, 1.15fr) 130px minmax(150px, auto);
-  gap: 22px;
+  grid-template-columns: minmax(170px, 1fr) minmax(160px, 1.05fr) 78px minmax(120px, 0.8fr);
+  gap: 14px;
 }
 
 .poster-output-frame .flow-row span,
 .poster-output-frame .gantt-row strong,
 .poster-output-frame .data-table {
-  font-size: 28px;
+  font-size: 22px;
+}
+
+.poster-output-frame .flow-list {
+  gap: 12px;
+}
+
+.poster-output-frame .flow-row span,
+.poster-output-frame .flow-row em {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.poster-output-frame .flow-row strong,
+.poster-output-frame .flow-row em {
+  font-size: 18px;
+  line-height: 1.1;
+}
+
+.poster-output-frame .flow-track {
+  height: 22px;
 }
 
 .poster-output-frame .diagram-source,
@@ -2285,6 +2397,89 @@ textarea {
 
 .poster-output-frame .metric-card strong {
   font-size: 86px;
+}
+
+.poster-output-frame .table-wrap {
+  min-width: 0;
+}
+
+.poster-output-frame .data-table {
+  table-layout: fixed;
+}
+
+.poster-output-frame .data-table th,
+.poster-output-frame .data-table td {
+  padding: 9px 10px;
+  overflow-wrap: anywhere;
+  line-height: 1.15;
+}
+
+.poster-output-frame .data-table th {
+  font-size: 16px;
+}
+
+.poster-output-frame .timeline-list {
+  gap: 10px;
+  justify-content: center;
+}
+
+.poster-output-frame .timeline-list li {
+  border-left-width: 4px;
+  padding-left: 26px;
+}
+
+.poster-output-frame .timeline-marker {
+  left: -18px;
+  width: 34px;
+  height: 34px;
+  border-width: 3px;
+  font-size: 16px;
+}
+
+.poster-output-frame .timeline-list time {
+  font-size: 16px;
+  line-height: 1.1;
+}
+
+.poster-output-frame .timeline-list strong {
+  margin-top: 3px;
+  overflow-wrap: anywhere;
+  font-size: 20px;
+  line-height: 1.1;
+}
+
+.poster-output-frame .timeline-list p {
+  display: -webkit-box;
+  margin-top: 4px;
+  overflow: hidden;
+  color: #526071;
+  font-size: 17px;
+  line-height: 1.15;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.poster-output-frame .poster-card.span-3 .timeline-list {
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  align-content: stretch;
+  align-items: start;
+  gap: 18px;
+}
+
+.poster-output-frame .poster-card.span-3 .timeline-list li {
+  border-top: 4px solid var(--theme-accent);
+  border-left: 0;
+  padding-top: 22px;
+  padding-left: 0;
+}
+
+.poster-output-frame .poster-card.span-3 .timeline-marker {
+  top: -18px;
+  left: 0;
+}
+
+.poster-output-frame .poster-card.span-3 .timeline-list time {
+  margin-top: 4px;
 }
 
 .poster-output-frame .text-claim-badges {
@@ -3345,6 +3540,139 @@ textarea {
   background:
     linear-gradient(135deg, var(--theme-primary), color-mix(in srgb, var(--theme-primary), var(--theme-accent) 35%)),
     repeating-linear-gradient(90deg, color-mix(in srgb, var(--theme-accent), transparent 78%) 0 2px, transparent 2px 24px);
+}
+
+/* ── Generated-theme component skins ──────────────────────────────────────────
+   These keep deterministic HTML/SVG content visually aligned with the
+   generated theme language. GPT-image should create empty themed surfaces and
+   backgrounds; factual labels, values, tables, and diagrams stay in HTML/SVG. */
+
+.poster-whiteboard-explainer {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.88), rgba(248,250,252,0.94)),
+    color-mix(in srgb, var(--theme-bg), white 74%);
+}
+
+.poster-whiteboard-explainer .poster-card,
+.poster-whiteboard-explainer .visual-box {
+  border: 2px solid color-mix(in srgb, var(--theme-primary), white 62%);
+  border-radius: 6px;
+  box-shadow: none;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.95), rgba(248,250,252,0.9)),
+    repeating-linear-gradient(0deg, transparent 0 31px, rgba(37,99,235,0.06) 31px 32px);
+}
+
+.poster-whiteboard-explainer .poster-card h3,
+.poster-whiteboard-explainer .visual-header h3 {
+  color: color-mix(in srgb, var(--theme-primary), #111827 14%);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--theme-accent), transparent 35%);
+  text-decoration-thickness: 3px;
+  text-underline-offset: 5px;
+}
+
+.poster-whiteboard-explainer .visual-header span,
+.poster-whiteboard-explainer .metric-card span {
+  border: 1px solid color-mix(in srgb, var(--theme-primary), white 56%);
+  border-radius: 999px;
+  background: #ffffff;
+}
+
+.poster-whiteboard-explainer .data-table th,
+.poster-whiteboard-explainer .data-table td {
+  border-bottom-style: dashed;
+}
+
+.poster-whiteboard-explainer .flow-track,
+.poster-whiteboard-explainer .gantt-track {
+  border: 2px dashed color-mix(in srgb, var(--theme-primary), white 55%);
+  background: rgba(255,255,255,0.72);
+}
+
+.poster-whiteboard-explainer .flow-bar,
+.poster-whiteboard-explainer .gantt-bar,
+.poster-whiteboard-explainer .timeline-marker {
+  border-radius: 999px;
+  background: var(--theme-accent);
+}
+
+.poster-whiteboard-explainer .mermaid-diagram svg {
+  filter: saturate(0.92);
+}
+
+.poster-blueprint-engineering {
+  background:
+    linear-gradient(180deg, rgba(11,61,111,0.94), rgba(8,38,77,0.98)),
+    var(--theme-primary);
+}
+
+.poster-blueprint-engineering .poster-card,
+.poster-blueprint-engineering .visual-box {
+  border: 1px solid rgba(226,246,255,0.52);
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1px rgba(226,246,255,0.14);
+  color: color-mix(in srgb, var(--theme-ink), white 22%);
+  background:
+    linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px),
+    rgba(7,43,84,0.84);
+  background-size: 22px 22px;
+}
+
+.poster-blueprint-engineering .poster-card h3,
+.poster-blueprint-engineering .visual-header h3 {
+  color: #e6f6ff;
+  font-family: "Aptos Display", Inter, system-ui, sans-serif;
+  text-transform: uppercase;
+}
+
+.poster-blueprint-engineering .poster-card p,
+.poster-blueprint-engineering .poster-card li,
+.poster-blueprint-engineering .data-table,
+.poster-blueprint-engineering .metric-card span {
+  color: rgba(230,246,255,0.86);
+}
+
+.poster-blueprint-engineering .visual-header span {
+  border: 1px solid rgba(226,246,255,0.36);
+  color: #e6f6ff;
+  background: rgba(5,28,56,0.72);
+}
+
+.poster-blueprint-engineering .data-table th {
+  color: #ffffff;
+  background: rgba(226,246,255,0.1);
+}
+
+.poster-blueprint-engineering .data-table th,
+.poster-blueprint-engineering .data-table td {
+  border-color: rgba(226,246,255,0.18);
+}
+
+.poster-blueprint-engineering .flow-track,
+.poster-blueprint-engineering .gantt-track {
+  border: 1px solid rgba(226,246,255,0.28);
+  background: rgba(5,28,56,0.78);
+}
+
+.poster-blueprint-engineering .flow-bar,
+.poster-blueprint-engineering .gantt-bar,
+.poster-blueprint-engineering .timeline-marker {
+  background: #7dd3fc;
+}
+
+.poster-blueprint-engineering .timeline-list li {
+  border-color: rgba(125,211,252,0.72);
+}
+
+.poster-blueprint-engineering .metric-card {
+  background:
+    linear-gradient(135deg, rgba(5,28,56,0.95), rgba(10,75,128,0.82));
+}
+
+.poster-blueprint-engineering .mermaid-diagram svg {
+  filter: invert(0.92) hue-rotate(164deg) saturate(0.8) brightness(1.15);
 }
 
 .registry-groups {

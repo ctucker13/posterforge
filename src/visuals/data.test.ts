@@ -10,6 +10,7 @@ import {
   parseSourceTextData,
   parseTableData,
   parseTimelineData,
+  parseFlowData,
 } from "./data";
 
 function sampleVisualData(id: string) {
@@ -18,15 +19,11 @@ function sampleVisualData(id: string) {
 
 describe("visual data parsers", () => {
   it("parses supported renderer data from the bundled sample poster", () => {
-    expect(parseConfusionMatrixData(sampleVisualData("vis_confusion_matrix")).ok).toBe(true);
-    expect(parseTableData(sampleVisualData("vis_metrics_table")).ok).toBe(true);
-    expect(parseSankeyData(sampleVisualData("vis_sankey")).ok).toBe(true);
-    expect(parseTimelineData(sampleVisualData("vis_monitoring_timeline")).ok).toBe(true);
-    expect(parseGanttData(sampleVisualData("vis_delivery_gantt")).ok).toBe(true);
-    expect(parseSourceTextData(sampleVisualData("vis_mermaid_workflow"), "mermaid_flow").ok).toBe(true);
-    expect(parseSourceTextData(sampleVisualData("vis_calibration_formula"), "math").ok).toBe(true);
-    expect(parseCodeBlockData(sampleVisualData("vis_code_block")).ok).toBe(true);
-    expect(parseMetricCardData(sampleVisualData("vis_metric_card")).ok).toBe(true);
+    expect(parseSourceTextData(sampleVisualData("vis_pipeline_flow"), "mermaid_flow").ok).toBe(true);
+    expect(parseTableData(sampleVisualData("vis_performance_table")).ok).toBe(true);
+    expect(parseFlowData(sampleVisualData("vis_taste_signals")).ok).toBe(true);
+    expect(parseMetricCardData(sampleVisualData("vis_metacritic_coverage")).ok).toBe(true);
+    expect(parseTimelineData(sampleVisualData("vis_build_timeline")).ok).toBe(true);
   });
 
   it("rejects malformed confusion matrix data", () => {

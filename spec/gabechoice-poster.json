@@ -61,7 +61,7 @@
         "trust_level": "high"
       },
       "title": "GabeChoice Build Spec (SPEC.md)",
-      "body": "LangGraph pipeline: fetch_library and fetch_wishlist run in parallel. enrich_games hits Steam appdetails API with SQLite cache (30-day TTL, token-bucket rate limiter at 0.5 req/s). build_taste_profile is an LLM node taking top 20 most-played games and returning a structured TasteProfile with preferred genres, mechanics, vibes, and anti-patterns. rank_and_explain is an LLM node that blends LLM taste-fit (70%) with Metacritic (30%) and writes a 1-2 sentence rationale per game. Tech stack: Python 3.12, uv, Pydantic v2, LangGraph, httpx (async), FastAPI, SQLite, Anthropic SDK and OpenAI SDK behind a thin provider abstraction, vanilla JS frontend. 24 tests covering cache, Steam client, and full pipeline with mocked clients.",
+      "body": "LangGraph pipeline: fetch_library and fetch_wishlist run in parallel. enrich_games hits Steam appdetails API with SQLite cache (30-day TTL, token-bucket rate limiter at 0.5 req/s). build_taste_profile is an LLM node taking top 20 most-played games and returning a structured TasteProfile with preferred genres, mechanics, vibes, and anti-patterns. rank_and_explain is an LLM node that blends LLM taste-fit (70%) with Metacritic (30%) and writes a 1-2 sentence rationale per game. Tech stack: Python 3.12, uv, Pydantic v2, LangGraph, httpx (async), FastAPI, SQLite, Anthropic SDK and OpenAI SDK behind a thin provider abstraction, vanilla JS frontend. 24 tests covering cache, Steam client, and full pipeline with stubbed clients.",
       "metadata": {
         "summary": "Full build spec describing architecture, data models, LLM prompting strategy, node behaviours, and tech stack."
       }
@@ -142,7 +142,7 @@
       "id": "ev_spec_tests",
       "source_id": "src_spec",
       "kind": "metric",
-      "text": "24 tests cover cache behaviour, Steam client, and the full LangGraph pipeline with mocked clients.",
+      "text": "24 tests cover cache behaviour, Steam client, and the full LangGraph pipeline with stubbed clients.",
       "location": "SPEC / Tech stack / tests",
       "confidence": "high"
     },
@@ -312,7 +312,7 @@
         {
           "type": "text",
           "claim_ids": ["claim_taste"],
-          "text": "The LLM analyses the top 20 most-played games and returns a structured taste profile: preferred genres, mechanics, vibes (e.g. atmospheric, competitive, cozy), and anti-patterns. The profile is shown in the UI so the user can see and validate what the system thinks of their taste."
+          "text": "The LLM analyses the top 20 most-played games and returns a structured taste profile covering genres, mechanics, vibes, and anti-patterns."
         },
         {
           "type": "visual_ref",
@@ -324,7 +324,7 @@
       "id": "discussion",
       "type": "discussion",
       "title": "Design decisions and limitations",
-      "layout": { "order": 5, "columnSpan": 1 },
+      "layout": { "order": 5, "columnSpan": 3 },
       "blocks": [
         {
           "type": "text",
@@ -350,28 +350,15 @@
     },
     {
       "id": "vis_score_breakdown",
-      "type": "matrix",
+      "type": "table",
       "title": "Blended scoring weights",
       "source_ids": ["src_readme"],
       "data": {
-        "cells": [
-          {
-            "label": "LLM taste-fit",
-            "value": "70%",
-            "note": "Alignment with preferred genres, mechanics, and vibes",
-            "variant": "primary"
-          },
-          {
-            "label": "Metacritic quality",
-            "value": "30%",
-            "note": "Critical quality signal; missing scores are not penalised",
-            "variant": "accent"
-          }
-        ],
-        "summary": [
-          { "label": "Top-N output", "value": "10 games" },
-          { "label": "Rationale per game", "value": "1–2 sentences" },
-          { "label": "Candidate pool", "value": "Wishlist + library sample" }
+        "columns": ["Signal", "Weight", "Role"],
+        "rows": [
+          { "Signal": "LLM taste-fit", "Weight": "70%", "Role": "Alignment with preferred genres, mechanics, and vibes" },
+          { "Signal": "Metacritic quality", "Weight": "30%", "Role": "Critical quality signal; missing scores are not penalised" },
+          { "Signal": "Rationale", "Weight": "1–2 sentences", "Role": "Plain-language explanation per recommendation" }
         ]
       }
     },
@@ -429,10 +416,35 @@
           { "date": "Step 6–7", "label": "Taste profile + ranking", "detail": "Add LLM nodes; tune prompts against real library." },
           { "date": "Step 8–9", "label": "FastAPI + frontend + polish", "detail": "Wrap in API; render recommendation cards in browser." }
         ]
+      },
+      "options": {
+        "labelStrategy": "wrap timeline labels to two lines"
       }
     }
   ],
-  "assets": [],
+  "assets": [
+    {
+      "id": "asset_gabechoice_hero_banner",
+      "type": "generated_background",
+      "role": "background",
+      "title": "GabeChoice hero banner artwork",
+      "prompt": "Retro time-lab academic poster banner artwork for GabeChoice, a personal agentic Steam game recommender. Show an abstract workstation scene with layered game-library cards, taste-profile signal paths, and a LangGraph-style recommendation pipeline as atmospheric shapes only. Leave a calm readable center-left area for poster typography overlays. Use deep ink, teal, warm amber, muted red, and off-white accents. No readable text, no logos, no exact UI, no charts, no tables, no numbers, no code.",
+      "model": "gpt-image-2",
+      "theme": "retro-time-lab",
+      "palette": "retro-lab",
+      "url": "/generated-assets/asset_gabechoice_hero_banner.png",
+      "width_px": 1392,
+      "height_px": 887,
+      "metadata": {
+        "provider": "openai",
+        "model": "gpt-image-2",
+        "generated_at": "2026-06-05T15:14:18.769Z",
+        "metadata_path": "public/generated-assets/asset_gabechoice_hero_banner.json",
+        "aspect_ratio": "1.57:1",
+        "source_path": "/home/tucker/.codex/generated_images/019e97db-b9a7-7bb1-8f92-4e20cf29b66a/ig_0819c7bf4c510e16016a22e2cac3bc819191c6a6cab8a1ee54.png"
+      }
+    }
+  ],
   "traces": [
     {
       "id": "trace_plan",

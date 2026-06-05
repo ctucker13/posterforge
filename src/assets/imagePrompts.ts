@@ -19,14 +19,16 @@ export const generatedAssetTypes = new Set(["ai_image", "generated_background", 
 
 export function listImageAssetRequests(poster: PosterProject): ImageAssetRequest[] {
   const visualRequests = poster.visuals.flatMap((visual) => {
-    if (!generatedVisualTypes.has(visual.type) || !visual.asset) {
+    if (!generatedVisualTypes.has(visual.type) || !visual.asset || visual.asset.url) {
       return [];
     }
 
     return [toImageAssetRequest(visual.asset, visual)];
   });
 
-  const projectAssetRequests = (poster.assets ?? []).filter((asset) => generatedAssetTypes.has(asset.type)).map((asset) => toImageAssetRequest(asset));
+  const projectAssetRequests = (poster.assets ?? [])
+    .filter((asset) => generatedAssetTypes.has(asset.type) && !asset.url)
+    .map((asset) => toImageAssetRequest(asset));
 
   return [...visualRequests, ...projectAssetRequests];
 }

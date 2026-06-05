@@ -2,8 +2,8 @@ import { type CSSProperties, type KeyboardEvent, type ClipboardEvent, useEffect,
 import { DndContext, closestCenter, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, arrayMove, useSortable, rectSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { AlertTriangle, ArrowDown, ArrowUp, Eye, EyeOff, FileCheck2, GripVertical, Image, Link2, Pencil, RotateCcw, Trash2 } from "lucide-react";
-import type { ContentRegion, GeneratedImageSlot, PosterBlock, PosterClaim, PosterProject, PosterSource, QaIssue } from "../domain/poster";
+import { AlertTriangle, ArrowDown, ArrowUp, Eye, EyeOff, GripVertical, Image, Pencil, RotateCcw, Trash2 } from "lucide-react";
+import type { ContentRegion, GeneratedImageSlot, PosterBlock, PosterProject, QaIssue } from "../domain/poster";
 import type { AssetSidecar } from "../layouts/buildLayoutSpec";
 import { isFeaturedSection, resolveLayoutTemplate } from "../layouts";
 import { resolvePalette } from "../themes";
@@ -60,8 +60,6 @@ export function PosterCanvas({
   const backgroundAsset = poster.assets?.find((a) => a.role === "background" && a.url);
   const outputFrame = getA0PreviewFrame(poster.format.orientation);
   const visuals = new Map(poster.visuals.map((visual) => [visual.id, visual]));
-  const sources = new Map(poster.sources.map((source) => [source.id, source]));
-  const claims = new Map(poster.claims.map((claim) => [claim.id, claim]));
   const imageSlots = new Map((poster.imageSlots ?? []).map((slot) => [slot.id, slot]));
   const bgStrategy = backgroundStrategyForTheme(poster.theme);
   const sections = getOrderedSections(poster);
@@ -190,7 +188,7 @@ export function PosterCanvas({
               {section.title}
             </h3>
             {section.blocks.map((block, index) =>
-              renderBlock(block, index, section.id, visuals, claims, sources, imageSlots, mode, selectedId, qaIssuesByLocation, onSelectItem, onUpdateTextBlock, onGenerateImageSlot, onUpdateImageSlotPosition, onImageSlotSidecarLoaded, generatingSlotIds),
+              renderBlock(block, index, section.id, visuals, imageSlots, mode, selectedId, qaIssuesByLocation, onSelectItem, onUpdateTextBlock, onGenerateImageSlot, onUpdateImageSlotPosition, onImageSlotSidecarLoaded, generatingSlotIds),
             )}
               </>
             )}
@@ -319,33 +317,6 @@ export function PosterCanvas({
           ) : (
             canvasSections.map(renderSection)
           )}
-
-          <section className="poster-card claim-card" data-poster-id="claim_map" data-poster-kind="claim_map">
-            <h3>Claim map</h3>
-            <div className="claim-list">
-              {poster.claims.map((claim) => (
-                <div key={claim.id}>
-                  <p>{claim.text}</p>
-                  <span>
-                    <Link2 size={14} />
-                    {claim.source_ids.map((sourceId) => sources.get(sourceId)?.title ?? sourceId).join(", ") || "No source"}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="poster-card source-card" data-poster-id="source_bundle" data-poster-kind="source_bundle">
-            <h3>Source bundle</h3>
-            <div className="source-list">
-              {poster.sources.map((source) => (
-                <div key={source.id}>
-                  <FileCheck2 size={18} />
-                  <span>{source.title}</span>
-                </div>
-              ))}
-            </div>
-          </section>
         </div>
       </article>
     </div>
@@ -411,8 +382,6 @@ function renderBlock(
   index: number,
   sectionId: string,
   visuals: Map<string, PosterProject["visuals"][number]>,
-  claims: Map<string, PosterClaim>,
-  sources: Map<string, PosterSource>,
   imageSlots: Map<string, GeneratedImageSlot>,
   mode: PosterCanvasProps["mode"],
   selectedId?: string,
@@ -428,8 +397,6 @@ function renderBlock(
   const selected = selectedId === blockId;
 
   if (block.type === "text") {
-    const blockClaims = (block.claim_ids ?? []).map((claimId) => claims.get(claimId)).filter(Boolean) as PosterClaim[];
-
     return (
       <div
         className={`poster-text-block ${selected ? "selected-canvas-item" : ""}`}
@@ -446,16 +413,6 @@ function renderBlock(
         <p contentEditable={mode === "edit"} suppressContentEditableWarning onBlur={(event) => onUpdateTextBlock?.(blockId, event.currentTarget.innerText.trim())} onPaste={handlePlainTextPaste}>
           {block.text}
         </p>
-        {blockClaims.length > 0 ? (
-          <div className="text-claim-badges" aria-label="Text claim sources">
-            {blockClaims.map((claim) => (
-              <span className="text-claim-badge" key={claim.id} title={claim.text}>
-                <Link2 size={12} />
-                {claim.source_ids.map((sourceId) => sources.get(sourceId)?.title ?? sourceId).join(", ") || claim.id}
-              </span>
-            ))}
-          </div>
-        ) : null}
       </div>
     );
   }
@@ -487,6 +444,7 @@ function renderBlock(
     <div
       className={`poster-visual-item ${selectedId === visual.id ? "selected-canvas-item" : ""}`}
       data-visual-id={visual.id}
+      data-visual-type={visual.type}
       data-poster-kind="visual"
       key={visual.id}
       onClick={(event) => {

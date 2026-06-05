@@ -70,7 +70,7 @@ describe("exports", () => {
     const descriptor = buildHtmlPreviewDescriptor(examplePoster);
     const artifact = buildHtmlPreviewArtifact(examplePoster, "2026-06-02T00:00:00.000Z");
 
-    expect(descriptor.visualIds).toContain("vis_confusion_matrix");
+    expect(descriptor.visualIds).toContain("vis_pipeline_flow");
     expect(artifact).toEqual(
       expect.objectContaining({
         id: "html_preview_descriptor",

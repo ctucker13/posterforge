@@ -5,6 +5,7 @@ import {
   parseConfusionMatrixData,
   parseGanttData,
   parseMetricCardData,
+  parseFlowData,
   parseSankeyData,
   parseSourceTextData,
   parseTableData,
@@ -93,7 +94,7 @@ export function runQa(poster: PosterProject): QaIssue[] {
       severity: "high",
       location: "sources",
       message: "Poster must have at least one source.",
-      suggestedFix: "Add a mock, local, web, paper, Confluence, or GitLab source before generation.",
+      suggestedFix: "Attach a GitHub, GitLab, web, paper, Confluence, or local source before generation.",
     });
   }
 
@@ -471,7 +472,9 @@ function validateRendererData(visual: PosterProject["visuals"][number]): string 
                   ? parseSourceTextData(visual.data, "math")
                   : visual.type === "code_block"
                     ? parseCodeBlockData(visual.data)
-                    : parseMetricCardData(visual.data);
+                    : visual.type === "flow"
+                      ? parseFlowData(visual.data)
+                      : parseMetricCardData(visual.data);
 
   return result.ok ? undefined : result.message;
 }

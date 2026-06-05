@@ -4,10 +4,10 @@ import { generatePoster } from "./generator";
 describe("generatePoster", () => {
   it("creates a source-grounded poster project with evidence artifacts", async () => {
     const poster = await generatePoster({
-      prompt: "Explain fraud model monitoring.",
+      prompt: "Explain the GabeChoice recommendation pipeline.",
       theme: "clean-academic",
       palette: "clean-blue",
-      sourceMode: "mock",
+      sourceMode: "github",
     });
 
     expect(poster.theme).toBe("clean-academic");
@@ -19,21 +19,15 @@ describe("generatePoster", () => {
     expect(poster.references?.length).toBe(poster.sources.length);
   });
 
-  it("filters mock sources by requested source mode", async () => {
-    const webPoster = await generatePoster({
-      prompt: "Use web and paper evidence.",
+  it("uses the bundled GitHub fallback package when no live sources are attached", async () => {
+    const poster = await generatePoster({
+      prompt: "Use GabeChoice repository evidence.",
       theme: "clean-academic",
       palette: "clean-blue",
-      sourceMode: "web",
-    });
-    const localPoster = await generatePoster({
-      prompt: "Use local project evidence.",
-      theme: "clean-academic",
-      palette: "clean-blue",
-      sourceMode: "local",
+      sourceMode: "github",
     });
 
-    expect(new Set(webPoster.sources.map((source) => source.type))).toEqual(new Set(["web", "research_paper"]));
-    expect(new Set(localPoster.sources.map((source) => source.type))).toEqual(new Set(["gitlab", "confluence"]));
+    expect(new Set(poster.sources.map((source) => source.type))).toEqual(new Set(["github"]));
+    expect(poster.sources.map((source) => source.title)).toEqual(expect.arrayContaining(["GabeChoice README", "GabeChoice Build Spec"]));
   });
 });

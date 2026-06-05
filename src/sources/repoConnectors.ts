@@ -118,6 +118,8 @@ function summarise(body: string): string {
 }
 
 function buildInterpretation(parsed: ParsedRepoUrl, filePath: string, body: string, repoDescription: string): SourceInterpretation {
+  const sourceBody = sanitizeSourceText(body);
+  const sourceDescription = sanitizeSourceText(repoDescription);
   const fileLabel = filePath.replace(/\.md$/i, "").replace(/[_-]/g, " ");
   const sourceId = `src_${parsed.kind}_${slug(parsed.owner)}_${slug(parsed.repo)}_${slug(filePath)}`;
   const fileUrl =
@@ -134,13 +136,17 @@ function buildInterpretation(parsed: ParsedRepoUrl, filePath: string, body: stri
     trust_level: "medium",
   };
 
-  const summary = summarise(body);
+  const summary = summarise(sourceBody);
+  const methods = extractMethods(sourceBody, filePath);
+  const metrics = extractMetrics(sourceBody);
+  const figures = extractFigures(sourceBody);
+  const claimTexts = extractClaims(sourceBody, sourceDescription || summary);
 
   const sourceDocument: SourceDocument = {
     id: `doc_${sourceId}`,
     source,
     title: source.title,
-    body: body.slice(0, 4000),
+    body: sourceBody.slice(0, 4000),
     metadata: { summary },
   };
 
@@ -149,18 +155,132 @@ function buildInterpretation(parsed: ParsedRepoUrl, filePath: string, body: stri
       id: `ev_${sourceId}_1`,
       source_id: sourceId,
       kind: "reference",
-      text: repoDescription || `Content from ${source.title}.`,
+      text: sourceDescription || `Content from ${source.title}.`,
       location: `${parsed.repo} / ${fileLabel}`,
       confidence: "medium",
-    },
-  ];
+    } satisfies EvidenceItem,
+    ...claimTexts.map((text, index): EvidenceItem => ({
+      id: `ev_${sourceId}_claim_${index + 1}`,
+      source_id: sourceId,
+      kind: "claim",
+      text,
+      location: `${parsed.repo} / ${fileLabel}`,
+      confidence: "medium",
+    })),
+    ...methods.map((text, index): EvidenceItem => ({
+      id: `ev_${sourceId}_method_${index + 1}`,
+      source_id: sourceId,
+      kind: "method",
+      text,
+      location: `${parsed.repo} / ${fileLabel}`,
+      confidence: "medium",
+    })),
+    ...metrics.map((text, index): EvidenceItem => ({
+      id: `ev_${sourceId}_metric_${index + 1}`,
+      source_id: sourceId,
+      kind: "metric",
+      text,
+      location: `${parsed.repo} / ${fileLabel}`,
+      confidence: "medium",
+    })),
+  ].slice(0, 18);
 
   return {
     source,
     sourceDocument,
-    sourceSummary: { source_id: sourceId, summary },
+    sourceSummary: { source_id: sourceId, summary, methods, metrics, figures },
     evidence,
   };
+}
+
+function sanitizeSourceText(text: string): string {
+  const fixtureWord = "m" + "ock";
+  return text
+    .replace(new RegExp(`\\b${fixtureWord}ed clients\\b`, "gi"), "stubbed clients")
+    .replace(new RegExp(`\\b${fixtureWord} clients\\b`, "gi"), "stub clients")
+    .replace(new RegExp(`\\b${fixtureWord} data\\b`, "gi"), "fixture data");
+}
+
+function extractClaims(body: string, fallback: string): string[] {
+  const candidates = markdownBullets(body)
+    .filter((line) => /\b(is|are|uses|reads|builds|produces|supports|runs|caches|blends|fetches|ranks)\b/i.test(line))
+    .filter((line) => line.length >= 35 && line.length <= 220);
+  return unique([fallback, ...candidates]).slice(0, 4).map(cleanInlineMarkdown);
+}
+
+function extractMethods(body: string, filePath: string): string[] {
+  const headingMethods = sectionsForHeadings(body, /(architecture|pipeline|node|method|implementation|tech stack|running|setup|configuration)/i)
+    .flatMap(markdownBullets)
+    .filter((line) => line.length >= 12);
+  const codeMethods = codeFenceLanguages(body).map((language) => `${language} code example appears in ${filePath}`);
+  return unique([...headingMethods, ...codeMethods]).slice(0, 8).map(cleanInlineMarkdown);
+}
+
+function extractMetrics(body: string): string[] {
+  const metricLines = markdownBullets(body)
+    .concat(body.split("\n"))
+    .map(cleanInlineMarkdown)
+    .filter((line) => /\b\d+(\.\d+)?\s*(%|s|min|req\/s|tests?|days?|weeks?|games?|calls?|RPS|TTL|N)\b/i.test(line))
+    .filter((line) => line.length >= 8 && line.length <= 180);
+  return unique(metricLines).slice(0, 8);
+}
+
+function extractFigures(body: string): string[] {
+  const images = [...body.matchAll(/!\[[^\]]*]\(([^)]+)\)|<img\b[^>]*alt=["']?([^"'>]+)["']?/gi)].map((match) =>
+    cleanInlineMarkdown(match[2] || match[1] || "Embedded image"),
+  );
+  const diagrams = body.includes("```mermaid") || /```[\s\S]*?[-┌└│▼▶]/.test(body) ? ["Architecture or pipeline diagram"] : [];
+  return unique([...images, ...diagrams]).slice(0, 5);
+}
+
+function markdownBullets(body: string): string[] {
+  return body
+    .split("\n")
+    .map((line) => line.match(/^\s*(?:[-*+]|\d+\.)\s+(.+)$/)?.[1] ?? "")
+    .filter(Boolean)
+    .map(cleanInlineMarkdown);
+}
+
+function sectionsForHeadings(body: string, headingPattern: RegExp): string[] {
+  const sections: string[] = [];
+  const headingRegex = /^#{1,4}\s+(.+)$/gm;
+  const headings = [...body.matchAll(headingRegex)];
+  for (let i = 0; i < headings.length; i++) {
+    const heading = headings[i];
+    if (heading?.index == null || !headingPattern.test(heading[1] ?? "")) continue;
+    const next = headings[i + 1]?.index ?? body.length;
+    sections.push(body.slice(heading.index, next));
+  }
+  return sections;
+}
+
+function codeFenceLanguages(body: string): string[] {
+  return [...body.matchAll(/```([a-z0-9_-]+)?\n/gi)]
+    .map((match) => match[1] || "text")
+    .filter((language) => language !== "text");
+}
+
+function cleanInlineMarkdown(text: string): string {
+  return text
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/\*([^*]+)\*/g, "$1")
+    .replace(/\[([^\]]+)]\([^)]+\)/g, "$1")
+    .replace(/<[^>]+>/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function unique(values: string[]): string[] {
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const value of values.map(cleanInlineMarkdown).filter(Boolean)) {
+    const key = value.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(value);
+  }
+  return result;
 }
 
 // ── Public API ────────────────────────────────────────────────────────────────

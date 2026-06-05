@@ -1,7 +1,7 @@
 import type { PosterProject, PosterClaim, PosterSection, PosterVisual } from "../domain/poster";
 import type { GenerationOptions } from "../domain/generator";
 import { buildClaimMap } from "../domain/evidence";
-import { createReferencesFromSources } from "../sources/mockConnectors";
+import { createReferencesFromSources } from "../sources/sourceFixtures";
 import { themes } from "../themes";
 import { getOpenAIClient, DEFAULT_MODEL } from "./openai";
 import { buildPosterGenerationMessages } from "./posterPrompt";

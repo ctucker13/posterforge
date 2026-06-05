@@ -1,5 +1,7 @@
 import { Palette, Search } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { findThemeBackgroundAsset, loadAssetCatalogue, type AssetCatalogue } from "../assets/catalogue";
+import { backgroundStrategyForTheme } from "../layouts/buildLayoutSpec";
 import { palettes, themes } from "../themes";
 
 const CATEGORIES = Array.from(new Set(Object.values(themes).map((t) => t.category).filter(Boolean))) as string[];
@@ -18,6 +20,21 @@ export function ThemePicker({
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [showOverride, setShowOverride] = useState(false);
+  const [catalogue, setCatalogue] = useState<AssetCatalogue | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadAssetCatalogue()
+      .then((data) => {
+        if (!cancelled) setCatalogue(data);
+      })
+      .catch(() => {
+        if (!cancelled) setCatalogue(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const allThemes = Object.values(themes);
   const filtered = allThemes.filter((theme) => {
@@ -67,17 +84,33 @@ export function ThemePicker({
           const palette = palettes[paletteId] ?? Object.values(palettes)[0];
           if (!palette) return null;
           const isSelected = selectedTheme === theme.id;
+          const strategy = backgroundStrategyForTheme(theme.id);
+          const generatedAsset = findThemeBackgroundAsset(catalogue, theme.id);
+          const previewUrl = generatedAsset?.publicUrl ?? (strategy === "svg" || strategy === "svg-hybrid" ? `/theme-backgrounds/${theme.id}.svg` : undefined);
           return (
             <button
               type="button"
-              className={isSelected ? "selected" : ""}
+              className={`theme-card${isSelected ? " selected" : ""}${previewUrl ? " has-preview" : ""}`}
               style={{ borderColor: isSelected ? palette.colors.primary : undefined }}
               key={theme.id}
               onClick={() => {
                 onThemeChange(theme.id);
-                onPaletteChange(theme.palette ?? "clean-blue");
               }}
             >
+              <div
+                className="theme-preview"
+                style={
+                  previewUrl
+                    ? { backgroundImage: `url(${previewUrl})`, backgroundColor: palette.colors.background }
+                    : {
+                        background:
+                          `linear-gradient(135deg, ${palette.colors.primary}, ${palette.colors.accent}), ` +
+                          `linear-gradient(45deg, ${palette.colors.background}, ${palette.colors.panel})`,
+                      }
+                }
+              >
+                <small>{generatedAsset ? "Generated" : strategy}</small>
+              </div>
               <strong>{theme.name}</strong>
               <span>{theme.description}</span>
               <div className="palette-swatches" aria-label={`${theme.name} palette`}>

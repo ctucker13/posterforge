@@ -38,16 +38,34 @@ function MermaidDiagram({ definition }: { definition: string }) {
 
   useEffect(() => {
     import("mermaid").then(({ default: mermaid }) => {
-      mermaid.initialize({ startOnLoad: false, theme: "neutral" });
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: "neutral",
+        flowchart: {
+          htmlLabels: true,
+          nodeSpacing: 28,
+          rankSpacing: 42,
+          padding: 10,
+          useMaxWidth: true,
+        },
+      });
       mermaid.render(id.current, definition)
-        .then(({ svg: rendered }) => setSvg(rendered))
+        .then(({ svg: rendered }) => setSvg(normalizeMermaidSvg(rendered)))
         .catch((e: unknown) => setError(String(e)));
     });
   }, [definition]);
 
   if (error) return <div style={{ color: "red", fontFamily: "monospace", fontSize: 12, padding: 8 }}>{error}</div>;
   if (!svg) return <div style={{ color: "#888", padding: 8, fontSize: 12 }}>Rendering diagram…</div>;
-  return <div dangerouslySetInnerHTML={{ __html: svg }} style={{ width: "100%", height: "100%" }} />;
+  return <div className="mermaid-diagram" dangerouslySetInnerHTML={{ __html: svg }} />;
+}
+
+function normalizeMermaidSvg(rendered: string): string {
+  return rendered
+    .replace(/<svg\b/, '<svg preserveAspectRatio="xMidYMid meet"')
+    .replace(/\sstyle="max-width:[^"]*;?"/, "")
+    .replace(/\sheight="[^"]*"/, ' height="100%"')
+    .replace(/\swidth="[^"]*"/, ' width="100%"');
 }
 
 export function VisualRenderer({ visual, palette }: { visual: PosterVisual; palette?: PosterPalette | undefined }) {

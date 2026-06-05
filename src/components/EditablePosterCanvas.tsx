@@ -6,7 +6,6 @@ import { reviseTextBlock } from "../domain/generator";
 import { generateImageForSlot } from "../services/imageGen";
 import { getA0PreviewFrame, PosterCanvas, type PosterCanvasItemKind } from "./PosterCanvas";
 import { BlockRevisionDiff } from "./BlockRevisionDiff";
-import { PosterMinimap } from "./PosterMinimap";
 import { parseBlockId } from "./posterUtils";
 import { SectionNavigator } from "./SectionNavigator";
 import { resolvePalette } from "../themes";
@@ -383,8 +382,7 @@ export function EditablePosterCanvas({
             </div>
           </div>
         ) : (
-          <>
-            <div ref={stageRef} className="a0-preview-stage" style={{ width: scaledPosterWidth, height: scaledPosterHeight }}>
+          <div ref={stageRef} className="a0-preview-stage" style={{ width: scaledPosterWidth, height: scaledPosterHeight }}>
               <div style={{ transform: `scale(${zoom})`, transformOrigin: "top left" }}>
                 <PosterCanvas
                   poster={poster}
@@ -427,8 +425,6 @@ export function EditablePosterCanvas({
                 />
               </div>
             </div>
-            <PosterMinimap poster={poster} currentZoom={zoom} viewportRef={viewportRef} stageRef={stageRef} />
-          </>
         )}
       </div>
       {imageGenError ? (

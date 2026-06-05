@@ -47,7 +47,7 @@ npx playwright install chromium
 npm run export:check -- --poster spec/example-poster.json
 npm run export:pdf -- --poster spec/example-poster.json
 npm run export:screen -- --poster spec/example-poster.json
-npm run export:pptx:html -- --poster public/generated-assets/poster_demo_fraud_model.generated.json
+npm run export:pptx:html -- --poster spec/gabechoice-poster.json
 ```
 
 `npm run dev` starts Vite on `0.0.0.0`.
@@ -152,7 +152,7 @@ src/
   qa/           QA rules and safe fixes
   renderers/    deterministic and chart visual renderers (VisualRenderer)
   services/     imageGen (in-browser image generation service)
-  sources/      source connector interfaces and mock connectors
+  sources/      source connector interfaces and GitHub fixtures
   themes/       theme/palette definitions, imagegen-themes.json
   visuals/      visual registry (visualRegistry.ts)
 

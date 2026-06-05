@@ -4,7 +4,7 @@ import { buildGanttSegments, formatPercent, summarizeConfusionMatrix, summarizeS
 describe("renderer derived data", () => {
   it("summarizes confusion matrix performance metrics", () => {
     const summary = summarizeConfusionMatrix({
-      labels: ["Legitimate", "Fraud"],
+      labels: ["Recommended", "Skipped"],
       matrix: [
         [9412, 188],
         [73, 327],

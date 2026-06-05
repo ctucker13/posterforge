@@ -12,7 +12,7 @@ export type PosterValidationResult =
 
 const formatSizes = ["A0", "A1", "A2", "custom"] as const;
 const orientations = ["portrait", "landscape"] as const;
-const sourceTypes = ["mock", "local_file", "web", "research_paper", "confluence", "gitlab", "github"] as const;
+const sourceTypes = ["local_file", "web", "research_paper", "confluence", "gitlab", "github"] as const;
 const trustLevels = ["low", "medium", "high"] as const;
 const evidenceKinds = ["claim", "method", "metric", "figure", "code_summary", "reference"] as const;
 const layoutIds = [

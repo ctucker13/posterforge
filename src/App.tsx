@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ChevronDown, Database, FolderOpen, Globe2, Play, Sparkles } from "lucide-react";
+import { ChevronDown, Play, Sparkles } from "lucide-react";
 import { EditablePosterCanvas } from "./components/EditablePosterCanvas";
 import { EvidencePanel } from "./components/EvidencePanel";
 import { ExportPanel } from "./components/ExportPanel";
@@ -14,7 +14,8 @@ import { SectionRevisionDiff } from "./components/SectionRevisionDiff";
 import { ThemePicker } from "./components/ThemePicker";
 import { AssetPicker } from "./components/AssetPicker";
 import { TracePanel } from "./components/TracePanel";
-import { generateOutline, generatePoster, generationTrace, regenerateSection, type GenerationOptions } from "./domain/generator";
+import { catalogueEntryToPosterAsset, findThemeBackgroundAsset, loadAssetCatalogue, type AssetCatalogue } from "./assets/catalogue";
+import { generateOutline, generatePoster, generationTrace, regenerateSection } from "./domain/generator";
 import { migratePosterProject } from "./domain/migration";
 import { examplePoster } from "./data/examplePoster";
 import type { PosterOutline, PosterProject, PosterSection, QaIssue, TraceEvent } from "./domain/poster";
@@ -24,8 +25,8 @@ import { palettes, themes } from "./themes";
 import { debounce } from "./utils/debounce";
 import "./styles/app.css";
 
-const defaultPrompt =
-  "Create a results-first poster about fraud model monitoring. Use a polished theme, include a workflow diagram, confusion matrix, Sankey decision flow, and a QA summary.";
+const gabeChoicePrompt =
+  "Create a data science academic poster about GabeChoice using the attached GitHub repository as evidence. Focus on the LangGraph recommendation pipeline, Steam data ingestion, taste-profile modeling, blended LLM and Metacritic scoring, caching, evaluation signals, and limitations.";
 
 function createQueuedTrace(): TraceEvent[] {
   return generationTrace.map((event) => ({ ...event, status: "queued" }));
@@ -38,10 +39,9 @@ const initialPoster = examplePoster;
 const initialQaIssues = runQa(initialPoster);
 
 export default function App() {
-  const [prompt, setPrompt] = useState(defaultPrompt);
+  const [prompt, setPrompt] = useState(gabeChoicePrompt);
   const [theme, setTheme] = useState(initialPoster.theme);
   const [palette, setPalette] = useState(initialPoster.palette ?? themes[initialPoster.theme]?.palette ?? "clean-blue");
-  const [sourceMode, setSourceMode] = useState<GenerationOptions["sourceMode"]>("mock");
   const [trace, setTrace] = useState<TraceEvent[]>(initialTrace);
   const [poster, setPoster] = useState<PosterProject>({ ...initialPoster, qaResults: initialQaIssues });
   const [qaIssues, setQaIssues] = useState<QaIssue[]>(initialQaIssues);
@@ -51,12 +51,13 @@ export default function App() {
   const [pendingSectionRevision, setPendingSectionRevision] = useState<{ sectionId: string; original: PosterSection; revised: PosterSection } | null>(null);
   const [selectedCanvasItem, setSelectedCanvasItem] = useState<{ id: string; kind: PosterCanvasItemKind } | undefined>();
   const [appMode, setAppMode] = useState<AppMode>("edit");
+  const [assetCatalogue, setAssetCatalogue] = useState<AssetCatalogue | null>(null);
   const generationIdRef = useRef(0);
 
   const selectedTheme = themes[theme];
   const selectedPalette = palettes[palette];
   const highQaCount = qaIssues.filter((issue) => issue.severity === "high").length;
-  const realSourceCount = poster.sources.filter((s) => !s.url?.startsWith("mock://")).length;
+  const realSourceCount = poster.sources.length;
 
   const debouncedRunQa = useMemo(() => debounce((p: PosterProject) => {
     const issues = runQa(p);
@@ -65,6 +66,20 @@ export default function App() {
   }, 400), []);
 
   useEffect(() => () => debouncedRunQa.cancel(), [debouncedRunQa]);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadAssetCatalogue()
+      .then((catalogue) => {
+        if (!cancelled) setAssetCatalogue(catalogue);
+      })
+      .catch(() => {
+        if (!cancelled) setAssetCatalogue(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function handleGenerate() {
     setIsGenerating(true);
@@ -76,7 +91,7 @@ export default function App() {
         prompt,
         theme,
         palette,
-        sourceMode,
+        sourceMode: "github",
         currentSources: {
           sources: poster.sources,
           sourceDocuments: poster.sourceDocuments ?? [],
@@ -121,7 +136,7 @@ export default function App() {
           prompt,
           theme,
           palette,
-          sourceMode,
+          sourceMode: "github",
           currentSources: {
             sources: poster.sources,
             sourceDocuments: poster.sourceDocuments ?? [],
@@ -163,9 +178,22 @@ export default function App() {
   }
 
   function handleThemeChange(nextTheme: string) {
-    const nextQaIssues = runQa({ ...poster, theme: nextTheme });
-    const nextPoster = { ...poster, theme: nextTheme, logo: themes[nextTheme]?.logoUrl, qaResults: nextQaIssues };
+    const nextPalette = themes[nextTheme]?.palette ?? "clean-blue";
+    const backgroundAsset = findThemeBackgroundAsset(assetCatalogue, nextTheme);
+    const nextAssets = backgroundAsset
+      ? [catalogueEntryToPosterAsset(backgroundAsset), ...(poster.assets ?? []).filter((asset) => asset.role !== "background")]
+      : (poster.assets ?? []).filter((asset) => asset.role !== "background");
+    const nextQaIssues = runQa({ ...poster, theme: nextTheme, palette: nextPalette, assets: nextAssets });
+    const nextPoster = {
+      ...poster,
+      theme: nextTheme,
+      palette: nextPalette,
+      logo: themes[nextTheme]?.logoUrl,
+      assets: nextAssets,
+      qaResults: nextQaIssues,
+    };
     setTheme(nextTheme);
+    setPalette(nextPalette);
     setPoster(nextPoster);
     setQaIssues(nextQaIssues);
   }
@@ -196,12 +224,11 @@ export default function App() {
   }
 
   async function handleResetProject() {
-    const nextPoster = await generatePoster({ prompt: defaultPrompt, theme: "natwest-group", palette: "natwest-group", sourceMode: "mock" });
+    const nextPoster = initialPoster;
     const nextQaIssues = runQa(nextPoster);
-    setPrompt(defaultPrompt);
+    setPrompt(gabeChoicePrompt);
     setTheme(nextPoster.theme);
-    setPalette(nextPoster.palette ?? "natwest-group");
-    setSourceMode("mock");
+    setPalette(nextPoster.palette ?? themes[nextPoster.theme]?.palette ?? "clean-blue");
     setPoster({ ...nextPoster, qaResults: nextQaIssues });
     setQaIssues(nextQaIssues);
     setTrace(createQueuedTrace());
@@ -364,18 +391,6 @@ export default function App() {
               />
             </details>
 
-            <div className="source-options" aria-label="Source mode">
-              <button className={sourceMode === "mock" ? "selected" : ""} type="button" onClick={() => setSourceMode("mock")}>
-                <Database size={18} /> Mock
-              </button>
-              <button className={sourceMode === "web" ? "selected" : ""} type="button" onClick={() => setSourceMode("web")}>
-                <Globe2 size={18} /> Web
-              </button>
-              <button className={sourceMode === "local" ? "selected" : ""} type="button" onClick={() => setSourceMode("local")}>
-                <FolderOpen size={18} /> Local
-              </button>
-            </div>
-
             <button className="primary-action" type="button" onClick={handleGenerate} disabled={isGenerating}>
               <Play size={18} />
               {isGenerating ? "Generating…" : realSourceCount > 0 ? `Generate from ${realSourceCount} source${realSourceCount !== 1 ? "s" : ""}` : "Generate poster"}
@@ -430,7 +445,21 @@ export default function App() {
 
         {appMode === "generate" ? (
           <div className="workspace-tab-panel">
-            <SourceSearchPanel poster={poster} sourceMode={sourceMode} onPosterChange={handlePosterStateChange} />
+            <SourceSearchPanel
+              poster={poster}
+              onPosterChange={handlePosterStateChange}
+              onUseExampleRepo={() => {
+                setPrompt(gabeChoicePrompt);
+                const nextTheme = "clean-academic";
+                const nextPalette = themes[nextTheme]?.palette ?? "clean-blue";
+                const nextPoster = { ...poster, theme: nextTheme, palette: nextPalette, logo: themes[nextTheme]?.logoUrl };
+                const nextQaIssues = runQa(nextPoster);
+                setTheme(nextTheme);
+                setPalette(nextPalette);
+                setPoster({ ...nextPoster, qaResults: nextQaIssues });
+                setQaIssues(nextQaIssues);
+              }}
+            />
             <EvidencePanel poster={poster} />
           </div>
         ) : null}

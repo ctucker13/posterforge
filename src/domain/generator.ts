@@ -18,15 +18,15 @@ import type {
 import { getThemeDensity, SECTION_ART_CONTENT_REGIONS } from "../layouts/buildLayoutSpec";
 import { examplePoster } from "../data/examplePoster";
 import { buildClaimMap } from "./evidence";
-import { buildMockSourcePackage, createReferencesFromSources } from "../sources/mockConnectors";
+import { buildFixtureSourcePackage, createReferencesFromSources } from "../sources/sourceFixtures";
 import { themes } from "../themes";
 
 export interface GenerationOptions {
   prompt: string;
   theme: string;
   palette?: string;
-  sourceMode: "mock" | "web" | "local";
-  /** When set and contains real (non-mock-URL) sources, generation uses these instead of mocks. */
+  sourceMode: "github" | "web" | "local";
+  /** When set and contains attached sources, generation uses these instead of bundled fixtures. */
   currentSources?: {
     sources: PosterSource[];
     sourceDocuments: SourceDocument[];
@@ -113,7 +113,7 @@ export const generationTrace: Omit<TraceEvent, "status">[] = [
 
 export async function generateOutline(options: GenerationOptions, onProgress?: (stepId: string) => void): Promise<PosterOutline> {
   onProgress?.("plan");
-  const realSources = options.currentSources?.sources.filter((s) => !s.url?.startsWith("mock://")) ?? [];
+  const realSources = options.currentSources?.sources ?? [];
   const title = deriveTitle(options.prompt, realSources.length > 0 ? realSources : examplePoster.sources);
   const apiKey = (typeof import.meta !== "undefined" && import.meta.env?.VITE_OPENAI_API_KEY) as string | undefined;
 
@@ -151,7 +151,7 @@ export async function generateOutline(options: GenerationOptions, onProgress?: (
 
   return {
     title,
-    subtitle: realSources.length > 0 ? `Generated from ${realSources.length} attached source${realSources.length === 1 ? "" : "s"}` : "Generated from mock source package",
+    subtitle: realSources.length > 0 ? `Generated from ${realSources.length} attached source${realSources.length === 1 ? "" : "s"}` : "Generated from the bundled GitHub source package",
     layout: examplePoster.layout,
     sections: examplePoster.sections.map((section) => ({
       id: section.id,
@@ -311,7 +311,7 @@ export async function generatePoster(
   const progress = onProgress ?? noop;
 
   const apiKey = (typeof import.meta !== "undefined" && import.meta.env?.VITE_OPENAI_API_KEY) as string | undefined;
-  const realSources = options.currentSources?.sources.filter((s) => !s.url?.startsWith("mock://")) ?? [];
+  const realSources = options.currentSources?.sources ?? [];
 
   // Route to real LLM when an API key is configured
   if (apiKey) {
@@ -331,13 +331,13 @@ export async function generatePoster(
     return generateFromRealSources(options);
   }
 
-  // ── Mock path ──────────────────────────────────────────────────────────────
+  // ── Offline fallback path ──────────────────────────────────────────────────
   progress("plan"); progress("sources"); progress("read_sources"); progress("evidence");
   progress("claim_map"); progress("layout"); progress("visuals");
-  const sourcePackage = buildMockSourcePackage(options.sourceMode);
+  const sourcePackage = buildFixtureSourcePackage(options.sourceMode);
   const sourceText =
-    options.sourceMode === "mock"
-      ? "mock Confluence, GitLab, and research-paper sources"
+    options.sourceMode === "github"
+      ? "bundled GabeChoice GitHub source package"
       : options.sourceMode === "web"
         ? "web pages and research papers"
         : "local project files";

@@ -1,6 +1,6 @@
 import type { EvidenceItem, PosterSource, SourceDocument, SourceSummary } from "../domain/poster";
 
-export type SourceConnectorKind = "mock" | "local_file" | "web" | "research_paper" | "confluence" | "gitlab" | "github";
+export type SourceConnectorKind = "local_file" | "web" | "research_paper" | "confluence" | "gitlab" | "github";
 
 export interface SourceConnectorCapability {
   kind: SourceConnectorKind;

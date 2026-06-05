@@ -1,5 +1,4 @@
 export type SourceType =
-  | "mock"
   | "local_file"
   | "web"
   | "research_paper"

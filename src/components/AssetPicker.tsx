@@ -1,24 +1,7 @@
 import { Image, RefreshCw } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { catalogueEntryToPosterAsset, loadAssetCatalogue, type AssetCatalogue, type AssetCatalogueEntry } from "../assets/catalogue";
 import type { PosterAsset } from "../domain/poster";
-
-interface CatalogueEntry {
-  id: string;
-  title: string;
-  theme: string;
-  role: string;
-  type: string;
-  publicUrl: string;
-  width_px: number;
-  height_px: number;
-  generatedAt: string;
-}
-
-interface AssetCatalogue {
-  schemaVersion: string;
-  updatedAt: string;
-  assets: CatalogueEntry[];
-}
 
 export function AssetPicker({
   selectedTheme,
@@ -36,9 +19,8 @@ export function AssetPicker({
   const load = useCallback(() => {
     setLoading(true);
     setError(false);
-    fetch("/generated-assets/asset-catalogue.json")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data: AssetCatalogue | null) => {
+    loadAssetCatalogue()
+      .then((data) => {
         setCatalogue(data);
         setLoading(false);
       })
@@ -108,7 +90,7 @@ function AssetGrid({
   selectedId,
   onSelect,
 }: {
-  entries: CatalogueEntry[];
+  entries: AssetCatalogueEntry[];
   selectedId?: string | undefined;
   onSelect: (asset: PosterAsset) => void;
 }) {
@@ -119,18 +101,7 @@ function AssetGrid({
           type="button"
           key={entry.id}
           className={`asset-picker-card${selectedId === entry.id ? " selected" : ""}`}
-          onClick={() =>
-            onSelect({
-              id: entry.id,
-              type: entry.type as PosterAsset["type"],
-              role: entry.role as PosterAsset["role"],
-              title: entry.title,
-              theme: entry.theme,
-              url: entry.publicUrl,
-              width_px: entry.width_px,
-              height_px: entry.height_px,
-            })
-          }
+          onClick={() => onSelect(catalogueEntryToPosterAsset(entry))}
         >
           <img src={entry.publicUrl} alt={entry.title} loading="lazy" />
           <span>{entry.title}</span>
