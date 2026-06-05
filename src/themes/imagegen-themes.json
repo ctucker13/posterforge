@@ -234,7 +234,34 @@
       "iconStyle": "Use blueprint grids, technical callouts as simple SVG/CSS motifs; labels remain HTML.",
       "textureStyle": "Subtle engineering texture layer; low contrast; must not reduce readability.",
       "density": "medium",
-      "formality": "formal"
+      "formality": "formal",
+      "componentSkins": {
+        "sectionCard": {
+          "--skin-bg": "rgba(10,24,48,0.85)",
+          "--skin-border": "1px solid rgba(0,220,255,0.45)",
+          "--skin-radius": "2px",
+          "--skin-shadow": "0 0 0 1px rgba(0,220,255,0.12), inset 0 0 20px rgba(0,0,0,0.3)",
+          "--skin-heading-transform": "uppercase",
+          "--skin-heading-font": "JetBrains Mono, ui-monospace, monospace",
+          "--skin-heading-tracking": "0.08em"
+        },
+        "metricCard": {
+          "--skin-bg": "rgba(5,15,35,0.9)",
+          "--skin-border": "1px solid rgba(0,220,255,0.6)",
+          "--skin-radius": "0px",
+          "--skin-shadow": "0 0 8px rgba(0,220,255,0.2)"
+        },
+        "dataTable": {
+          "--skin-bg": "rgba(10,24,48,0.7)",
+          "--skin-border": "1px solid rgba(0,200,220,0.3)",
+          "--skin-radius": "0px"
+        },
+        "mermaidDiagram": {
+          "--skin-bg": "rgba(5,15,35,0.8)",
+          "--skin-border": "1px solid rgba(0,220,255,0.3)",
+          "--skin-radius": "0px"
+        }
+      }
     },
     {
       "id": "magazine-feature-spread",
@@ -585,7 +612,32 @@
       "iconStyle": "Use marker arrows, sketch icons as simple SVG/CSS motifs; labels remain HTML.",
       "textureStyle": "Subtle education texture layer; low contrast; must not reduce readability.",
       "density": "low",
-      "formality": "friendly"
+      "formality": "friendly",
+      "componentSkins": {
+        "sectionCard": {
+          "--skin-bg": "rgba(255,255,255,0.96)",
+          "--skin-border": "2px dashed #aaaaaa",
+          "--skin-radius": "8px",
+          "--skin-shadow": "2px 3px 0 rgba(0,0,0,0.05)",
+          "--skin-padding": "1.2rem"
+        },
+        "metricCard": {
+          "--skin-bg": "rgba(255,255,255,0.92)",
+          "--skin-border": "2px dashed #888888",
+          "--skin-radius": "6px",
+          "--skin-shadow": "none"
+        },
+        "dataTable": {
+          "--skin-bg": "transparent",
+          "--skin-border": "1.5px dashed #bbbbbb",
+          "--skin-radius": "4px"
+        },
+        "mermaidDiagram": {
+          "--skin-bg": "rgba(255,255,255,0.7)",
+          "--skin-border": "1.5px dashed #999999",
+          "--skin-radius": "6px"
+        }
+      }
     },
     {
       "id": "product-launch-startup-pitch",
@@ -1092,7 +1144,35 @@
       "iconStyle": "Use frosted glass cards, neural nodes as simple SVG/CSS motifs; labels remain HTML.",
       "textureStyle": "Subtle technology texture layer; low contrast; must not reduce readability.",
       "density": "medium",
-      "formality": "modern"
+      "formality": "modern",
+      "componentSkins": {
+        "sectionCard": {
+          "--skin-bg": "rgba(255,255,255,0.08)",
+          "--skin-border": "1px solid rgba(255,255,255,0.15)",
+          "--skin-radius": "16px",
+          "--skin-shadow": "0 8px 32px rgba(0,0,0,0.3)",
+          "--skin-backdrop": "blur(12px) saturate(1.4)"
+        },
+        "metricCard": {
+          "--skin-bg": "rgba(255,255,255,0.10)",
+          "--skin-border": "1px solid rgba(255,255,255,0.18)",
+          "--skin-radius": "12px",
+          "--skin-shadow": "0 4px 16px rgba(0,0,0,0.25)",
+          "--skin-backdrop": "blur(8px)"
+        },
+        "dataTable": {
+          "--skin-bg": "rgba(255,255,255,0.06)",
+          "--skin-border": "1px solid rgba(255,255,255,0.12)",
+          "--skin-radius": "10px",
+          "--skin-backdrop": "blur(6px)"
+        },
+        "mermaidDiagram": {
+          "--skin-bg": "rgba(255,255,255,0.05)",
+          "--skin-border": "1px solid rgba(255,255,255,0.10)",
+          "--skin-radius": "12px",
+          "--skin-backdrop": "blur(6px)"
+        }
+      }
     },
     {
       "id": "industrial-data-factory",

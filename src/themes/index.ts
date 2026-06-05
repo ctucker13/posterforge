@@ -15,6 +15,62 @@ export interface PosterPalette {
   };
 }
 
+export interface ThemeHtmlTokens {
+  radius?: string;
+  borderWidth?: string;
+  shadow?: string;
+  sectionPadding?: string;
+  titleScale?: string;
+}
+
+export interface ThemeTypography {
+  heading?: string;
+  body?: string;
+  mono?: string;
+}
+
+/**
+ * CSS custom property overrides applied to a specific component type when this
+ * theme is active. Values are injected as inline `style` vars on the wrapper
+ * element so they cascade to all children without touching global CSS.
+ *
+ * Supported vars (all optional):
+ *   --skin-bg              background / background-color
+ *   --skin-border          border shorthand
+ *   --skin-radius          border-radius
+ *   --skin-shadow          box-shadow
+ *   --skin-padding         padding override
+ *   --skin-backdrop        backdrop-filter value (glassmorphism)
+ *   --skin-heading-font    font-family override for section headings
+ *   --skin-heading-transform  text-transform for headings
+ *   --skin-heading-tracking   letter-spacing for headings
+ */
+export type SkinTokens = Record<string, string>;
+
+export interface ComponentSkins {
+  sectionCard?: SkinTokens;
+  metricCard?: SkinTokens;
+  dataTable?: SkinTokens;
+  mermaidDiagram?: SkinTokens;
+  timeline?: SkinTokens;
+  codeBlock?: SkinTokens;
+}
+
+export interface SlotTemplate {
+  id: string;
+  role: "background" | "hero_illustration" | "section_art";
+  widthPx: number;
+  heightPx: number;
+  contentRegions?: Array<{
+    id: string;
+    x: string;
+    y: string;
+    width: string;
+    height: string;
+    type: "text" | "chart" | "metric" | "diagram-node" | "image";
+  }>;
+}
+
 export interface PosterTheme {
   id: string;
   name: string;
@@ -26,6 +82,17 @@ export interface PosterTheme {
   category?: string;
   collection?: string;
   bestFor?: string[];
+  backgroundStrategy?: "svg" | "svg-hybrid" | "raster";
+  density?: "low" | "medium" | "high";
+  formality?: string;
+  chartStyle?: string;
+  diagramStyle?: string;
+  htmlTokens?: ThemeHtmlTokens;
+  typography?: ThemeTypography;
+  /** Per-component CSS skin tokens. Applied as inline style vars at render time. */
+  componentSkins?: ComponentSkins;
+  /** Generated-image slot templates for this theme's standard layout. */
+  slotTemplates?: SlotTemplate[];
 }
 
 export type Palette = PosterPalette;
@@ -134,6 +201,15 @@ interface ImagegenThemeEntry {
   category?: string;
   collection?: string;
   bestFor?: string[];
+  backgroundStrategy?: "svg" | "svg-hybrid" | "raster";
+  density?: "low" | "medium" | "high";
+  formality?: string;
+  chartStyle?: string;
+  diagramStyle?: string;
+  htmlTokens?: ThemeHtmlTokens;
+  typography?: ThemeTypography;
+  componentSkins?: ComponentSkins;
+  slotTemplates?: SlotTemplate[];
 }
 
 interface ImagegenPaletteEntry {
@@ -164,6 +240,15 @@ for (const t of imagegenThemesRaw.themes as ImagegenThemeEntry[]) {
     ...(t.category != null && { category: t.category }),
     ...(t.collection != null && { collection: t.collection }),
     ...(t.bestFor != null && { bestFor: t.bestFor }),
+    ...(t.backgroundStrategy != null && { backgroundStrategy: t.backgroundStrategy }),
+    ...(t.density != null && { density: t.density }),
+    ...(t.formality != null && { formality: t.formality }),
+    ...(t.chartStyle != null && { chartStyle: t.chartStyle }),
+    ...(t.diagramStyle != null && { diagramStyle: t.diagramStyle }),
+    ...(t.htmlTokens != null && { htmlTokens: t.htmlTokens }),
+    ...(t.typography != null && { typography: t.typography }),
+    ...(t.componentSkins != null && { componentSkins: t.componentSkins }),
+    ...(t.slotTemplates != null && { slotTemplates: t.slotTemplates }),
   };
 }
 
@@ -194,6 +279,11 @@ export const themes: Record<string, PosterTheme> = {
   ...imagegenThemes,
   ...builtinThemes,
 };
+
+/** Returns the component skin tokens for the active theme, or an empty object. */
+export function resolveComponentSkins(themeId: string): ComponentSkins {
+  return themes[themeId]?.componentSkins ?? {};
+}
 
 export function resolvePalette(themeId: string, paletteOverride?: string | undefined): PosterPalette {
   const theme = themes[themeId] ?? themes["clean-academic"];
