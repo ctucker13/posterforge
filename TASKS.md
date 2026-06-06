@@ -12,15 +12,10 @@ Working task list for the PosterForge project. Update this file as work is compl
 
 ### Theme-Generated Components (`docs/plans/theme-generated-components.md`)
 
-- [x] **Phase 2 — Generated-image slot model** — `GeneratedImageSlot` and `SlotTemplate` gain `x`, `y`, `objectPosition`; `buildSlotsFromTemplates()` exported from `buildLayoutSpec`; `buildLayoutSpec` and `buildStandardImageSlots` delegate to theme `slotTemplates` when present; `objectPosition` canonical on slot (block value kept as legacy fallback); `slotTemplates` defined for `neural-network-glassmorphism` and `whiteboard-explainer`.
 - [ ] **Phase 3 — Layout spec generation** — Extend `buildLayoutSpec` to write one section per raster slot; SVG/svg-hybrid slots resolve through `ThemeMotifLayer`.
 - [ ] **Phase 4 — Canvas overlay renderer** — Place deterministic content into sidecar-defined content regions; keep pan/resize/regenerate controls per slot.
 - [ ] **Phase 5 — Theme-specific component skins (timeline, network-graph, sankey)** — Remaining visual types (timeline, network-graph, sankey) not yet wired to skin vars. Section card heading vars (font/transform/tracking) are CSS-only; verify they render correctly for blueprint-engineering uppercase headings.
 - [ ] **Phase 6 — QA additions** — Checks for missing generated assets, stale dimensions, region overflow, low contrast, factual content in image prompts.
-
-### Glassmorphism
-
-- [x] **`neural-network-glassmorphism` component skins** — Wired in Phase 5: `backdrop-filter: blur(12px)`, semi-transparent backgrounds, and frosted card CSS tokens applied via `componentSkins` and `--skin-backdrop` CSS vars. No library needed.
 
 ### Source Layer
 
@@ -51,6 +46,8 @@ Working task list for the PosterForge project. Update this file as work is compl
 
 ## Completed
 
+- [x] Phase 2 component slot model — `GeneratedImageSlot` and `SlotTemplate` gain `x`, `y`, `objectPosition`; `buildSlotsFromTemplates()` exported; `buildLayoutSpec` and `buildStandardImageSlots` delegate to theme `slotTemplates` when present; `objectPosition` canonical on slot; `slotTemplates` defined for `neural-network-glassmorphism` and `whiteboard-explainer`
+- [x] `neural-network-glassmorphism` component skins — `backdrop-filter: blur(12px)`, semi-transparent backgrounds, frosted card CSS tokens via `componentSkins` and `--skin-backdrop` vars
 - [x] Bar chart rendering (Recharts ResponsiveContainer fix)
 - [x] Part A3 gaps: content region overlays, `imagegen-themes.json` consumption, `assetId` sidecar pattern
 - [x] `ThemeMotifLayer` for SVG/svg-hybrid themes
