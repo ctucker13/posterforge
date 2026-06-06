@@ -12,7 +12,7 @@ Working task list for the PosterForge project. Update this file as work is compl
 
 ### Theme-Generated Components (`docs/plans/theme-generated-components.md`)
 
-- [ ] **Phase 2 — Generated-image slot model** — Promote image slots to first-class plan elements with `x`, `y`, `widthPx`, `heightPx` positioning in `buildLayoutSpec`.
+- [x] **Phase 2 — Generated-image slot model** — `GeneratedImageSlot` and `SlotTemplate` gain `x`, `y`, `objectPosition`; `buildSlotsFromTemplates()` exported from `buildLayoutSpec`; `buildLayoutSpec` and `buildStandardImageSlots` delegate to theme `slotTemplates` when present; `objectPosition` canonical on slot (block value kept as legacy fallback); `slotTemplates` defined for `neural-network-glassmorphism` and `whiteboard-explainer`.
 - [ ] **Phase 3 — Layout spec generation** — Extend `buildLayoutSpec` to write one section per raster slot; SVG/svg-hybrid slots resolve through `ThemeMotifLayer`.
 - [ ] **Phase 4 — Canvas overlay renderer** — Place deterministic content into sidecar-defined content regions; keep pan/resize/regenerate controls per slot.
 - [ ] **Phase 5 — Theme-specific component skins (timeline, network-graph, sankey)** — Remaining visual types (timeline, network-graph, sankey) not yet wired to skin vars. Section card heading vars (font/transform/tracking) are CSS-only; verify they render correctly for blueprint-engineering uppercase headings.
@@ -20,7 +20,7 @@ Working task list for the PosterForge project. Update this file as work is compl
 
 ### Glassmorphism
 
-- [ ] **`neural-network-glassmorphism` component skins** — Wire `backdrop-filter: blur(12px)`, semi-transparent backgrounds, and frosted card CSS tokens into the theme skin once Phase 1 contract types are in place. React can do this natively with CSS properties — no library needed.
+- [x] **`neural-network-glassmorphism` component skins** — Wired in Phase 5: `backdrop-filter: blur(12px)`, semi-transparent backgrounds, and frosted card CSS tokens applied via `componentSkins` and `--skin-backdrop` CSS vars. No library needed.
 
 ### Source Layer
 
