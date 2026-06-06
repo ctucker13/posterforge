@@ -1,4 +1,6 @@
-import type { PosterProject } from "../domain/poster";
+import type { GeneratedImageSlot, PosterProject } from "../domain/poster";
+import type { SlotTemplate } from "../themes";
+import { themes } from "../themes";
 import imagegenThemes from "../themes/imagegen-themes.json";
 
 export interface ContentRegionSpec {
@@ -84,6 +86,52 @@ export const SECTION_ART_CONTENT_REGIONS: ContentRegionSpec[] = [
   { id: "chart", x: "65%", y: "22%", width: "30%", height: "55%", type: "chart" },
 ];
 
+/**
+ * Converts a theme's `slotTemplates` into concrete `GeneratedImageSlot[]` for a
+ * poster. Each `section_art` template is expanded once per `sectionId`; all other
+ * roles produce a single slot per template entry.
+ */
+export function buildSlotsFromTemplates(
+  templates: SlotTemplate[],
+  sectionIds: string[],
+): GeneratedImageSlot[] {
+  const slots: GeneratedImageSlot[] = [];
+  for (const tmpl of templates) {
+    const base = {
+      width_px: tmpl.widthPx,
+      height_px: tmpl.heightPx,
+      ...(tmpl.x != null && { x: tmpl.x }),
+      ...(tmpl.y != null && { y: tmpl.y }),
+      ...(tmpl.objectPosition != null && { objectPosition: tmpl.objectPosition }),
+      ...(tmpl.contentRegions != null && { contentRegions: tmpl.contentRegions.map((r) => ({ ...r })) }),
+    };
+
+    if (tmpl.role === "section_art") {
+      for (const sectionId of sectionIds) {
+        slots.push({
+          id: `${tmpl.id}_${sectionId}`,
+          role: "section_art",
+          outputFormat: "png",
+          ...base,
+          // section_art positions are layout-dependent; clear template x/y so
+          // Phase 4 can compute them from the live DOM.
+          x: undefined,
+          y: undefined,
+          contentRegions: tmpl.contentRegions?.map((r) => ({ ...r })),
+        });
+      }
+    } else {
+      slots.push({
+        id: tmpl.id,
+        role: tmpl.role,
+        outputFormat: tmpl.role === "background" ? "webp" : "png",
+        ...base,
+      });
+    }
+  }
+  return slots;
+}
+
 export function buildLayoutSpec(
   poster: PosterProject,
   quality: "low" | "medium" | "high" = "medium",
@@ -91,10 +139,52 @@ export function buildLayoutSpec(
   canvasH = 864,
 ): LayoutSpec {
   const bgStrategy = backgroundStrategyForTheme(poster.theme);
+  const theme = themes[poster.theme];
+  const sectionIds = poster.sections.slice(0, 4).map((s) => s.id);
 
+  const header = {
+    theme_id: poster.theme,
+    project_title: poster.title,
+    ...(poster.subtitle ? { project_subtitle: poster.subtitle } : {}),
+    quality,
+  };
+
+  // If the theme defines slot templates, derive sections from them.
+  if (theme?.slotTemplates && theme.slotTemplates.length > 0) {
+    const sections: LayoutSection[] = [];
+    for (const tmpl of theme.slotTemplates) {
+      if (tmpl.role === "section_art") {
+        for (const sectionId of sectionIds) {
+          sections.push({
+            id: `${tmpl.id}_${sectionId}`,
+            role: "section_art",
+            width_px: tmpl.widthPx,
+            height_px: tmpl.heightPx,
+            content_anchor: "center",
+            output_format: "png",
+            background_strategy: "raster",
+            content_regions: (tmpl.contentRegions ?? []).map((r) => ({ ...r })),
+          });
+        }
+      } else {
+        sections.push({
+          id: tmpl.id,
+          role: tmpl.role,
+          width_px: tmpl.widthPx,
+          height_px: tmpl.heightPx,
+          content_anchor: "center",
+          output_format: tmpl.role === "background" ? "webp" : "png",
+          background_strategy: bgStrategy,
+          content_regions: (tmpl.contentRegions ?? []).map((r) => ({ ...r })),
+        });
+      }
+    }
+    return { ...header, sections: sections.filter((s) => s.background_strategy === "raster") };
+  }
+
+  // Fallback: hardcoded slot structure
   const sections: LayoutSection[] = [];
 
-  // Background slot
   sections.push({
     id: "hero-background",
     role: "background",
@@ -106,11 +196,10 @@ export function buildLayoutSpec(
     content_regions: [],
   });
 
-  // Section art slots — one per poster section for raster themes
   if (bgStrategy === "raster") {
-    for (const section of poster.sections.slice(0, 4)) {
+    for (const sectionId of sectionIds) {
       sections.push({
-        id: `section-art-${section.id}`,
+        id: `section-art-${sectionId}`,
         role: "section_art",
         width_px: 720,
         height_px: 480,
@@ -122,11 +211,5 @@ export function buildLayoutSpec(
     }
   }
 
-  return {
-    theme_id: poster.theme,
-    project_title: poster.title,
-    ...(poster.subtitle ? { project_subtitle: poster.subtitle } : {}),
-    quality,
-    sections: sections.filter((s) => s.background_strategy === "raster"),
-  };
+  return { ...header, sections: sections.filter((s) => s.background_strategy === "raster") };
 }

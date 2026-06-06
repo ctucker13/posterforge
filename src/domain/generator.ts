@@ -15,7 +15,7 @@ import type {
   TraceEvent,
   TrustLevel,
 } from "./poster";
-import { getThemeDensity, SECTION_ART_CONTENT_REGIONS } from "../layouts/buildLayoutSpec";
+import { buildSlotsFromTemplates, getThemeDensity, SECTION_ART_CONTENT_REGIONS } from "../layouts/buildLayoutSpec";
 import { examplePoster } from "../data/examplePoster";
 import { buildClaimMap } from "./evidence";
 import { buildFixtureSourcePackage, createReferencesFromSources } from "../sources/sourceFixtures";
@@ -795,6 +795,14 @@ function deriveHeroText(prompt: string, summaries: SourceSummary[]): string {
 // ── Image slot helpers ────────────────────────────────────────────────────────
 
 function buildStandardImageSlots(sectionIds: string[], themeId: string, canvasW = 1536, canvasH = 864): GeneratedImageSlot[] {
+  const theme = themes[themeId];
+
+  // Delegate to theme slot templates when defined.
+  if (theme?.slotTemplates && theme.slotTemplates.length > 0) {
+    return buildSlotsFromTemplates(theme.slotTemplates, sectionIds.slice(0, 3));
+  }
+
+  // Fallback: hardcoded slot structure based on density.
   const density = getThemeDensity(themeId);
   const slots: GeneratedImageSlot[] = [
     { id: "slot_bg", role: "background", outputFormat: "webp", width_px: canvasW, height_px: canvasH },

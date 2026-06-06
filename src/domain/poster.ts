@@ -138,6 +138,12 @@ export interface GeneratedImageSlot {
   seed?: number | undefined;
   width_px?: number | undefined;
   height_px?: number | undefined;
+  /** Pixel offset from the left edge of the poster canvas (Phase 4 overlay positioning). */
+  x?: number | undefined;
+  /** Pixel offset from the top edge of the poster canvas (Phase 4 overlay positioning). */
+  y?: number | undefined;
+  /** CSS object-position for the rendered image (e.g. "50% 25%"). Canonical; block.objectPosition is legacy fallback. */
+  objectPosition?: string | undefined;
   contentRegions?: ContentRegion[] | undefined;
 }
 

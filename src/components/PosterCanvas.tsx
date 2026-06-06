@@ -437,7 +437,7 @@ function renderBlock(
         blockId={blockId}
         slot={slot}
         slotId={block.slot_id}
-        objectPosition={block.objectPosition}
+        objectPosition={slot?.objectPosition ?? block.objectPosition}
         mode={mode}
         generating={generatingSlotIds?.has(block.slot_id) ?? false}
         onGenerate={onGenerateImageSlot}

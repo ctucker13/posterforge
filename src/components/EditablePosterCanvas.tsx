@@ -404,14 +404,10 @@ export function EditablePosterCanvas({
                   onUpdateImageSlotPosition={(slotId, objectPosition) => {
                     onPosterChange({
                       ...poster,
-                      sections: poster.sections.map((section) => ({
-                        ...section,
-                        blocks: section.blocks.map((block) =>
-                          block.type === "generated_image" && block.slot_id === slotId
-                            ? { ...block, objectPosition }
-                            : block,
-                        ),
-                      })),
+                      // objectPosition is canonical on the slot; blocks keep legacy value for old data.
+                      imageSlots: (poster.imageSlots ?? []).map((slot) =>
+                        slot.id === slotId ? { ...slot, objectPosition } : slot,
+                      ),
                     });
                   }}
                   onImageSlotSidecarLoaded={(slotId, patch) => {

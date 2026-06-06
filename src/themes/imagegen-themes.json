@@ -637,7 +637,18 @@
           "--skin-border": "1.5px dashed #999999",
           "--skin-radius": "6px"
         }
-      }
+      },
+      "slotTemplates": [
+        {
+          "id": "slot_hero_illus",
+          "role": "hero_illustration",
+          "widthPx": 1536,
+          "heightPx": 410,
+          "x": 0,
+          "y": 0,
+          "objectPosition": "50% 50%"
+        }
+      ]
     },
     {
       "id": "product-launch-startup-pitch",
@@ -1172,7 +1183,39 @@
           "--skin-radius": "12px",
           "--skin-backdrop": "blur(6px)"
         }
-      }
+      },
+      "slotTemplates": [
+        {
+          "id": "slot_bg",
+          "role": "background",
+          "widthPx": 1536,
+          "heightPx": 1024,
+          "x": 0,
+          "y": 0,
+          "objectPosition": "50% 50%"
+        },
+        {
+          "id": "slot_hero_illus",
+          "role": "hero_illustration",
+          "widthPx": 1536,
+          "heightPx": 410,
+          "x": 0,
+          "y": 0,
+          "objectPosition": "50% 40%"
+        },
+        {
+          "id": "slot_art",
+          "role": "section_art",
+          "widthPx": 720,
+          "heightPx": 480,
+          "objectPosition": "50% 50%",
+          "contentRegions": [
+            { "id": "title", "x": "5%", "y": "5%",  "width": "90%", "height": "15%", "type": "text" },
+            { "id": "body",  "x": "5%", "y": "22%", "width": "58%", "height": "55%", "type": "text" },
+            { "id": "chart", "x": "65%","y": "22%", "width": "30%", "height": "55%", "type": "chart" }
+          ]
+        }
+      ]
     },
     {
       "id": "industrial-data-factory",

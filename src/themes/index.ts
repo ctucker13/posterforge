@@ -61,6 +61,12 @@ export interface SlotTemplate {
   role: "background" | "hero_illustration" | "section_art";
   widthPx: number;
   heightPx: number;
+  /** Pixel offset from the left edge of the poster canvas (used for Phase 4 overlay positioning). */
+  x?: number | undefined;
+  /** Pixel offset from the top edge of the poster canvas (used for Phase 4 overlay positioning). */
+  y?: number | undefined;
+  /** CSS object-position default for this slot (e.g. "50% 25%"). */
+  objectPosition?: string | undefined;
   contentRegions?: Array<{
     id: string;
     x: string;
