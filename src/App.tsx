@@ -368,6 +368,8 @@ export default function App() {
           </div>
         </div>
 
+        <ModeBar mode={appMode} onModeChange={setAppMode} qaIssueCount={qaIssues.length} />
+
         <div className="workspace-status" aria-label="Project status">
           <div>
             <span>Spec</span>
@@ -394,12 +396,6 @@ export default function App() {
       {pendingOutline ? <OutlineConfirmDialog outline={pendingOutline} onConfirm={handleConfirmOutline} onBack={() => setPendingOutline(null)} /> : null}
 
       <section className="control-panel tool-panel" aria-label="PosterForge controls">
-        <ModeBar mode={appMode} onModeChange={setAppMode} qaIssueCount={qaIssues.length} />
-        <div className="panel-header">
-          <h2>{getAppModeLabel(appMode)}</h2>
-          <span>{appMode === "generate" && realSourceCount > 0 ? `${realSourceCount} real source${realSourceCount !== 1 ? "s" : ""}` : appMode}</span>
-        </div>
-
         {appMode === "generate" ? (
           <>
             <label className="field">
@@ -541,10 +537,6 @@ export default function App() {
       </section>
     </main>
   );
-}
-
-function getAppModeLabel(mode: AppMode) {
-  return mode.charAt(0).toUpperCase() + mode.slice(1);
 }
 
 function isEditableTarget(target: EventTarget | null) {
