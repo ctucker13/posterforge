@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowDown, ArrowUp, CheckCircle2, Eye, EyeOff, MousePointer2, Plus } from "lucide-react";
+import { ArrowDown, ArrowUp, CheckCircle2, ChevronDown, Eye, EyeOff, MousePointer2, Plus } from "lucide-react";
 import type { PosterChangeOptions } from "../app/posterHistory";
 import type { PosterBlock, PosterProject, PosterSection, PosterSectionLayout, PosterVisual } from "../domain/poster";
 import type { PosterCanvasItemKind } from "./PosterCanvas";
@@ -180,37 +180,42 @@ export function PosterInspector({ poster, selectedId, selectedKind, onPosterChan
             </button>
           </div>
 
-          <div className="field-grid">
-            <label className="field">
-              <span>Column span</span>
-              <select
-                value={selectedSection.layout?.columnSpan ?? ""}
-                onChange={(event) =>
-                  updateSectionLayout(selectedSection.id, {
-                    columnSpan: event.target.value ? (Number(event.target.value) as PosterSectionLayout["columnSpan"]) : undefined,
-                  })
-                }
-              >
-                <option value="">Auto</option>
-                <option value="1">1 column</option>
-                <option value="2">2 columns</option>
-                <option value="3">3 columns</option>
-                <option value="4">4 columns</option>
-              </select>
-            </label>
+          <details className="inspector-disclosure">
+            <summary>
+              <ChevronDown size={14} /> Layout options
+            </summary>
+            <div className="field-grid">
+              <label className="field">
+                <span>Column span</span>
+                <select
+                  value={selectedSection.layout?.columnSpan ?? ""}
+                  onChange={(event) =>
+                    updateSectionLayout(selectedSection.id, {
+                      columnSpan: event.target.value ? (Number(event.target.value) as PosterSectionLayout["columnSpan"]) : undefined,
+                    })
+                  }
+                >
+                  <option value="">Auto</option>
+                  <option value="1">1 column</option>
+                  <option value="2">2 columns</option>
+                  <option value="3">3 columns</option>
+                  <option value="4">4 columns</option>
+                </select>
+              </label>
 
-            <label className="field">
-              <span>Emphasis</span>
-              <select
-                value={selectedSection.layout?.emphasis ?? "normal"}
-                onChange={(event) => updateSectionLayout(selectedSection.id, { emphasis: event.target.value as PosterSectionLayout["emphasis"] })}
-              >
-                <option value="normal">Normal</option>
-                <option value="featured">Featured</option>
-                <option value="hero">Hero</option>
-              </select>
-            </label>
-          </div>
+              <label className="field">
+                <span>Emphasis</span>
+                <select
+                  value={selectedSection.layout?.emphasis ?? "normal"}
+                  onChange={(event) => updateSectionLayout(selectedSection.id, { emphasis: event.target.value as PosterSectionLayout["emphasis"] })}
+                >
+                  <option value="normal">Normal</option>
+                  <option value="featured">Featured</option>
+                  <option value="hero">Hero</option>
+                </select>
+              </label>
+            </div>
+          </details>
         </div>
       ) : null}
 
@@ -275,31 +280,37 @@ function VisualDataInspector({ poster, visual, onPosterChange }: { poster: Poste
         <span>{parseError ?? "Visual data is valid."}</span>
       </div>
 
-      <dl className="visual-data-summary">
-        <div>
-          <dt>Type</dt>
-          <dd>{visual.type}</dd>
-        </div>
-        <div>
-          <dt>Sources</dt>
-          <dd>{visual.source_ids?.length ?? 0}</dd>
-        </div>
-      </dl>
-
       <VisualEditor visual={visual} onSave={saveStructuredVisualData} />
-
-      <label className="field">
-        <span>Visual data JSON</span>
-        <textarea value={draft} onChange={(event) => setDraft(event.target.value)} rows={10} spellCheck={false} />
-      </label>
 
       {message ? <div className={message === "Visual data saved." ? "visual-data-message ready" : "visual-data-message error"}>{message}</div> : null}
 
-      <div className="inspector-actions single-action">
-        <button type="button" onClick={saveVisualData}>
-          Save data
-        </button>
-      </div>
+      <details className="inspector-disclosure">
+        <summary>
+          <ChevronDown size={14} /> Advanced
+        </summary>
+
+        <dl className="visual-data-summary">
+          <div>
+            <dt>Type</dt>
+            <dd>{visual.type}</dd>
+          </div>
+          <div>
+            <dt>Sources</dt>
+            <dd>{visual.source_ids?.length ?? 0}</dd>
+          </div>
+        </dl>
+
+        <label className="field">
+          <span>Visual data JSON</span>
+          <textarea value={draft} onChange={(event) => setDraft(event.target.value)} rows={10} spellCheck={false} />
+        </label>
+
+        <div className="inspector-actions single-action">
+          <button type="button" onClick={saveVisualData}>
+            Save JSON
+          </button>
+        </div>
+      </details>
     </div>
   );
 
