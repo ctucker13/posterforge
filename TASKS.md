@@ -65,6 +65,7 @@ Organised by milestone — see `docs/plans/product-roadmap-2026-06.md` for the f
 - [ ] **F6. Keyboard parity + shortcuts overlay** — Every common action keyboard-reachable; `?` shortcuts overlay; consistent Cmd+Z/D/K conventions.
 - [ ] **F7. Plain-language error and recovery surfaces** — No raw API errors; each failure says what happened and offers one-click recovery. *Land with M2/M3.*
 - [ ] **F8. Accessibility baseline** — Focus rings, ARIA labels on canvas controls, contrast-checked app chrome.
+- [ ] **F9. Glass UI redesign** — Clean Apple-like chrome with a glassmorphic layer system; fixes the squashed mode bar, crowded canvas toolbar, section-navigator bulk, and boxes-in-boxes border noise. Plan and phases (G1 tokens/shell → G2 header/mode bar → G3 canvas stage → G4 control kit/rails → G5 audit) in `docs/plans/ui-redesign-glass.md`. Poster canvas stays untouched.
 
 ### M5 — QA, persistence, and export polish
 
