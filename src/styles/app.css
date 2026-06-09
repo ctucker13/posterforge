@@ -2880,6 +2880,14 @@ textarea {
   color: var(--theme-primary);
 }
 
+/* Cleared editable text stays visible and clickable via its placeholder. */
+.poster-canvas-mode-edit [contenteditable="true"]:empty::before {
+  content: attr(data-placeholder);
+  opacity: 0.45;
+  font-style: italic;
+  pointer-events: none;
+}
+
 .poster-canvas-mode-edit .poster-card:hover,
 .poster-canvas-mode-edit .poster-text-block:hover,
 .poster-canvas-mode-edit [data-visual-id]:hover {
@@ -2914,6 +2922,8 @@ textarea {
 
 .poster-text-block p {
   margin: 0;
+  /* Line breaks typed during inline editing survive the committed render. */
+  white-space: pre-line;
 }
 
 .text-claim-badges {

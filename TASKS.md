@@ -14,7 +14,6 @@ Organised by milestone — see `docs/plans/product-roadmap-2026-06.md` for the f
 
 ### M1 — Canvas editing power
 
-- [ ] **A2. Inline text editing** — Click-to-edit text blocks, section titles, poster title/subtitle on the canvas; Cmd+K stays as the AI revision path.
 - [ ] **A3. Drag-resize sections** — Resize handles snapping to grid columns/rows, writing `columnSpan`/`rowSpan`, with ghost preview.
 - [ ] **A4. Block-level rearrange** — dnd-kit drag of blocks within and between sections with insert indicators.
 - [ ] **A5. Phase 3 — Layout spec generation** — Extend `buildLayoutSpec` to write one section per raster slot; SVG/svg-hybrid slots resolve through `ThemeMotifLayer`.
@@ -87,6 +86,7 @@ Organised by milestone — see `docs/plans/product-roadmap-2026-06.md` for the f
 
 ## Completed
 
+- [x] A2 inline text editing — `EditableText` component in `PosterCanvas` unifying poster title/subtitle, section titles, and text blocks: Enter commits single-line fields, Escape reverts and exits without committing, unchanged text never reaches `onCommit` (no spurious undo steps), plain-text paste preserved; `:empty::before` placeholder CSS keeps cleared text clickable; `white-space: pre-line` so newlines typed in text blocks survive the committed render; verified in-browser with Playwright (12 interaction checks)
 - [x] A1 undo/redo history — pure history core (`src/app/posterHistory.ts`, capped at 100 steps, gesture coalescing via `coalesce` keys, `skipHistory` for derived data) + `usePosterHistory` hook owning the `PosterProject` in `App.tsx`; Cmd/Ctrl+Z and Cmd/Ctrl+Shift+Z / Ctrl+Y shortcuts (skipped inside inputs/contentEditable); undo/redo toolbar buttons in `EditablePosterCanvas`; per-keystroke call sites coalesced (ProjectEditor title/subtitle/audience, PosterInspector section title/block text/visual data); QA results and sidecar hydration bypass history; theme/palette picker state follows poster on undo
 - [x] Phase 2 component slot model — `GeneratedImageSlot` and `SlotTemplate` gain `x`, `y`, `objectPosition`; `buildSlotsFromTemplates()` exported; `buildLayoutSpec` and `buildStandardImageSlots` delegate to theme `slotTemplates` when present; `objectPosition` canonical on slot; `slotTemplates` defined for `neural-network-glassmorphism` and `whiteboard-explainer`
 - [x] `neural-network-glassmorphism` component skins — `backdrop-filter: blur(12px)`, semi-transparent backgrounds, frosted card CSS tokens via `componentSkins` and `--skin-backdrop` vars

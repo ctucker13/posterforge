@@ -1,4 +1,4 @@
-import { type CSSProperties, type KeyboardEvent, type ClipboardEvent, useEffect, useState } from "react";
+import { type CSSProperties, type ClipboardEvent, useEffect, useState } from "react";
 import { DndContext, closestCenter, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, arrayMove, useSortable, rectSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -185,15 +185,13 @@ export function PosterCanvas({
                 </button>
               </div>
             ) : null}
-            <h3
-              contentEditable={mode === "edit"}
-              suppressContentEditableWarning
-              onBlur={(event) => onUpdateSectionTitle?.(section.id, event.currentTarget.innerText.trim())}
-              onKeyDown={handleSingleLineEditKeyDown}
-              onPaste={handlePlainTextPaste}
-            >
-              {section.title}
-            </h3>
+            <EditableText
+              as="h3"
+              value={section.title}
+              editing={mode === "edit"}
+              placeholder="Section title"
+              onCommit={(next) => onUpdateSectionTitle?.(section.id, next)}
+            />
             {section.blocks.map((block, index) =>
               renderBlock(block, index, section.id, visuals, imageSlots, mode, skins, palette, selectedId, qaIssuesByLocation, onSelectItem, onUpdateTextBlock, onGenerateImageSlot, onUpdateImageSlotPosition, onImageSlotSidecarLoaded, generatingSlotIds),
             )}
@@ -278,24 +276,20 @@ export function PosterCanvas({
         <header className="poster-hero" data-poster-id="hero" data-poster-kind="hero">
           <div>
             <p className="poster-kicker">{layout.name} · {poster.audience}</p>
-            <h2
-              contentEditable={mode === "edit"}
-              suppressContentEditableWarning
-              onBlur={(event) => onUpdatePosterField?.("title", event.currentTarget.innerText.trim())}
-              onKeyDown={handleSingleLineEditKeyDown}
-              onPaste={handlePlainTextPaste}
-            >
-              {poster.title}
-            </h2>
-            <p
-              contentEditable={mode === "edit"}
-              suppressContentEditableWarning
-              onBlur={(event) => onUpdatePosterField?.("subtitle", event.currentTarget.innerText.trim())}
-              onKeyDown={handleSingleLineEditKeyDown}
-              onPaste={handlePlainTextPaste}
-            >
-              {poster.subtitle}
-            </p>
+            <EditableText
+              as="h2"
+              value={poster.title}
+              editing={mode === "edit"}
+              placeholder="Poster title"
+              onCommit={(next) => onUpdatePosterField?.("title", next)}
+            />
+            <EditableText
+              as="p"
+              value={poster.subtitle ?? ""}
+              editing={mode === "edit"}
+              placeholder="Add a subtitle"
+              onCommit={(next) => onUpdatePosterField?.("subtitle", next)}
+            />
           </div>
           <div
             className={`hero-asset${poster.logo ? " hero-asset-logo" : backgroundAsset ? " hero-asset-image" : ""}`}
@@ -379,6 +373,57 @@ function handlePlainTextPaste(e: ClipboardEvent) {
   document.execCommand("insertText", false, text);
 }
 
+/**
+ * Click-to-edit text on the poster canvas. Commits trimmed text on blur,
+ * Enter commits single-line fields, Escape reverts and exits without
+ * committing. Unchanged text never reaches onCommit, so focusing and
+ * leaving a field cannot create an undo step.
+ */
+function EditableText({
+  as: Tag,
+  value,
+  editing,
+  multiline = false,
+  placeholder,
+  onCommit,
+}: {
+  as: "h2" | "h3" | "p";
+  value: string;
+  editing: boolean;
+  multiline?: boolean;
+  placeholder?: string;
+  onCommit?: ((next: string) => void) | undefined;
+}) {
+  return (
+    <Tag
+      contentEditable={editing}
+      suppressContentEditableWarning
+      data-placeholder={editing ? placeholder : undefined}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" && !multiline) {
+          event.preventDefault();
+          event.currentTarget.blur();
+        } else if (event.key === "Escape") {
+          event.preventDefault();
+          event.currentTarget.innerText = value;
+          event.currentTarget.blur();
+        }
+      }}
+      onBlur={(event) => {
+        const next = event.currentTarget.innerText.trim();
+        if (next === value.trim()) {
+          if (event.currentTarget.innerText !== value) event.currentTarget.innerText = value;
+          return;
+        }
+        onCommit?.(next);
+      }}
+      onPaste={handlePlainTextPaste}
+    >
+      {value}
+    </Tag>
+  );
+}
+
 function mmToCssPx(value: number) {
   return Math.round((value * 96) / 25.4);
 }
@@ -422,9 +467,14 @@ function renderBlock(
           }
         }}
       >
-        <p contentEditable={mode === "edit"} suppressContentEditableWarning onBlur={(event) => onUpdateTextBlock?.(blockId, event.currentTarget.innerText.trim())} onPaste={handlePlainTextPaste}>
-          {block.text}
-        </p>
+        <EditableText
+          as="p"
+          value={block.text}
+          editing={mode === "edit"}
+          multiline
+          placeholder="Empty text block — click to write"
+          onCommit={(next) => onUpdateTextBlock?.(blockId, next)}
+        />
       </div>
     );
   }
@@ -502,13 +552,6 @@ function QaBadge({ issues, onClick }: { issues: QaIssue[]; onClick: () => void }
       {issues.length}
     </button>
   );
-}
-
-function handleSingleLineEditKeyDown(event: KeyboardEvent<HTMLElement>) {
-  if (event.key === "Enter") {
-    event.preventDefault();
-    event.currentTarget.blur();
-  }
 }
 
 function GeneratedImageBlock({
