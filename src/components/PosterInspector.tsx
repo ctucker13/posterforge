@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ArrowDown, ArrowUp, CheckCircle2, Eye, EyeOff, MousePointer2, Plus } from "lucide-react";
+import type { PosterChangeOptions } from "../app/posterHistory";
 import type { PosterBlock, PosterProject, PosterSection, PosterSectionLayout, PosterVisual } from "../domain/poster";
 import type { PosterCanvasItemKind } from "./PosterCanvas";
 import { parseBlockId } from "./posterUtils";
@@ -26,7 +27,7 @@ interface PosterInspectorProps {
   poster: PosterProject;
   selectedId?: string | undefined;
   selectedKind?: PosterCanvasItemKind | undefined;
-  onPosterChange: (poster: PosterProject) => void;
+  onPosterChange: (poster: PosterProject, options?: PosterChangeOptions) => void;
   onMoveSection?: (sectionId: string, direction: -1 | 1) => void;
   onToggleHideSection?: (sectionId: string) => void;
 }
@@ -108,19 +109,23 @@ export function PosterInspector({ poster, selectedId, selectedKind, onPosterChan
       return;
     }
 
-    onPosterChange({
-      ...poster,
-      sections: poster.sections.map((section) => {
-        if (section.id !== parsed.sectionId) {
-          return section;
-        }
+    onPosterChange(
+      {
+        ...poster,
+        sections: poster.sections.map((section) => {
+          if (section.id !== parsed.sectionId) {
+            return section;
+          }
 
-        return {
-          ...section,
-          blocks: section.blocks.map((block, index) => (index === parsed.index && block.type === "text" ? { ...block, text } : block)),
-        };
-      }),
-    });
+          return {
+            ...section,
+            blocks: section.blocks.map((block, index) => (index === parsed.index && block.type === "text" ? { ...block, text } : block)),
+          };
+        }),
+      },
+      // The textarea fires per keystroke — keep each typing burst as one undo step.
+      { coalesce: `block-text:${blockId}` },
+    );
   }
 
   return (
@@ -148,7 +153,18 @@ export function PosterInspector({ poster, selectedId, selectedKind, onPosterChan
         <div className="project-editor-body">
           <label className="field">
             <span>Section title</span>
-            <input value={selectedSection.title} onChange={(event) => updateSection(selectedSection.id, (section) => ({ ...section, title: event.target.value }))} />
+            <input
+              value={selectedSection.title}
+              onChange={(event) =>
+                onPosterChange(
+                  {
+                    ...poster,
+                    sections: poster.sections.map((section) => (section.id === selectedSection.id ? { ...section, title: event.target.value } : section)),
+                  },
+                  { coalesce: `section-title:${selectedSection.id}` },
+                )
+              }
+            />
           </label>
 
           <div className="inspector-actions">
@@ -220,7 +236,7 @@ export function PosterInspector({ poster, selectedId, selectedKind, onPosterChan
   );
 }
 
-function VisualDataInspector({ poster, visual, onPosterChange }: { poster: PosterProject; visual: PosterVisual; onPosterChange: (poster: PosterProject) => void }) {
+function VisualDataInspector({ poster, visual, onPosterChange }: { poster: PosterProject; visual: PosterVisual; onPosterChange: (poster: PosterProject, options?: PosterChangeOptions) => void }) {
   const [draft, setDraft] = useState(formatVisualData(visual.data));
   const [message, setMessage] = useState<string | undefined>();
   const parseError = getVisualParseError(visual);
@@ -294,10 +310,14 @@ function VisualDataInspector({ poster, visual, onPosterChange }: { poster: Poste
       return;
     }
 
-    onPosterChange({
-      ...poster,
-      visuals: poster.visuals.map((item) => (item.id === visual.id ? { ...item, data: newData } : item)),
-    });
+    onPosterChange(
+      {
+        ...poster,
+        visuals: poster.visuals.map((item) => (item.id === visual.id ? { ...item, data: newData } : item)),
+      },
+      // Live field editors fire per keystroke — coalesce per visual.
+      { coalesce: `visual-data:${visual.id}` },
+    );
     setMessage("Visual data saved.");
   }
 }

@@ -1,10 +1,11 @@
 import { FileText, LayoutTemplate, Maximize2, Monitor, Users } from "lucide-react";
+import type { PosterChangeOptions } from "../app/posterHistory";
 import type { PosterLayoutId, PosterProject } from "../domain/poster";
 import { layoutTemplates, resolveLayoutTemplate } from "../layouts";
 
 interface ProjectEditorProps {
   poster: PosterProject;
-  onPosterChange: (poster: PosterProject) => void;
+  onPosterChange: (poster: PosterProject, options?: PosterChangeOptions) => void;
 }
 
 export function ProjectEditor({ poster, onPosterChange }: ProjectEditorProps) {
@@ -12,6 +13,11 @@ export function ProjectEditor({ poster, onPosterChange }: ProjectEditorProps) {
 
   function updateField<Key extends keyof PosterProject>(key: Key, value: PosterProject[Key]) {
     onPosterChange({ ...poster, [key]: value });
+  }
+
+  // Text inputs fire per keystroke — coalesce each field's burst into one undo step.
+  function updateTextField(key: "title" | "subtitle" | "audience", value: string) {
+    onPosterChange({ ...poster, [key]: value }, { coalesce: `project:${key}` });
   }
 
   return (
@@ -26,14 +32,14 @@ export function ProjectEditor({ poster, onPosterChange }: ProjectEditorProps) {
           <span>
             <FileText size={15} /> Title
           </span>
-          <input value={poster.title} onChange={(event) => updateField("title", event.target.value)} />
+          <input value={poster.title} onChange={(event) => updateTextField("title", event.target.value)} />
         </label>
 
         <label className="field">
           <span>
             <FileText size={15} /> Subtitle
           </span>
-          <input value={poster.subtitle ?? ""} onChange={(event) => updateField("subtitle", event.target.value)} />
+          <input value={poster.subtitle ?? ""} onChange={(event) => updateTextField("subtitle", event.target.value)} />
         </label>
 
         <div className="field-grid">
@@ -54,7 +60,7 @@ export function ProjectEditor({ poster, onPosterChange }: ProjectEditorProps) {
             <span>
               <Users size={15} /> Audience
             </span>
-            <input value={poster.audience ?? ""} onChange={(event) => updateField("audience", event.target.value)} />
+            <input value={poster.audience ?? ""} onChange={(event) => updateTextField("audience", event.target.value)} />
           </label>
         </div>
 

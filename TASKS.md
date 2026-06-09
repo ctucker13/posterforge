@@ -14,7 +14,6 @@ Organised by milestone — see `docs/plans/product-roadmap-2026-06.md` for the f
 
 ### M1 — Canvas editing power
 
-- [ ] **A1. Undo/redo history** — Centralise `PosterProject` mutation behind a history store; Cmd+Z / Cmd+Shift+Z; coalesce drag gestures. Land before other M1 tasks.
 - [ ] **A2. Inline text editing** — Click-to-edit text blocks, section titles, poster title/subtitle on the canvas; Cmd+K stays as the AI revision path.
 - [ ] **A3. Drag-resize sections** — Resize handles snapping to grid columns/rows, writing `columnSpan`/`rowSpan`, with ghost preview.
 - [ ] **A4. Block-level rearrange** — dnd-kit drag of blocks within and between sections with insert indicators.
@@ -88,6 +87,7 @@ Organised by milestone — see `docs/plans/product-roadmap-2026-06.md` for the f
 
 ## Completed
 
+- [x] A1 undo/redo history — pure history core (`src/app/posterHistory.ts`, capped at 100 steps, gesture coalescing via `coalesce` keys, `skipHistory` for derived data) + `usePosterHistory` hook owning the `PosterProject` in `App.tsx`; Cmd/Ctrl+Z and Cmd/Ctrl+Shift+Z / Ctrl+Y shortcuts (skipped inside inputs/contentEditable); undo/redo toolbar buttons in `EditablePosterCanvas`; per-keystroke call sites coalesced (ProjectEditor title/subtitle/audience, PosterInspector section title/block text/visual data); QA results and sidecar hydration bypass history; theme/palette picker state follows poster on undo
 - [x] Phase 2 component slot model — `GeneratedImageSlot` and `SlotTemplate` gain `x`, `y`, `objectPosition`; `buildSlotsFromTemplates()` exported; `buildLayoutSpec` and `buildStandardImageSlots` delegate to theme `slotTemplates` when present; `objectPosition` canonical on slot; `slotTemplates` defined for `neural-network-glassmorphism` and `whiteboard-explainer`
 - [x] `neural-network-glassmorphism` component skins — `backdrop-filter: blur(12px)`, semi-transparent backgrounds, frosted card CSS tokens via `componentSkins` and `--skin-backdrop` vars
 - [x] Bar chart rendering (Recharts ResponsiveContainer fix)

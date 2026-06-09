@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AlertTriangle, CheckCircle2, Eye, Maximize2, Minus, Monitor, Pencil, Plus } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Eye, Maximize2, Minus, Monitor, Pencil, Plus, Redo2, Undo2 } from "lucide-react";
 import { Wand2 } from "lucide-react";
+import type { PosterChangeOptions } from "../app/posterHistory";
 import type { PosterProject, QaIssue } from "../domain/poster";
 import { reviseTextBlock } from "../domain/generator";
 import { generateImageForSlot } from "../services/imageGen";
@@ -23,11 +24,15 @@ import {
 
 interface EditablePosterCanvasProps {
   poster: PosterProject;
-  onPosterChange: (poster: PosterProject) => void;
+  onPosterChange: (poster: PosterProject, options?: PosterChangeOptions) => void;
   onSelectItem: (id: string, kind: PosterCanvasItemKind) => void;
   selectedId?: string | undefined;
   selectedKind?: PosterCanvasItemKind | undefined;
   qaIssues?: QaIssue[];
+  onUndo?: (() => void) | undefined;
+  onRedo?: (() => void) | undefined;
+  canUndo?: boolean | undefined;
+  canRedo?: boolean | undefined;
   onSectionReorder?: (orderedIds: string[]) => void;
   onRegenerateSection?: (sectionId: string, instruction?: string) => void;
   onMoveSection?: (sectionId: string, direction: -1 | 1) => void;
@@ -45,6 +50,10 @@ export function EditablePosterCanvas({
   selectedKind,
   qaIssues = [],
   onPosterChange,
+  onUndo,
+  onRedo,
+  canUndo = false,
+  canRedo = false,
   onSelectItem,
   onSectionReorder,
   onRegenerateSection,
@@ -293,6 +302,12 @@ export function EditablePosterCanvas({
       </div>
       <SectionNavigator poster={poster} selectedId={selectedId} qaIssues={qaIssues} onSelectSection={(id) => onSelectItem(id, "section")} />
       <div className="preview-toolbar" aria-label="Editor view controls">
+        <button type="button" title="Undo (Cmd/Ctrl+Z)" aria-label="Undo" disabled={!canUndo} onClick={onUndo}>
+          <Undo2 size={15} />
+        </button>
+        <button type="button" title="Redo (Cmd/Ctrl+Shift+Z)" aria-label="Redo" disabled={!canRedo} onClick={onRedo}>
+          <Redo2 size={15} />
+        </button>
         <button className={virtualMode ? "active" : ""} type="button" title="Virtual session view" aria-label="Virtual session view" onClick={toggleVirtualMode}>
           <Monitor size={15} />
         </button>
@@ -411,12 +426,13 @@ export function EditablePosterCanvas({
                     });
                   }}
                   onImageSlotSidecarLoaded={(slotId, patch) => {
+                    // Sidecar metadata is hydration, not a user edit — keep it out of undo history.
                     onPosterChange({
                       ...poster,
                       imageSlots: (poster.imageSlots ?? []).map((slot) =>
                         slot.id === slotId ? { ...slot, ...patch } : slot,
                       ),
-                    });
+                    }, { skipHistory: true });
                   }}
                 />
               </div>

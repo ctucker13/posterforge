@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChevronDown, Play, Sparkles } from "lucide-react";
 import { EditablePosterCanvas } from "./components/EditablePosterCanvas";
 import { EvidencePanel } from "./components/EvidencePanel";
@@ -15,6 +15,7 @@ import { ThemePicker } from "./components/ThemePicker";
 import { AssetPicker } from "./components/AssetPicker";
 import { TracePanel } from "./components/TracePanel";
 import { catalogueEntryToPosterAsset, findThemeBackgroundAsset, loadAssetCatalogue, type AssetCatalogue } from "./assets/catalogue";
+import { usePosterHistory, type PosterChangeOptions } from "./app/usePosterHistory";
 import { generateOutline, generatePoster, generationTrace, regenerateSection } from "./domain/generator";
 import { migratePosterProject } from "./domain/migration";
 import { examplePoster } from "./data/examplePoster";
@@ -43,7 +44,7 @@ export default function App() {
   const [theme, setTheme] = useState(initialPoster.theme);
   const [palette, setPalette] = useState(initialPoster.palette ?? themes[initialPoster.theme]?.palette ?? "clean-blue");
   const [trace, setTrace] = useState<TraceEvent[]>(initialTrace);
-  const [poster, setPoster] = useState<PosterProject>({ ...initialPoster, qaResults: initialQaIssues });
+  const { poster, setPoster, undo, redo, canUndo, canRedo } = usePosterHistory({ ...initialPoster, qaResults: initialQaIssues });
   const [qaIssues, setQaIssues] = useState<QaIssue[]>(initialQaIssues);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationWarning, setGenerationWarning] = useState<string | null>(null);
@@ -62,10 +63,49 @@ export default function App() {
   const debouncedRunQa = useMemo(() => debounce((p: PosterProject) => {
     const issues = runQa(p);
     setQaIssues(issues);
-    setPoster((prev) => ({ ...prev, qaResults: issues }));
-  }, 400), []);
+    // QA results are derived data — refresh them without polluting undo history.
+    setPoster((prev) => ({ ...prev, qaResults: issues }), { skipHistory: true });
+  }, 400), [setPoster]);
 
   useEffect(() => () => debouncedRunQa.cancel(), [debouncedRunQa]);
+
+  // Theme/palette picker state follows the poster so undo/redo restores it too.
+  useEffect(() => {
+    setTheme(poster.theme);
+    setPalette(poster.palette ?? themes[poster.theme]?.palette ?? "clean-blue");
+  }, [poster.theme, poster.palette]);
+
+  const handleUndo = useCallback(() => {
+    const restored = undo();
+    if (!restored) return;
+    setQaIssues(restored.qaResults ?? []);
+    debouncedRunQa(restored);
+  }, [undo, debouncedRunQa]);
+
+  const handleRedo = useCallback(() => {
+    const restored = redo();
+    if (!restored) return;
+    setQaIssues(restored.qaResults ?? []);
+    debouncedRunQa(restored);
+  }, [redo, debouncedRunQa]);
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (!(event.metaKey || event.ctrlKey)) return;
+      const key = event.key.toLowerCase();
+      const wantsRedo = (key === "z" && event.shiftKey) || key === "y";
+      const wantsUndo = key === "z" && !event.shiftKey;
+      if (!wantsUndo && !wantsRedo) return;
+      // Inputs and contentEditable keep their native text undo.
+      if (isEditableTarget(event.target)) return;
+      event.preventDefault();
+      if (wantsRedo) handleRedo();
+      else handleUndo();
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [handleUndo, handleRedo]);
 
   useEffect(() => {
     let cancelled = false;
@@ -192,8 +232,6 @@ export default function App() {
       assets: nextAssets,
       qaResults: nextQaIssues,
     };
-    setTheme(nextTheme);
-    setPalette(nextPalette);
     setPoster(nextPoster);
     setQaIssues(nextQaIssues);
   }
@@ -201,7 +239,6 @@ export default function App() {
   function handlePaletteChange(nextPalette: string) {
     const nextQaIssues = runQa({ ...poster, palette: nextPalette });
     const nextPoster = { ...poster, palette: nextPalette, qaResults: nextQaIssues };
-    setPalette(nextPalette);
     setPoster(nextPoster);
     setQaIssues(nextQaIssues);
   }
@@ -215,8 +252,6 @@ export default function App() {
     const nextPalette = migrated.palette && palettes[migrated.palette] ? migrated.palette : themes[nextTheme]?.palette ?? "clean-blue";
     const normalizedPoster = { ...migrated, theme: nextTheme, palette: nextPalette };
     const nextQaIssues = runQa(normalizedPoster);
-    setTheme(nextTheme);
-    setPalette(nextPalette);
     if (migrated.metadata?.prompt) setPrompt(migrated.metadata.prompt);
     setPoster({ ...normalizedPoster, qaResults: nextQaIssues });
     setQaIssues(nextQaIssues);
@@ -227,8 +262,6 @@ export default function App() {
     const nextPoster = initialPoster;
     const nextQaIssues = runQa(nextPoster);
     setPrompt(gabeChoicePrompt);
-    setTheme(nextPoster.theme);
-    setPalette(nextPoster.palette ?? themes[nextPoster.theme]?.palette ?? "clean-blue");
     setPoster({ ...nextPoster, qaResults: nextQaIssues });
     setQaIssues(nextQaIssues);
     setTrace(createQueuedTrace());
@@ -237,12 +270,12 @@ export default function App() {
   function handleRunQa() {
     const nextQaIssues = runQa(poster);
     setQaIssues(nextQaIssues);
-    setPoster((current) => ({ ...current, qaResults: nextQaIssues }));
+    setPoster((current) => ({ ...current, qaResults: nextQaIssues }), { skipHistory: true });
   }
 
-  function handlePosterStateChange(nextPoster: PosterProject) {
-    setPoster(nextPoster);
-    debouncedRunQa(nextPoster);
+  function handlePosterStateChange(nextPoster: PosterProject, options?: PosterChangeOptions) {
+    setPoster(nextPoster, options);
+    if (!options?.skipHistory) debouncedRunQa(nextPoster);
   }
 
   function handleQaFix(fixId: NonNullable<QaIssue["fixId"]>) {
@@ -454,8 +487,6 @@ export default function App() {
                 const nextPalette = themes[nextTheme]?.palette ?? "clean-blue";
                 const nextPoster = { ...poster, theme: nextTheme, palette: nextPalette, logo: themes[nextTheme]?.logoUrl };
                 const nextQaIssues = runQa(nextPoster);
-                setTheme(nextTheme);
-                setPalette(nextPalette);
                 setPoster({ ...nextPoster, qaResults: nextQaIssues });
                 setQaIssues(nextQaIssues);
               }}
@@ -478,6 +509,10 @@ export default function App() {
           selectedKind={selectedCanvasItem?.kind}
           qaIssues={appMode === "review" ? qaIssues : []}
           onPosterChange={handlePosterStateChange}
+          onUndo={handleUndo}
+          onRedo={handleRedo}
+          canUndo={canUndo}
+          canRedo={canRedo}
           onSectionReorder={handleSectionReorder}
           onRegenerateSection={handleRegenerateSection}
           onMoveSection={handleMoveSection}
@@ -510,4 +545,9 @@ export default function App() {
 
 function getAppModeLabel(mode: AppMode) {
   return mode.charAt(0).toUpperCase() + mode.slice(1);
+}
+
+function isEditableTarget(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) return false;
+  return target.isContentEditable || target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.tagName === "SELECT";
 }
