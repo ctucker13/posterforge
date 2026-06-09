@@ -14,7 +14,6 @@ Organised by milestone — see `docs/plans/product-roadmap-2026-06.md` for the f
 
 ### M1 — Canvas editing power
 
-- [ ] **A3. Drag-resize sections** — Resize handles snapping to grid columns/rows, writing `columnSpan`/`rowSpan`, with ghost preview.
 - [ ] **A4. Block-level rearrange** — dnd-kit drag of blocks within and between sections with insert indicators.
 - [ ] **A5. Phase 3 — Layout spec generation** — Extend `buildLayoutSpec` to write one section per raster slot; SVG/svg-hybrid slots resolve through `ThemeMotifLayer`.
 - [ ] **A6. Phase 4 — Freeform slot overlay renderer** — Render generated slots as positioned surfaces (`x`/`y`/`width_px`/`height_px`); drag-move and corner-handle resize; deterministic content into sidecar content regions; keep pan/regenerate controls per slot.
@@ -84,6 +83,7 @@ Organised by milestone — see `docs/plans/product-roadmap-2026-06.md` for the f
 
 ## Completed
 
+- [x] A3 drag-resize sections — `SectionResizeHandles` in `PosterCanvas` (east/south/corner handles on the selected section): drag snaps to whole grid tracks with live reflow preview + span badge, commits `columnSpan`/`rowSpan` once on release (single undo step), Escape cancels; handles math converts computed track sizes into screen px to respect canvas zoom; starting a resize blurs any in-progress text edit so Cmd/Ctrl+Z routes to poster history; fixed pre-existing specificity bug where layout templates' per-section-type `grid-column` rules silently beat user `.span-N` classes (results-first, case-study); verified with Playwright (10 interaction checks)
 - [x] F1 app design language system — chrome design tokens in `:root` (`--chrome-*` ink ramp/surfaces/borders/accent+semantic colors, `--radius-*`, `--text-*` chrome type scale, `--space-*`, `--elevation-*`, `--motion-*`/`--ease-out`); 322 value-identical replacements across `app.css` (stray radii 3/5/7px normalised onto the 4/6/8 scale); baseline transitions on chrome buttons with `prefers-reduced-motion` guard; poster canvas explicitly excluded (stays on `--theme-*`/`--skin-*`); verified pixel-identical vs baseline screenshots except deliberate corner-radius normalisation
 - [x] F2 progressive-disclosure inspector — section selection shows title + Up/Down/Hide with span/emphasis behind a "Layout options" disclosure; visual selection shows validity + structured editor with metadata/raw-JSON/save behind "Advanced"; shared `.inspector-disclosure` style on F1 tokens; fixed pre-existing stretch bug (`align-content: start`) that blew inspector controls up to fill the rail height
 - [x] F3 workspace decision — recorded in `docs/plans/f3-workspace-decision.md`: collapse modes into one continuous workspace, implement with M2

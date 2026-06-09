@@ -409,6 +409,14 @@ export function EditablePosterCanvas({
                   onUpdateSectionTitle={updateSectionTitle}
                   onUpdateTextBlock={updateTextBlock}
                   onSectionReorder={onSectionReorder}
+                  onUpdateSectionLayout={(sectionId, layoutPatch) => {
+                    onPosterChange({
+                      ...poster,
+                      sections: poster.sections.map((section) =>
+                        section.id === sectionId ? { ...section, layout: { ...(section.layout ?? {}), ...layoutPatch } } : section,
+                      ),
+                    });
+                  }}
                   onRegenerateSection={openRegenerateInstruction}
                   onMoveSection={onMoveSection}
                   onToggleHideSection={onToggleHideSection}

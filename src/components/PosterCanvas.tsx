@@ -1,4 +1,4 @@
-import { type CSSProperties, type ClipboardEvent, useEffect, useState } from "react";
+import { type CSSProperties, type ClipboardEvent, type PointerEvent as ReactPointerEvent, useEffect, useState } from "react";
 import { DndContext, closestCenter, type DragEndEvent } from "@dnd-kit/core";
 import { SortableContext, arrayMove, useSortable, rectSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -23,6 +23,7 @@ export interface PosterCanvasProps {
   onUpdateSectionTitle?: ((sectionId: string, title: string) => void) | undefined;
   onUpdateTextBlock?: ((blockId: string, text: string) => void) | undefined;
   onSectionReorder?: ((orderedIds: string[]) => void) | undefined;
+  onUpdateSectionLayout?: ((sectionId: string, layout: { columnSpan?: 1 | 2 | 3 | 4; rowSpan?: 1 | 2 }) => void) | undefined;
   onRegenerateSection?: ((sectionId: string, instruction?: string) => void) | undefined;
   onMoveSection?: ((sectionId: string, direction: -1 | 1) => void) | undefined;
   onToggleHideSection?: ((sectionId: string) => void) | undefined;
@@ -45,6 +46,7 @@ export function PosterCanvas({
   onUpdateSectionTitle,
   onUpdateTextBlock,
   onSectionReorder,
+  onUpdateSectionLayout,
   onRegenerateSection,
   onMoveSection,
   onToggleHideSection,
@@ -195,6 +197,9 @@ export function PosterCanvas({
             {section.blocks.map((block, index) =>
               renderBlock(block, index, section.id, visuals, imageSlots, mode, skins, palette, selectedId, qaIssuesByLocation, onSelectItem, onUpdateTextBlock, onGenerateImageSlot, onUpdateImageSlotPosition, onImageSlotSidecarLoaded, generatingSlotIds),
             )}
+            {mode === "edit" && isSelected && onUpdateSectionLayout ? (
+              <SectionResizeHandles onCommit={(spans) => onUpdateSectionLayout(section.id, spans)} />
+            ) : null}
               </>
             )}
           </>
@@ -551,6 +556,96 @@ function QaBadge({ issues, onClick }: { issues: QaIssue[]; onClick: () => void }
       <AlertTriangle size={13} />
       {issues.length}
     </button>
+  );
+}
+
+/**
+ * Drag handles on the selected section's east/south edges and corner that
+ * resize it by whole grid tracks, writing columnSpan/rowSpan on release.
+ * The span is applied live to the card while dragging (real reflow preview);
+ * pointer math uses the card's position captured at drag start so the
+ * preview reflow cannot destabilise it. Escape cancels the gesture.
+ */
+function SectionResizeHandles({ onCommit }: { onCommit: (spans: { columnSpan: 1 | 2 | 3 | 4; rowSpan: 1 | 2 }) => void }) {
+  const [preview, setPreview] = useState<{ cols: number; rows: number } | null>(null);
+
+  function beginResize(event: ReactPointerEvent<HTMLDivElement>, axis: "x" | "y" | "xy") {
+    if (event.button !== 0) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const card = event.currentTarget.closest<HTMLElement>(".poster-card");
+    const grid = card?.closest<HTMLElement>(".poster-grid");
+    if (!card || !grid) return;
+
+    // A canvas gesture ends any in-progress text edit; this also keeps
+    // Cmd/Ctrl+Z routed to poster history instead of the focused field.
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+
+    // Computed track sizes are in layout px while client rects are scaled by
+    // the canvas zoom transform — convert tracks into screen px to mix them.
+    const gridStyle = getComputedStyle(grid);
+    const colTracks = gridStyle.gridTemplateColumns.split(" ").map(Number.parseFloat);
+    const rowTracks = gridStyle.gridTemplateRows.split(" ").map(Number.parseFloat);
+    const cardRect = card.getBoundingClientRect();
+    const scale = card.offsetWidth > 0 ? cardRect.width / card.offsetWidth : 1;
+    const colWidth = (colTracks[0] ?? card.offsetWidth) * scale;
+    const rowHeight = (rowTracks[0] ?? card.offsetHeight) * scale;
+    const gapX = (Number.parseFloat(gridStyle.columnGap) || 0) * scale;
+    const gapY = (Number.parseFloat(gridStyle.rowGap) || 0) * scale;
+    const maxCols = Math.min(colTracks.length, 4) as 1 | 2 | 3 | 4;
+
+    const spanFromSize = (size: number, track: number, gap: number, max: number) =>
+      Math.min(Math.max(Math.round((size + gap) / (track + gap)), 1), max);
+
+    const startCols = spanFromSize(cardRect.width, colWidth, gapX, maxCols);
+    const startRows = spanFromSize(cardRect.height, rowHeight, gapY, 2);
+    const current = { cols: startCols, rows: startRows };
+    setPreview(current);
+
+    const applyPreview = () => {
+      card.style.gridColumn = `span ${current.cols}`;
+      card.style.gridRow = `span ${current.rows}`;
+      setPreview({ ...current });
+    };
+
+    const handleMove = (moveEvent: PointerEvent) => {
+      if (axis !== "y") current.cols = spanFromSize(moveEvent.clientX - cardRect.left, colWidth, gapX, maxCols);
+      if (axis !== "x") current.rows = spanFromSize(moveEvent.clientY - cardRect.top, rowHeight, gapY, 2);
+      applyPreview();
+    };
+
+    const finish = (commit: boolean) => {
+      document.removeEventListener("pointermove", handleMove);
+      document.removeEventListener("pointerup", handleUp);
+      document.removeEventListener("keydown", handleKey, true);
+      card.style.gridColumn = "";
+      card.style.gridRow = "";
+      setPreview(null);
+      if (commit && (current.cols !== startCols || current.rows !== startRows)) {
+        onCommit({ columnSpan: current.cols as 1 | 2 | 3 | 4, rowSpan: current.rows as 1 | 2 });
+      }
+    };
+
+    const handleUp = () => finish(true);
+    const handleKey = (keyEvent: KeyboardEvent) => {
+      if (keyEvent.key === "Escape") {
+        keyEvent.stopPropagation();
+        finish(false);
+      }
+    };
+
+    document.addEventListener("pointermove", handleMove);
+    document.addEventListener("pointerup", handleUp);
+    document.addEventListener("keydown", handleKey, true);
+  }
+
+  return (
+    <>
+      <div className="section-resize-handle handle-e" title="Resize columns" onPointerDown={(event) => beginResize(event, "x")} />
+      <div className="section-resize-handle handle-s" title="Resize rows" onPointerDown={(event) => beginResize(event, "y")} />
+      <div className="section-resize-handle handle-se" title="Resize" onPointerDown={(event) => beginResize(event, "xy")} />
+      {preview ? <div className="section-resize-badge">{`${preview.cols} col${preview.cols > 1 ? "s" : ""} × ${preview.rows} row${preview.rows > 1 ? "s" : ""}`}</div> : null}
+    </>
   );
 }
 
