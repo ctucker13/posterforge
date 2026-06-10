@@ -5,6 +5,7 @@ import { EvidencePanel } from "./components/EvidencePanel";
 import { ExportPanel } from "./components/ExportPanel";
 import { JsonProjectControls } from "./components/JsonProjectControls";
 import { ModeBar, type AppMode } from "./components/ModeBar";
+import { RightRailTabs, type RightPanel } from "./components/RightRailTabs";
 import { OutlineConfirmDialog } from "./components/OutlineConfirmDialog";
 import { PosterInspector } from "./components/PosterInspector";
 import { ProjectEditor } from "./components/ProjectEditor";
@@ -55,6 +56,7 @@ export default function App() {
   const [pendingSectionRevision, setPendingSectionRevision] = useState<{ sectionId: string; original: PosterSection; revised: PosterSection } | null>(null);
   const [selectedCanvasItem, setSelectedCanvasItem] = useState<{ id: string; kind: PosterCanvasItemKind } | undefined>();
   const [appMode, setAppMode] = useState<AppMode>("edit");
+  const [rightPanel, setRightPanel] = useState<RightPanel>("inspector");
   const [assetCatalogue, setAssetCatalogue] = useState<AssetCatalogue | null>(null);
   const generationIdRef = useRef(0);
 
@@ -360,6 +362,7 @@ export default function App() {
     const nextQaIssues = runQa(poster);
     setQaIssues(nextQaIssues);
     setPoster((current) => ({ ...current, qaResults: nextQaIssues }), { skipHistory: true });
+    if (nextQaIssues.length > 0) setRightPanel("qa");
   }
 
   function handlePosterStateChange(nextPoster: PosterProject, options?: PosterChangeOptions) {
@@ -377,13 +380,10 @@ export default function App() {
   function handleQaNavigate(location: string) {
     const [collection, id] = location.split(".");
     if (!id) return;
-
-    if (collection === "visuals") {
-      setSelectedCanvasItem({ id, kind: "visual" });
-    } else if (collection === "sections") {
-      setSelectedCanvasItem({ id, kind: "section" });
-    }
+    if (collection === "visuals") setSelectedCanvasItem({ id, kind: "visual" });
+    else if (collection === "sections") setSelectedCanvasItem({ id, kind: "section" });
     setAppMode("edit");
+    setRightPanel("inspector");
   }
 
   function handleMoveBlock(fromSectionId: string, fromIndex: number, toSectionId: string, toIndex: number) {
@@ -497,7 +497,7 @@ export default function App() {
           </div>
         </div>
 
-        <ModeBar mode={appMode} onModeChange={setAppMode} qaIssueCount={qaIssues.length} />
+        <ModeBar mode={appMode} onModeChange={setAppMode} />
 
         <div className="workspace-status" aria-label="Project status">
           <div>
@@ -567,56 +567,55 @@ export default function App() {
               </aside>
             ) : null}
           </>
-        ) : null}
-
-        {appMode === "edit" ? <ProjectEditor poster={poster} onPosterChange={handlePosterStateChange} /> : null}
-
-        {appMode === "review" ? <QaPanel issues={qaIssues} onRunQa={handleRunQa} onApplyFix={handleQaFix} onNavigate={handleQaNavigate} /> : null}
-
-        {appMode === "export" ? (
-          <>
-            <ExportPanel poster={poster} />
-            <JsonProjectControls poster={poster} onImport={handleProjectImport} onReset={handleResetProject} />
-          </>
-        ) : null}
+        ) : (
+          <ProjectEditor poster={poster} onPosterChange={handlePosterStateChange} />
+        )}
       </section>
 
-      <section className="inspector-column" aria-label="Poster inspectors">
-        {appMode === "edit" ? (
-          <PosterInspector
-            poster={poster}
-            selectedId={selectedCanvasItem?.id}
-            selectedKind={selectedCanvasItem?.kind}
-            onPosterChange={handlePosterStateChange}
-            onMoveSection={handleMoveSection}
-            onToggleHideSection={handleToggleHideSection}
-          />
-        ) : null}
-
-        {appMode === "generate" ? (
-          <div className="workspace-tab-panel">
-            <SourceSearchPanel
+      <section className="inspector-column" aria-label="Right panel">
+        <RightRailTabs active={rightPanel} onSelect={setRightPanel} qaCount={qaIssues.length} />
+        <div className="right-rail-content">
+          {rightPanel === "inspector" && (
+            <PosterInspector
               poster={poster}
+              selectedId={selectedCanvasItem?.id}
+              selectedKind={selectedCanvasItem?.kind}
               onPosterChange={handlePosterStateChange}
-              onUseExampleRepo={() => {
-                setPrompt(gabeChoicePrompt);
-                const nextTheme = "clean-academic";
-                const nextPalette = themes[nextTheme]?.palette ?? "clean-blue";
-                const nextPoster = { ...poster, theme: nextTheme, palette: nextPalette, logo: themes[nextTheme]?.logoUrl };
-                const nextQaIssues = runQa(nextPoster);
-                setPoster({ ...nextPoster, qaResults: nextQaIssues });
-                setQaIssues(nextQaIssues);
-              }}
+              onMoveSection={handleMoveSection}
+              onToggleHideSection={handleToggleHideSection}
             />
-            <EvidencePanel poster={poster} />
-          </div>
-        ) : null}
-
-        {appMode === "review" ? (
-          <div className="workspace-tab-panel">
+          )}
+          {rightPanel === "sources" && (
+            <div className="workspace-tab-panel">
+              <SourceSearchPanel
+                poster={poster}
+                onPosterChange={handlePosterStateChange}
+                onUseExampleRepo={() => {
+                  setPrompt(gabeChoicePrompt);
+                  const nextTheme = "clean-academic";
+                  const nextPalette = themes[nextTheme]?.palette ?? "clean-blue";
+                  const nextPoster = { ...poster, theme: nextTheme, palette: nextPalette, logo: themes[nextTheme]?.logoUrl };
+                  const nextQaIssues = runQa(nextPoster);
+                  setPoster({ ...nextPoster, qaResults: nextQaIssues });
+                  setQaIssues(nextQaIssues);
+                }}
+              />
+              <EvidencePanel poster={poster} />
+            </div>
+          )}
+          {rightPanel === "qa" && (
+            <QaPanel issues={qaIssues} onRunQa={handleRunQa} onApplyFix={handleQaFix} onNavigate={handleQaNavigate} />
+          )}
+          {rightPanel === "export" && (
+            <>
+              <ExportPanel poster={poster} />
+              <JsonProjectControls poster={poster} onImport={handleProjectImport} onReset={handleResetProject} />
+            </>
+          )}
+          {rightPanel === "trace" && (
             <TracePanel events={trace} />
-          </div>
-        ) : null}
+          )}
+        </div>
       </section>
 
       <section className="preview-column" aria-label="Poster workspace">
@@ -624,7 +623,7 @@ export default function App() {
           poster={poster}
           selectedId={selectedCanvasItem?.id}
           selectedKind={selectedCanvasItem?.kind}
-          qaIssues={appMode === "review" ? qaIssues : []}
+          qaIssues={qaIssues}
           onPosterChange={handlePosterStateChange}
           onUndo={handleUndo}
           onRedo={handleRedo}
@@ -640,6 +639,7 @@ export default function App() {
           onSelectItem={(id, kind) => {
             setSelectedCanvasItem({ id, kind });
             setAppMode("edit");
+            setRightPanel("inspector");
           }}
         />
         {pendingSectionRevision ? (
