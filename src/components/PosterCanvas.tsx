@@ -1,8 +1,8 @@
-import { type CSSProperties, type ClipboardEvent, type PointerEvent as ReactPointerEvent, useEffect, useState } from "react";
+import { type CSSProperties, type ClipboardEvent, type PointerEvent as ReactPointerEvent, useCallback, useEffect, useRef, useState } from "react";
 import { DndContext, DragOverlay, closestCenter, type CollisionDetection, type DragEndEvent, type DragStartEvent } from "@dnd-kit/core";
 import { SortableContext, arrayMove, useSortable, rectSortingStrategy, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { AlertTriangle, ArrowDown, ArrowUp, Eye, EyeOff, GripVertical, Image, Pencil, RotateCcw, Trash2 } from "lucide-react";
+import { AlertTriangle, ArrowDown, ArrowUp, Eye, EyeOff, GripVertical, Image, Move, Pencil, RotateCcw, Trash2 } from "lucide-react";
 import type { ContentRegion, GeneratedImageSlot, PosterBlock, PosterProject, QaIssue } from "../domain/poster";
 import type { AssetSidecar } from "../layouts/buildLayoutSpec";
 import { isFeaturedSection, resolveLayoutTemplate } from "../layouts";
@@ -33,9 +33,15 @@ export interface PosterCanvasProps {
   onGenerateImageSlot?: ((slotId: string) => void) | undefined;
   onUpdateImageSlotPosition?: ((slotId: string, objectPosition: string) => void) | undefined;
   onImageSlotSidecarLoaded?: ((slotId: string, patch: { seed?: number; contentRegions?: ContentRegion[] }) => void) | undefined;
+  /** Move a freeform slot to an absolute position (poster-pixel coordinates). */
+  onMoveSlot?: ((slotId: string, x: number, y: number) => void) | undefined;
+  /** Resize a freeform slot to new bounds (poster-pixel coordinates). */
+  onResizeSlot?: ((slotId: string, x: number, y: number, w: number, h: number) => void) | undefined;
   onDeselectItem?: (() => void) | undefined;
   /** Slot ids with an in-flight generation request; used to show progress UI. */
   generatingSlotIds?: Set<string> | undefined;
+  /** CSS scale factor applied outside the poster (zoom level). Used to convert screen-pixel drag deltas to poster-pixel deltas. */
+  canvasScale?: number | undefined;
 }
 
 const blockAwareCollision: CollisionDetection = (args) => {
@@ -66,8 +72,11 @@ export function PosterCanvas({
   onGenerateImageSlot,
   onUpdateImageSlotPosition,
   onImageSlotSidecarLoaded,
+  onMoveSlot,
+  onResizeSlot,
   onDeselectItem,
   generatingSlotIds,
+  canvasScale = 1,
 }: PosterCanvasProps) {
   const [activeBlockId, setActiveBlockId] = useState<string | null>(null);
   const palette = resolvePalette(poster.theme, poster.palette);
@@ -76,6 +85,10 @@ export function PosterCanvas({
   const outputFrame = getA0PreviewFrame(poster.format.orientation);
   const visuals = new Map(poster.visuals.map((visual) => [visual.id, visual]));
   const imageSlots = new Map((poster.imageSlots ?? []).map((slot) => [slot.id, slot]));
+  const freeformSlots = (poster.imageSlots ?? []).filter(
+    (s): s is GeneratedImageSlot & { x: number; y: number; width_px: number; height_px: number } =>
+      s.role !== "background" && s.x != null && s.y != null && s.width_px != null && s.height_px != null,
+  );
   const bgStrategy = backgroundStrategyForTheme(poster.theme);
   const sections = getOrderedSections(poster);
   const canvasSections = mode === "edit" ? sections : sections.filter((section) => !section.layout?.hidden);
@@ -333,6 +346,20 @@ export function PosterCanvas({
             </>
           );
         })()}
+        {freeformSlots.map((slot) => (
+          <FreeformSlot
+            key={slot.id}
+            slot={slot}
+            mode={mode}
+            canvasScale={canvasScale}
+            generatingSlotIds={generatingSlotIds}
+            onGenerate={onGenerateImageSlot}
+            onUpdatePosition={onUpdateImageSlotPosition}
+            onSidecarLoaded={onImageSlotSidecarLoaded}
+            onMove={onMoveSlot}
+            onResize={onResizeSlot}
+          />
+        ))}
         <header className="poster-hero" data-poster-id="hero" data-poster-kind="hero">
           <div>
             <p className="poster-kicker">{layout.name} · {poster.audience}</p>
@@ -753,6 +780,144 @@ function SectionResizeHandles({ onCommit }: { onCommit: (spans: { columnSpan: 1 
       <div className="section-resize-handle handle-se" title="Resize" onPointerDown={(event) => beginResize(event, "xy")} />
       {preview ? <div className="section-resize-badge">{`${preview.cols} col${preview.cols > 1 ? "s" : ""} × ${preview.rows} row${preview.rows > 1 ? "s" : ""}`}</div> : null}
     </>
+  );
+}
+
+type FreeformSlotData = GeneratedImageSlot & { x: number; y: number; width_px: number; height_px: number };
+
+function FreeformSlot({
+  slot,
+  mode,
+  canvasScale,
+  generatingSlotIds,
+  onGenerate,
+  onUpdatePosition,
+  onSidecarLoaded,
+  onMove,
+  onResize,
+}: {
+  slot: FreeformSlotData;
+  mode: PosterCanvasProps["mode"];
+  canvasScale: number;
+  generatingSlotIds: Set<string> | undefined;
+  onGenerate: PosterCanvasProps["onGenerateImageSlot"];
+  onUpdatePosition: PosterCanvasProps["onUpdateImageSlotPosition"];
+  onSidecarLoaded: PosterCanvasProps["onImageSlotSidecarLoaded"];
+  onMove: ((slotId: string, x: number, y: number) => void) | undefined;
+  onResize: ((slotId: string, x: number, y: number, w: number, h: number) => void) | undefined;
+}) {
+  const [livePos, setLivePos] = useState<{ x: number; y: number } | null>(null);
+  const [liveSize, setLiveSize] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
+  const [active, setActive] = useState(false);
+  const moveStartRef = useRef<{ px: number; py: number; sx: number; sy: number } | null>(null);
+
+  const cx = livePos?.x ?? liveSize?.x ?? slot.x;
+  const cy = livePos?.y ?? liveSize?.y ?? slot.y;
+  const cw = liveSize?.w ?? slot.width_px;
+  const ch = liveSize?.h ?? slot.height_px;
+  const isEdit = mode === "edit";
+  const generating = generatingSlotIds?.has(slot.id) ?? false;
+
+  const handleMoveDown = (e: React.PointerEvent) => {
+    e.stopPropagation();
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    moveStartRef.current = { px: e.clientX, py: e.clientY, sx: slot.x, sy: slot.y };
+    setActive(true);
+  };
+  const handleMoveMove = (e: React.PointerEvent) => {
+    if (!moveStartRef.current) return;
+    setLivePos({
+      x: moveStartRef.current.sx + (e.clientX - moveStartRef.current.px) / canvasScale,
+      y: moveStartRef.current.sy + (e.clientY - moveStartRef.current.py) / canvasScale,
+    });
+  };
+  const handleMoveUp = (e: React.PointerEvent) => {
+    if (!moveStartRef.current) return;
+    const nx = moveStartRef.current.sx + (e.clientX - moveStartRef.current.px) / canvasScale;
+    const ny = moveStartRef.current.sy + (e.clientY - moveStartRef.current.py) / canvasScale;
+    onMove?.(slot.id, Math.round(nx), Math.round(ny));
+    moveStartRef.current = null;
+    setLivePos(null);
+    setActive(false);
+  };
+
+  const handleResize = useCallback(
+    (corner: string, dx: number, dy: number, done: boolean) => {
+      const MIN = 80;
+      let nx = slot.x, ny = slot.y, nw = slot.width_px, nh = slot.height_px;
+      const pdx = dx / canvasScale;
+      const pdy = dy / canvasScale;
+      if (corner.includes("e")) nw = Math.max(MIN, nw + pdx);
+      if (corner.includes("s")) nh = Math.max(MIN, nh + pdy);
+      if (corner.includes("w")) { const newW = Math.max(MIN, nw - pdx); nx = nx + nw - newW; nw = newW; }
+      if (corner.includes("n")) { const newH = Math.max(MIN, nh - pdy); ny = ny + nh - newH; nh = newH; }
+      nx = Math.round(nx); ny = Math.round(ny); nw = Math.round(nw); nh = Math.round(nh);
+      if (done) { setLiveSize(null); setActive(false); onResize?.(slot.id, nx, ny, nw, nh); }
+      else { setLiveSize({ x: nx, y: ny, w: nw, h: nh }); setActive(true); }
+    },
+    [slot, canvasScale, onResize],
+  );
+
+  return (
+    <div
+      className={`freeform-slot${isEdit ? " freeform-slot-edit" : ""}${active ? " freeform-slot-active" : ""}`}
+      style={{ position: "absolute", left: cx, top: cy, width: cw, height: ch }}
+    >
+      <GeneratedImageBlock
+        blockId={slot.id}
+        slot={slot}
+        slotId={slot.id}
+        objectPosition={slot.objectPosition}
+        mode={mode}
+        generating={generating}
+        onGenerate={onGenerate}
+        onUpdatePosition={onUpdatePosition}
+        onSidecarLoaded={onSidecarLoaded}
+      />
+      {isEdit && (
+        <div
+          className="freeform-move-handle"
+          title="Drag to move"
+          onPointerDown={handleMoveDown}
+          onPointerMove={handleMoveMove}
+          onPointerUp={handleMoveUp}
+        >
+          <Move size={14} />
+        </div>
+      )}
+      {isEdit && (["nw", "n", "ne", "w", "e", "sw", "s", "se"] as const).map((corner) => (
+        <FreeformResizeHandle key={corner} corner={corner} onResize={handleResize} />
+      ))}
+    </div>
+  );
+}
+
+function FreeformResizeHandle({
+  corner,
+  onResize,
+}: {
+  corner: string;
+  onResize: (corner: string, dx: number, dy: number, done: boolean) => void;
+}) {
+  const startRef = useRef<{ px: number; py: number } | null>(null);
+  return (
+    <div
+      className={`freeform-resize-handle freeform-handle-${corner}`}
+      onPointerDown={(e) => {
+        e.stopPropagation();
+        (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+        startRef.current = { px: e.clientX, py: e.clientY };
+      }}
+      onPointerMove={(e) => {
+        if (!startRef.current) return;
+        onResize(corner, e.clientX - startRef.current.px, e.clientY - startRef.current.py, false);
+      }}
+      onPointerUp={(e) => {
+        if (!startRef.current) return;
+        onResize(corner, e.clientX - startRef.current.px, e.clientY - startRef.current.py, true);
+        startRef.current = null;
+      }}
+    />
   );
 }
 

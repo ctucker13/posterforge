@@ -174,7 +174,9 @@ export function buildLayoutSpec(
           height_px: tmpl.heightPx,
           content_anchor: "center",
           output_format: tmpl.role === "background" ? "webp" : "png",
-          background_strategy: bgStrategy,
+          // background role respects theme strategy; all other roles (hero_illustration,
+          // section_art) always need raster generation regardless of theme background type
+          background_strategy: tmpl.role === "background" ? bgStrategy : "raster",
           content_regions: (tmpl.contentRegions ?? []).map((r) => ({ ...r })),
         });
       }

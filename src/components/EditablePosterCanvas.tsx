@@ -448,6 +448,23 @@ export function EditablePosterCanvas({
                       ),
                     }, { skipHistory: true });
                   }}
+                  onMoveSlot={(slotId, x, y) => {
+                    onPosterChange({
+                      ...poster,
+                      imageSlots: (poster.imageSlots ?? []).map((slot) =>
+                        slot.id === slotId ? { ...slot, x, y } : slot,
+                      ),
+                    });
+                  }}
+                  onResizeSlot={(slotId, x, y, w, h) => {
+                    onPosterChange({
+                      ...poster,
+                      imageSlots: (poster.imageSlots ?? []).map((slot) =>
+                        slot.id === slotId ? { ...slot, x, y, width_px: w, height_px: h } : slot,
+                      ),
+                    });
+                  }}
+                  canvasScale={zoom}
                 />
               </div>
             </div>
