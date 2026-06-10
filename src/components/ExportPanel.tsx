@@ -63,25 +63,10 @@ export function ExportPanel({ poster }: ExportPanelProps) {
       <div className="export-list">
         {readiness.map((capability) => (
           <article className={`export-target ${capability.status}`} key={capability.target}>
-            <div className="export-target-main">
-              <div className="export-target-icon">{renderExportIcon(capability.target)}</div>
-              <div>
-                <strong>{capability.label}</strong>
-                <p>{capability.status === "ready" ? "Ready to export from the current PosterProject." : capability.blockers[0]}</p>
-                <div className="export-requirements">
-                  <span>{capability.output}</span>
-                  {capability.requirements.map((requirement) => (
-                    <span key={`${capability.target}-${requirement}`}>{requirement}</span>
-                  ))}
-                </div>
-                {capability.blockers.length > 1 ? (
-                  <ul className="export-blockers">
-                    {capability.blockers.slice(1, 4).map((blocker) => (
-                      <li key={`${capability.target}-${blocker}`}>{blocker}</li>
-                    ))}
-                  </ul>
-                ) : null}
-              </div>
+            <div className="export-target-icon">{renderExportIcon(capability.target)}</div>
+            <div className="export-target-info">
+              <strong>{capability.label}</strong>
+              <p title={capability.blockers.join("\n")}>{capability.status === "ready" ? capability.output : capability.blockers[0]}</p>
             </div>
             <button type="button" disabled={capability.status !== "ready"} onClick={() => setPendingExport(capability.target)}>
               {capability.status === "ready" ? (

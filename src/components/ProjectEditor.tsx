@@ -1,4 +1,4 @@
-import { FileText, LayoutTemplate, Maximize2, Monitor, Users } from "lucide-react";
+import { ChevronDown, FileText, LayoutTemplate, Maximize2, Monitor, Users } from "lucide-react";
 import type { PosterChangeOptions } from "../app/posterHistory";
 import type { PosterLayoutId, PosterProject } from "../domain/poster";
 import { layoutTemplates, resolveLayoutTemplate } from "../layouts";
@@ -22,9 +22,8 @@ export function ProjectEditor({ poster, onPosterChange }: ProjectEditorProps) {
 
   return (
     <section className="project-editor tool-panel" aria-label="Poster project editor">
-      <div className="panel-header">
-        <h2>Project Spec</h2>
-        <span>poster.json</span>
+      <div className="panel-header compact">
+        <h2>Poster settings</h2>
       </div>
 
       <div className="project-editor-body">
@@ -42,19 +41,25 @@ export function ProjectEditor({ poster, onPosterChange }: ProjectEditorProps) {
           <input value={poster.subtitle ?? ""} onChange={(event) => updateTextField("subtitle", event.target.value)} />
         </label>
 
-        <div className="field-grid">
-          <label className="field">
-            <span>
-              <LayoutTemplate size={15} /> Layout
-            </span>
-            <select value={poster.layout} onChange={(event) => updateField("layout", event.target.value as PosterLayoutId)}>
-              {layoutTemplates.map((layout) => (
-                <option value={layout.id} key={layout.id}>
-                  {layout.name}
-                </option>
-              ))}
-            </select>
-          </label>
+        <label className="field">
+          <span>
+            <LayoutTemplate size={15} /> Layout
+          </span>
+          <select value={poster.layout} onChange={(event) => updateField("layout", event.target.value as PosterLayoutId)}>
+            {layoutTemplates.map((layout) => (
+              <option value={layout.id} key={layout.id}>
+                {layout.name}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <p className="layout-note-quiet">{selectedLayout.description}</p>
+
+        <details className="inspector-disclosure">
+          <summary>
+            <ChevronDown size={14} /> More options
+          </summary>
 
           <label className="field">
             <span>
@@ -62,68 +67,58 @@ export function ProjectEditor({ poster, onPosterChange }: ProjectEditorProps) {
             </span>
             <input value={poster.audience ?? ""} onChange={(event) => updateTextField("audience", event.target.value)} />
           </label>
-        </div>
 
-        <div className="field-grid">
-          <label className="field">
-            <span>
-              <Maximize2 size={15} /> Size
-            </span>
-            <select
-              value={poster.format.size}
-              onChange={(event) =>
-                updateField("format", {
-                  ...poster.format,
-                  size: event.target.value as PosterProject["format"]["size"],
-                })
-              }
-            >
-              <option value="A0">A0</option>
-              <option value="A1">A1</option>
-              <option value="A2">A2</option>
-              <option value="custom">Custom</option>
-            </select>
-          </label>
+          <div className="field-grid">
+            <label className="field">
+              <span>
+                <Maximize2 size={15} /> Size
+              </span>
+              <select
+                value={poster.format.size}
+                onChange={(event) =>
+                  updateField("format", {
+                    ...poster.format,
+                    size: event.target.value as PosterProject["format"]["size"],
+                  })
+                }
+              >
+                <option value="A0">A0</option>
+                <option value="A1">A1</option>
+                <option value="A2">A2</option>
+                <option value="custom">Custom</option>
+              </select>
+            </label>
 
-          <label className="field">
-            <span>
-              <Maximize2 size={15} /> Orientation
-            </span>
-            <select
-              value={poster.format.orientation}
-              onChange={(event) =>
-                updateField("format", {
-                  ...poster.format,
-                  orientation: event.target.value as PosterProject["format"]["orientation"],
-                })
-              }
-            >
-              <option value="landscape">Landscape</option>
-              <option value="portrait">Portrait</option>
-            </select>
-          </label>
-        </div>
-
-        <label className="field">
-          <span>
-            <Monitor size={15} /> Output intent
-          </span>
-          <select value={poster.outputIntent ?? "both"} onChange={(event) => updateField("outputIntent", event.target.value as PosterProject["outputIntent"])}>
-            <option value="both">Print and virtual</option>
-            <option value="print">Print only</option>
-            <option value="virtual">Virtual session only</option>
-          </select>
-        </label>
-
-        <aside className="layout-note">
-          <strong>{selectedLayout.name}</strong>
-          <p>{selectedLayout.description}</p>
-          <div>
-            {selectedLayout.motifs.map((motif) => (
-              <span key={motif}>{motif}</span>
-            ))}
+            <label className="field">
+              <span>
+                <Maximize2 size={15} /> Orientation
+              </span>
+              <select
+                value={poster.format.orientation}
+                onChange={(event) =>
+                  updateField("format", {
+                    ...poster.format,
+                    orientation: event.target.value as PosterProject["format"]["orientation"],
+                  })
+                }
+              >
+                <option value="landscape">Landscape</option>
+                <option value="portrait">Portrait</option>
+              </select>
+            </label>
           </div>
-        </aside>
+
+          <label className="field">
+            <span>
+              <Monitor size={15} /> Output intent
+            </span>
+            <select value={poster.outputIntent ?? "both"} onChange={(event) => updateField("outputIntent", event.target.value as PosterProject["outputIntent"])}>
+              <option value="both">Print and virtual</option>
+              <option value="print">Print only</option>
+              <option value="virtual">Virtual session only</option>
+            </select>
+          </label>
+        </details>
 
         <dl className="spec-metrics" aria-label="Project counts">
           <div>

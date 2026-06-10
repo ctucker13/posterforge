@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { AlertTriangle, CheckCircle2, Eye, Maximize2, Minus, Monitor, Pencil, Plus, Redo2, Undo2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Eye, Minus, Monitor, Pencil, Plus, Redo2, Undo2 } from "lucide-react";
 import { Wand2 } from "lucide-react";
 import type { PosterChangeOptions } from "../app/posterHistory";
 import type { PosterProject, QaIssue } from "../domain/poster";
@@ -301,59 +301,62 @@ export function EditablePosterCanvas({
         <span>{`A0 ${outputFrame.orientation} · ${canvasEditMode} · ${zoomLabel}`}</span>
       </div>
       <SectionNavigator poster={poster} selectedId={selectedId} qaIssues={qaIssues} onSelectSection={(id) => onSelectItem(id, "section")} />
-      <div className="preview-toolbar" aria-label="Editor view controls">
-        <button type="button" title="Undo (Cmd/Ctrl+Z)" aria-label="Undo" disabled={!canUndo} onClick={onUndo}>
-          <Undo2 size={15} />
-        </button>
-        <button type="button" title="Redo (Cmd/Ctrl+Shift+Z)" aria-label="Redo" disabled={!canRedo} onClick={onRedo}>
-          <Redo2 size={15} />
-        </button>
-        <button className={virtualMode ? "active" : ""} type="button" title="Virtual session view" aria-label="Virtual session view" onClick={toggleVirtualMode}>
-          <Monitor size={15} />
-        </button>
-        <button type="button" title="Fit page" aria-label="Fit page" onClick={() => applyZoomMode(virtualMode ? "fitVirtual" : "fitPage")}>
-          <Maximize2 size={15} />
-        </button>
-        <button className={zoomMode === "fitWidth" ? "active view-preset-button" : "view-preset-button"} type="button" onClick={() => applyZoomMode("fitWidth")}>
-          Fit width
-        </button>
-        {virtualMode ? (
-          <button className={zoomMode === "fitVirtual" ? "active view-preset-button" : "view-preset-button"} type="button" onClick={() => applyZoomMode("fitVirtual")}>
-            Fit virtual
+      <div className="canvas-stage">
+      <div className="canvas-toolbar" aria-label="Editor view controls">
+        <div className="toolbar-group" role="group" aria-label="History">
+          <button type="button" title="Undo (Cmd/Ctrl+Z)" aria-label="Undo" disabled={!canUndo} onClick={onUndo}>
+            <Undo2 size={15} />
           </button>
-        ) : null}
-        <button type="button" title="Zoom out" aria-label="Zoom out" onClick={() => setCustomZoom(zoomOut)}>
-          <Minus size={15} />
-        </button>
-        <strong>{zoomLabel}</strong>
-        <button type="button" title="Zoom in" aria-label="Zoom in" onClick={() => setCustomZoom(zoomIn)}>
-          <Plus size={15} />
-        </button>
-        <button
-          className={canvasEditMode === "preview" ? "active" : ""}
-          type="button"
-          title={canvasEditMode === "editing" ? "Preview poster" : "Edit poster"}
-          aria-label={canvasEditMode === "editing" ? "Preview poster" : "Edit poster"}
-          onClick={() => setCanvasEditMode((current) => (current === "editing" ? "preview" : "editing"))}
-        >
-          {canvasEditMode === "editing" ? <Eye size={15} /> : <Pencil size={15} />}
-        </button>
-        <button
-          className={showLayoutCheck ? "active" : ""}
-          type="button"
-          title="Toggle layout check"
-          aria-label="Toggle layout check"
-          onClick={() => setShowLayoutCheck((current) => !current)}
-        >
-          {layoutWarnings.length > 0 ? <AlertTriangle size={15} /> : <CheckCircle2 size={15} />}
-        </button>
-        <span>{virtualMode ? "Virtual output preview; zoom remains free." : canvasEditMode === "editing" ? "Scroll to pan. Cmd/Ctrl + wheel zooms." : "Preview mode disables in-canvas text editing."}</span>
-        {showLayoutCheck ? (
-          <span className={layoutWarnings.length > 0 ? "render-check warning" : "render-check passed"} title={layoutWarnings.slice(0, 4).join("\n")}>
-            {layoutWarnings.length > 0 ? <AlertTriangle size={15} /> : <CheckCircle2 size={15} />}
-            {layoutWarnings.length > 0 ? `${layoutWarnings.length} layout warning${layoutWarnings.length === 1 ? "" : "s"}` : "Layout check passed"}
-          </span>
-        ) : null}
+          <button type="button" title="Redo (Cmd/Ctrl+Shift+Z)" aria-label="Redo" disabled={!canRedo} onClick={onRedo}>
+            <Redo2 size={15} />
+          </button>
+        </div>
+        <div className="toolbar-group" role="group" aria-label="Zoom">
+          <button type="button" title="Zoom out" aria-label="Zoom out" onClick={() => setCustomZoom(zoomOut)}>
+            <Minus size={15} />
+          </button>
+          <strong className="zoom-readout">{zoomLabel}</strong>
+          <button type="button" title="Zoom in (Cmd/Ctrl + wheel also zooms)" aria-label="Zoom in" onClick={() => setCustomZoom(zoomIn)}>
+            <Plus size={15} />
+          </button>
+          <select
+            className="fit-select"
+            aria-label="Fit poster to view"
+            value={zoomMode}
+            onChange={(event) => applyZoomMode(event.target.value as ZoomMode)}
+          >
+            <option value="fitPage">Fit page</option>
+            <option value="fitWidth">Fit width</option>
+            {virtualMode ? <option value="fitVirtual">Fit virtual</option> : null}
+            <option value="custom" hidden>
+              Custom
+            </option>
+          </select>
+        </div>
+        <div className="toolbar-group" role="group" aria-label="View">
+          <button className={virtualMode ? "active" : ""} type="button" title="Virtual session view" aria-label="Virtual session view" onClick={toggleVirtualMode}>
+            <Monitor size={15} />
+          </button>
+          <button
+            className={canvasEditMode === "preview" ? "active" : ""}
+            type="button"
+            title={canvasEditMode === "editing" ? "Preview poster (disables in-canvas editing)" : "Edit poster"}
+            aria-label={canvasEditMode === "editing" ? "Preview poster" : "Edit poster"}
+            onClick={() => setCanvasEditMode((current) => (current === "editing" ? "preview" : "editing"))}
+          >
+            {canvasEditMode === "editing" ? <Eye size={15} /> : <Pencil size={15} />}
+          </button>
+          <button
+            className={showLayoutCheck ? "active" : ""}
+            type="button"
+            title={showLayoutCheck && layoutWarnings.length > 0 ? layoutWarnings.slice(0, 4).join("\n") : "Toggle layout check"}
+            aria-label="Toggle layout check"
+            onClick={() => setShowLayoutCheck((current) => !current)}
+          >
+            {showLayoutCheck && layoutWarnings.length > 0 ? <AlertTriangle size={15} /> : <CheckCircle2 size={15} />}
+            {showLayoutCheck && layoutWarnings.length > 0 ? <span className="toolbar-badge">{layoutWarnings.length}</span> : null}
+          </button>
+        </div>
       </div>
       <div
         ref={viewportRef}
@@ -446,6 +449,7 @@ export function EditablePosterCanvas({
               </div>
             </div>
         )}
+      </div>
       </div>
       {imageGenError ? (
         <div className="image-gen-error-bar" role="alert">

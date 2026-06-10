@@ -31,7 +31,7 @@ export function QaPanel({ issues, onRunQa, onApplyFix, onNavigate }: QaPanelProp
 
       <div className="qa-overview">
         <div className={issues.length === 0 ? "qa-score ready" : "qa-score"}>
-          {issues.length === 0 ? <ShieldCheck size={28} /> : <AlertTriangle size={28} />}
+          {issues.length === 0 ? <ShieldCheck size={16} /> : <AlertTriangle size={16} />}
           <strong>{issues.length === 0 ? "Pass" : "Review"}</strong>
         </div>
         <dl>

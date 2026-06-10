@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ChevronDown, Play, Sparkles } from "lucide-react";
+import { Play, Sparkles } from "lucide-react";
 import { EditablePosterCanvas } from "./components/EditablePosterCanvas";
 import { EvidencePanel } from "./components/EvidencePanel";
 import { ExportPanel } from "./components/ExportPanel";
@@ -440,15 +440,7 @@ export default function App() {
           </>
         ) : null}
 
-        {appMode === "edit" ? (
-          <details className="poster-settings-disclosure">
-            <summary>
-              <ChevronDown size={15} />
-              Poster settings
-            </summary>
-            <ProjectEditor poster={poster} onPosterChange={handlePosterStateChange} />
-          </details>
-        ) : null}
+        {appMode === "edit" ? <ProjectEditor poster={poster} onPosterChange={handlePosterStateChange} /> : null}
 
         {appMode === "review" ? <QaPanel issues={qaIssues} onRunQa={handleRunQa} onApplyFix={handleQaFix} onNavigate={handleQaNavigate} /> : null}
 
