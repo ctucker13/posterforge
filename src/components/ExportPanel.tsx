@@ -65,7 +65,7 @@ export function ExportPanel({ poster }: ExportPanelProps) {
           <article className={`export-target ${capability.status}`} key={capability.target}>
             <div className="export-target-icon">{renderExportIcon(capability.target)}</div>
             <div className="export-target-info">
-              <strong>{capability.label}</strong>
+              <strong title={capability.label}>{capability.label}</strong>
               <p title={capability.blockers.join("\n")}>{capability.status === "ready" ? capability.output : capability.blockers[0]}</p>
             </div>
             <button type="button" disabled={capability.status !== "ready"} onClick={() => setPendingExport(capability.target)}>

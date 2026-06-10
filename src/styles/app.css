@@ -795,6 +795,7 @@ textarea {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
   padding: 10px 2px;
 }
 
@@ -829,10 +830,13 @@ textarea {
 
 .export-target strong {
   display: block;
+  overflow: hidden;
   color: var(--chrome-ink-strong);
   font-size: var(--text-md);
   font-weight: 600;
   line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .export-target p {
