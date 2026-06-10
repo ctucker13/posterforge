@@ -18,6 +18,8 @@ export interface UsePosterHistoryResult {
     next: PosterProject | ((current: PosterProject) => PosterProject),
     options?: PosterChangeOptions,
   ) => void;
+  /** Replace the entire history with a new initial state (e.g. when switching projects). */
+  reset: (newInitial: PosterProject) => void;
   /** Undo the last change. Returns the restored poster, or null when at the oldest state. */
   undo: () => PosterProject | null;
   /** Redo the last undone change. Returns the restored poster, or null when at the newest state. */
@@ -68,9 +70,15 @@ export function usePosterHistory(initial: PosterProject): UsePosterHistoryResult
     return nextHistory.present;
   }, [sync]);
 
+  const reset = useCallback((newInitial: PosterProject) => {
+    historyRef.current = createPosterHistory(newInitial);
+    sync();
+  }, [sync]);
+
   return {
     poster,
     setPoster,
+    reset,
     undo,
     redo,
     canUndo: stackDepths.past > 0,

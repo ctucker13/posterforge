@@ -8,6 +8,7 @@ import { ModeBar, type AppMode } from "./components/ModeBar";
 import { OutlineConfirmDialog } from "./components/OutlineConfirmDialog";
 import { PosterInspector } from "./components/PosterInspector";
 import { ProjectEditor } from "./components/ProjectEditor";
+import { ProjectSwitcher } from "./components/ProjectSwitcher";
 import { QaPanel } from "./components/QaPanel";
 import { SourceSearchPanel } from "./components/SourceSearchPanel";
 import { SectionRevisionDiff } from "./components/SectionRevisionDiff";
@@ -16,6 +17,7 @@ import { AssetPicker } from "./components/AssetPicker";
 import { TracePanel } from "./components/TracePanel";
 import { catalogueEntryToPosterAsset, findThemeBackgroundAsset, loadAssetCatalogue, type AssetCatalogue } from "./assets/catalogue";
 import { usePosterHistory, type PosterChangeOptions } from "./app/usePosterHistory";
+import { createProject, getLastProjectId, loadProject, saveProject, setLastProjectId, snapshotProject } from "./app/projectStore";
 import { generateOutline, generatePoster, generationTrace, regenerateSection } from "./domain/generator";
 import { migratePosterProject } from "./domain/migration";
 import { examplePoster } from "./data/examplePoster";
@@ -44,7 +46,8 @@ export default function App() {
   const [theme, setTheme] = useState(initialPoster.theme);
   const [palette, setPalette] = useState(initialPoster.palette ?? themes[initialPoster.theme]?.palette ?? "clean-blue");
   const [trace, setTrace] = useState<TraceEvent[]>(initialTrace);
-  const { poster, setPoster, undo, redo, canUndo, canRedo } = usePosterHistory({ ...initialPoster, qaResults: initialQaIssues });
+  const { poster, setPoster, reset, undo, redo, canUndo, canRedo } = usePosterHistory({ ...initialPoster, qaResults: initialQaIssues });
+  const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
   const [qaIssues, setQaIssues] = useState<QaIssue[]>(initialQaIssues);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationWarning, setGenerationWarning] = useState<string | null>(null);
@@ -121,6 +124,56 @@ export default function App() {
     };
   }, []);
 
+  // On mount: load the last-opened project from IndexedDB, or create one from the example.
+  useEffect(() => {
+    let cancelled = false;
+    async function loadLastProject() {
+      try {
+        const lastId = getLastProjectId();
+        if (lastId) {
+          const stored = await loadProject(lastId);
+          if (stored && !cancelled) {
+            const { poster: loaded } = migratePosterProject(stored.poster);
+            const qa = runQa(loaded);
+            reset({ ...loaded, qaResults: qa });
+            setQaIssues(qa);
+            setCurrentProjectId(lastId);
+            return;
+          }
+        }
+        // No saved project — persist the example poster as the first project.
+        if (!cancelled) {
+          const id = await createProject({ ...initialPoster, qaResults: initialQaIssues });
+          setLastProjectId(id);
+          setCurrentProjectId(id);
+        }
+      } catch (err) {
+        console.warn("[posterforge] Could not load project from IndexedDB:", err);
+      }
+    }
+    void loadLastProject();
+    return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Debounced autosave: write to IndexedDB 2 s after any poster change.
+  const debouncedSave = useMemo(
+    () =>
+      debounce((id: string, p: PosterProject) => {
+        saveProject(id, p).catch((err) =>
+          console.warn("[posterforge] Autosave failed:", err),
+        );
+      }, 2000),
+    [],
+  );
+
+  useEffect(() => {
+    if (!currentProjectId) return;
+    debouncedSave(currentProjectId, poster);
+  }, [poster, currentProjectId, debouncedSave]);
+
+  useEffect(() => () => debouncedSave.cancel(), [debouncedSave]);
+
   async function handleGenerate() {
     setIsGenerating(true);
     setGenerationWarning(null);
@@ -152,6 +205,10 @@ export default function App() {
     const thisId = ++generationIdRef.current;
     setIsGenerating(true);
     setPendingOutline(null);
+    // Snapshot before generation so the user can always recover their edited poster.
+    if (currentProjectId) {
+      void snapshotProject(currentProjectId, poster, "Before generation");
+    }
     setGenerationWarning(null);
     const startedAt = new Date().toISOString();
     setTrace(createQueuedTrace());
@@ -267,6 +324,38 @@ export default function App() {
     setTrace(createQueuedTrace());
   }
 
+  async function handleSwitchProject(id: string) {
+    try {
+      const stored = await loadProject(id);
+      if (!stored) return;
+      const { poster: loaded } = migratePosterProject(stored.poster);
+      const qa = runQa(loaded);
+      reset({ ...loaded, qaResults: qa });
+      setQaIssues(qa);
+      setTrace(loaded.traces?.length ? loaded.traces : createQueuedTrace());
+      if (loaded.metadata?.prompt) setPrompt(loaded.metadata.prompt);
+      setCurrentProjectId(id);
+      setLastProjectId(id);
+    } catch (err) {
+      console.warn("[posterforge] Failed to switch project:", err);
+    }
+  }
+
+  async function handleNewProject() {
+    try {
+      const blank: PosterProject = { ...initialPoster, title: "New poster", sections: initialPoster.sections };
+      const qa = runQa(blank);
+      const id = await createProject({ ...blank, qaResults: qa });
+      setLastProjectId(id);
+      reset({ ...blank, qaResults: qa });
+      setQaIssues(qa);
+      setTrace(createQueuedTrace());
+      setCurrentProjectId(id);
+    } catch (err) {
+      console.warn("[posterforge] Failed to create project:", err);
+    }
+  }
+
   function handleRunQa() {
     const nextQaIssues = runQa(poster);
     setQaIssues(nextQaIssues);
@@ -364,7 +453,12 @@ export default function App() {
           </div>
           <div>
             <p>PosterForge</p>
-            <h1>Schema-driven poster compiler</h1>
+            <ProjectSwitcher
+              currentProjectId={currentProjectId}
+              currentProjectName={poster.title}
+              onSwitch={handleSwitchProject}
+              onNew={handleNewProject}
+            />
           </div>
         </div>
 
