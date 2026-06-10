@@ -34,6 +34,7 @@ interface EditablePosterCanvasProps {
   canUndo?: boolean | undefined;
   canRedo?: boolean | undefined;
   onSectionReorder?: (orderedIds: string[]) => void;
+  onMoveBlock?: (fromSectionId: string, fromIndex: number, toSectionId: string, toIndex: number) => void;
   onRegenerateSection?: (sectionId: string, instruction?: string) => void;
   onMoveSection?: (sectionId: string, direction: -1 | 1) => void;
   onToggleHideSection?: (sectionId: string) => void;
@@ -56,6 +57,7 @@ export function EditablePosterCanvas({
   canRedo = false,
   onSelectItem,
   onSectionReorder,
+  onMoveBlock,
   onRegenerateSection,
   onMoveSection,
   onToggleHideSection,
@@ -412,6 +414,7 @@ export function EditablePosterCanvas({
                   onUpdateSectionTitle={updateSectionTitle}
                   onUpdateTextBlock={updateTextBlock}
                   onSectionReorder={onSectionReorder}
+                  onMoveBlock={onMoveBlock}
                   onUpdateSectionLayout={(sectionId, layoutPatch) => {
                     onPosterChange({
                       ...poster,

@@ -3098,6 +3098,55 @@ textarea {
 }
 
 .poster-canvas-mode-edit .poster-card,
+/* Block drag — wrapper, handle, and ghost overlay */
+.sortable-block-item {
+  position: relative;
+}
+
+.block-drag-handle {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  width: 13px;
+  height: 13px;
+  border: 0;
+  border-radius: 3px;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(16, 24, 40, 0.42);
+  cursor: grab;
+  opacity: 0;
+  transition: opacity 80ms;
+}
+
+.sortable-block-item:hover .block-drag-handle {
+  opacity: 1;
+}
+
+.block-drag-handle:active {
+  cursor: grabbing;
+}
+
+.block-drag-ghost {
+  border-radius: var(--radius-md);
+  padding: 6px 10px;
+  color: var(--chrome-ink-strong);
+  background: var(--glass-panel-strong);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: 0 8px 24px rgba(16, 24, 40, 0.18);
+  font-size: var(--text-sm);
+  pointer-events: none;
+}
+
+.block-ghost-label {
+  color: var(--chrome-ink-faint);
+  font-style: italic;
+}
+
 .poster-canvas-mode-edit .poster-text-block,
 .poster-canvas-mode-edit [data-visual-id] {
   cursor: pointer;

@@ -1,11 +1,12 @@
 import { type CSSProperties, type ClipboardEvent, type PointerEvent as ReactPointerEvent, useEffect, useState } from "react";
-import { DndContext, closestCenter, type DragEndEvent } from "@dnd-kit/core";
-import { SortableContext, arrayMove, useSortable, rectSortingStrategy } from "@dnd-kit/sortable";
+import { DndContext, DragOverlay, closestCenter, type CollisionDetection, type DragEndEvent, type DragStartEvent } from "@dnd-kit/core";
+import { SortableContext, arrayMove, useSortable, rectSortingStrategy, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { AlertTriangle, ArrowDown, ArrowUp, Eye, EyeOff, GripVertical, Image, Pencil, RotateCcw, Trash2 } from "lucide-react";
 import type { ContentRegion, GeneratedImageSlot, PosterBlock, PosterProject, QaIssue } from "../domain/poster";
 import type { AssetSidecar } from "../layouts/buildLayoutSpec";
 import { isFeaturedSection, resolveLayoutTemplate } from "../layouts";
+import { parseBlockId } from "./posterUtils";
 import { resolvePalette, resolveComponentSkins, type ComponentSkins, type SkinTokens } from "../themes";
 import { VisualRenderer } from "../renderers/VisualRenderer";
 import { backgroundStrategyForTheme } from "../layouts/buildLayoutSpec";
@@ -23,6 +24,7 @@ export interface PosterCanvasProps {
   onUpdateSectionTitle?: ((sectionId: string, title: string) => void) | undefined;
   onUpdateTextBlock?: ((blockId: string, text: string) => void) | undefined;
   onSectionReorder?: ((orderedIds: string[]) => void) | undefined;
+  onMoveBlock?: ((fromSectionId: string, fromIndex: number, toSectionId: string, toIndex: number) => void) | undefined;
   onUpdateSectionLayout?: ((sectionId: string, layout: { columnSpan?: 1 | 2 | 3 | 4; rowSpan?: 1 | 2 }) => void) | undefined;
   onRegenerateSection?: ((sectionId: string, instruction?: string) => void) | undefined;
   onMoveSection?: ((sectionId: string, direction: -1 | 1) => void) | undefined;
@@ -36,6 +38,15 @@ export interface PosterCanvasProps {
   generatingSlotIds?: Set<string> | undefined;
 }
 
+const blockAwareCollision: CollisionDetection = (args) => {
+  const activeId = String(args.active.id);
+  if (activeId.includes(":block:")) {
+    const blockContainers = args.droppableContainers.filter((d) => String(d.id).includes(":block:"));
+    if (blockContainers.length > 0) return closestCenter({ ...args, droppableContainers: blockContainers });
+  }
+  return closestCenter(args);
+};
+
 export function PosterCanvas({
   poster,
   mode = "preview",
@@ -46,6 +57,7 @@ export function PosterCanvas({
   onUpdateSectionTitle,
   onUpdateTextBlock,
   onSectionReorder,
+  onMoveBlock,
   onUpdateSectionLayout,
   onRegenerateSection,
   onMoveSection,
@@ -57,6 +69,7 @@ export function PosterCanvas({
   onDeselectItem,
   generatingSlotIds,
 }: PosterCanvasProps) {
+  const [activeBlockId, setActiveBlockId] = useState<string | null>(null);
   const palette = resolvePalette(poster.theme, poster.palette);
   const layout = resolveLayoutTemplate(poster.layout);
   const backgroundAsset = poster.assets?.find((a) => a.role === "background" && a.url);
@@ -68,12 +81,38 @@ export function PosterCanvas({
   const canvasSections = mode === "edit" ? sections : sections.filter((section) => !section.layout?.hidden);
   const qaIssuesByLocation = groupQaIssuesByLocation(qaIssues);
 
+  function handleDragStart(event: DragStartEvent) {
+    const id = String(event.active.id);
+    if (id.includes(":block:")) setActiveBlockId(id);
+  }
+
   function handleDragEnd(event: DragEndEvent) {
+    setActiveBlockId(null);
     const { active, over } = event;
     if (!over || active.id === over.id) return;
+
+    const activeId = String(active.id);
+    const overId = String(over.id);
+
+    if (activeId.includes(":block:")) {
+      // Block drag — within-section or cross-section
+      const fromParsed = parseBlockId(activeId);
+      if (!fromParsed) return;
+      const toParsed = parseBlockId(overId);
+      if (toParsed) {
+        onMoveBlock?.(fromParsed.sectionId, fromParsed.index, toParsed.sectionId, toParsed.index);
+      } else {
+        // Dropped onto a section container — append to end of that section
+        const targetSection = sections.find((s) => s.id === overId);
+        if (targetSection) onMoveBlock?.(fromParsed.sectionId, fromParsed.index, overId, targetSection.blocks.length);
+      }
+      return;
+    }
+
+    // Section drag
     const sectionIds = sections.map((section) => section.id);
-    const oldIndex = sectionIds.indexOf(String(active.id));
-    const newIndex = sectionIds.indexOf(String(over.id));
+    const oldIndex = sectionIds.indexOf(activeId);
+    const newIndex = sectionIds.indexOf(overId);
     if (oldIndex < 0 || newIndex < 0) return;
     onSectionReorder?.(arrayMove(sectionIds, oldIndex, newIndex));
   }
@@ -194,8 +233,24 @@ export function PosterCanvas({
               placeholder="Section title"
               onCommit={(next) => onUpdateSectionTitle?.(section.id, next)}
             />
-            {section.blocks.map((block, index) =>
-              renderBlock(block, index, section.id, visuals, imageSlots, mode, skins, palette, selectedId, qaIssuesByLocation, onSelectItem, onUpdateTextBlock, onGenerateImageSlot, onUpdateImageSlotPosition, onImageSlotSidecarLoaded, generatingSlotIds),
+            {mode === "edit" && onMoveBlock ? (
+              <SortableContext
+                items={section.blocks.map((_, i) => `${section.id}:block:${i}`)}
+                strategy={verticalListSortingStrategy}
+              >
+                {section.blocks.map((block, index) => {
+                  const blockId = `${section.id}:block:${index}`;
+                  return (
+                    <SortableBlockItem key={blockId} id={blockId} sectionId={section.id} index={index}>
+                      {renderBlock(block, index, section.id, visuals, imageSlots, mode, skins, palette, selectedId, qaIssuesByLocation, onSelectItem, onUpdateTextBlock, onGenerateImageSlot, onUpdateImageSlotPosition, onImageSlotSidecarLoaded, generatingSlotIds)}
+                    </SortableBlockItem>
+                  );
+                })}
+              </SortableContext>
+            ) : (
+              section.blocks.map((block, index) =>
+                renderBlock(block, index, section.id, visuals, imageSlots, mode, skins, palette, selectedId, qaIssuesByLocation, onSelectItem, onUpdateTextBlock, onGenerateImageSlot, onUpdateImageSlotPosition, onImageSlotSidecarLoaded, generatingSlotIds),
+              )
             )}
             {mode === "edit" && isSelected && onUpdateSectionLayout ? (
               <SectionResizeHandles onCommit={(spans) => onUpdateSectionLayout(section.id, spans)} />
@@ -314,11 +369,14 @@ export function PosterCanvas({
         </header>
 
         <div className="poster-grid">
-          {mode === "edit" && onSectionReorder ? (
-            <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          {mode === "edit" && (onSectionReorder || onMoveBlock) ? (
+            <DndContext collisionDetection={blockAwareCollision} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
               <SortableContext items={canvasSections.map((section) => section.id)} strategy={rectSortingStrategy}>
                 {canvasSections.map(renderSection)}
               </SortableContext>
+              <DragOverlay>
+                {activeBlockId ? <BlockDragGhost blockId={activeBlockId} poster={poster} /> : null}
+              </DragOverlay>
             </DndContext>
           ) : (
             canvasSections.map(renderSection)
@@ -344,7 +402,7 @@ function SortableSectionShell({
   onClick: (event: React.MouseEvent<HTMLElement>) => void;
   children: (dragHandleProps: Record<string, unknown> | undefined) => React.ReactNode;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled: !sortable });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled: !sortable, data: { type: "section" } });
   const style: CSSProperties = {
     ...skinStyle,
     transform: CSS.Transform.toString(transform),
@@ -356,6 +414,55 @@ function SortableSectionShell({
     <section ref={setNodeRef} className={className} data-poster-id={id} data-poster-kind="section" style={style} onClick={onClick}>
       {children(sortable ? { ...attributes, ...listeners } : undefined)}
     </section>
+  );
+}
+
+function SortableBlockItem({
+  id,
+  sectionId,
+  index,
+  children,
+}: {
+  id: string;
+  sectionId: string;
+  index: number;
+  children: React.ReactNode;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id,
+    data: { type: "block", sectionId, index },
+  });
+  const style: CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.35 : 1,
+  };
+  return (
+    <div ref={setNodeRef} style={style} className="sortable-block-item">
+      <button type="button" className="block-drag-handle" title="Drag to reorder block" aria-label="Drag block" {...attributes} {...listeners}>
+        <GripVertical size={11} />
+      </button>
+      {children}
+    </div>
+  );
+}
+
+function BlockDragGhost({ blockId, poster }: { blockId: string; poster: PosterProject }) {
+  const parsed = parseBlockId(blockId);
+  if (!parsed) return null;
+  const section = poster.sections.find((s) => s.id === parsed.sectionId);
+  const block = section?.blocks[parsed.index];
+  if (!block) return null;
+  return (
+    <div className="block-drag-ghost">
+      {block.type === "text" ? (
+        <p>{block.text.slice(0, 80)}{block.text.length > 80 ? "…" : ""}</p>
+      ) : block.type === "visual_ref" ? (
+        <p className="block-ghost-label">Visual: {block.visual_id}</p>
+      ) : (
+        <p className="block-ghost-label">Image slot</p>
+      )}
+    </div>
   );
 }
 

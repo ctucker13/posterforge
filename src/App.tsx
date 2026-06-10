@@ -386,6 +386,41 @@ export default function App() {
     setAppMode("edit");
   }
 
+  function handleMoveBlock(fromSectionId: string, fromIndex: number, toSectionId: string, toIndex: number) {
+    const fromSection = poster.sections.find((s) => s.id === fromSectionId);
+    if (!fromSection) return;
+    const block = fromSection.blocks[fromIndex];
+    if (!block) return;
+
+    if (fromSectionId === toSectionId) {
+      // Within same section — reorder
+      const newBlocks = [...fromSection.blocks];
+      newBlocks.splice(fromIndex, 1);
+      const clampedTo = Math.min(toIndex, newBlocks.length);
+      newBlocks.splice(clampedTo, 0, block);
+      handlePosterStateChange({
+        ...poster,
+        sections: poster.sections.map((s) => s.id === fromSectionId ? { ...s, blocks: newBlocks } : s),
+      });
+    } else {
+      // Cross-section move
+      const toSection = poster.sections.find((s) => s.id === toSectionId);
+      if (!toSection) return;
+      const fromBlocks = fromSection.blocks.filter((_, i) => i !== fromIndex);
+      const toBlocks = [...toSection.blocks];
+      const clampedTo = Math.min(toIndex, toBlocks.length);
+      toBlocks.splice(clampedTo, 0, block);
+      handlePosterStateChange({
+        ...poster,
+        sections: poster.sections.map((s) => {
+          if (s.id === fromSectionId) return { ...s, blocks: fromBlocks };
+          if (s.id === toSectionId) return { ...s, blocks: toBlocks };
+          return s;
+        }),
+      });
+    }
+  }
+
   function handleSectionReorder(orderedIds: string[]) {
     handlePosterStateChange({
       ...poster,
@@ -596,6 +631,7 @@ export default function App() {
           canUndo={canUndo}
           canRedo={canRedo}
           onSectionReorder={handleSectionReorder}
+          onMoveBlock={handleMoveBlock}
           onRegenerateSection={handleRegenerateSection}
           onMoveSection={handleMoveSection}
           onToggleHideSection={handleToggleHideSection}
