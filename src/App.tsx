@@ -16,6 +16,7 @@ import { SectionRevisionDiff } from "./components/SectionRevisionDiff";
 import { ThemePicker } from "./components/ThemePicker";
 import { AssetPicker } from "./components/AssetPicker";
 import { TracePanel } from "./components/TracePanel";
+import { KeyboardShortcutsOverlay } from "./components/KeyboardShortcutsOverlay";
 import { catalogueEntryToPosterAsset, findThemeBackgroundAsset, loadAssetCatalogue, type AssetCatalogue } from "./assets/catalogue";
 import { usePosterHistory, type PosterChangeOptions } from "./app/usePosterHistory";
 import { createProject, getLastProjectId, loadProject, saveProject, setLastProjectId, snapshotProject } from "./app/projectStore";
@@ -57,8 +58,17 @@ export default function App() {
   const [selectedCanvasItem, setSelectedCanvasItem] = useState<{ id: string; kind: PosterCanvasItemKind } | undefined>();
   const [appMode, setAppMode] = useState<AppMode>("edit");
   const [rightPanel, setRightPanel] = useState<RightPanel>("inspector");
+  const [showShortcuts, setShowShortcuts] = useState(false);
   const [assetCatalogue, setAssetCatalogue] = useState<AssetCatalogue | null>(null);
   const generationIdRef = useRef(0);
+  const liveRegionRef = useRef<HTMLDivElement>(null);
+
+  function announce(msg: string) {
+    const el = liveRegionRef.current;
+    if (!el) return;
+    el.textContent = "";
+    requestAnimationFrame(() => { el.textContent = msg; });
+  }
 
   const selectedTheme = themes[theme];
   const selectedPalette = palettes[palette];
@@ -111,6 +121,30 @@ export default function App() {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleUndo, handleRedo]);
+
+  // F6: non-mod keyboard shortcuts (Esc, arrows, delete, ?)
+  const f6StateRef = useRef({ appMode, selectedCanvasItem, handleMoveSection, handleToggleHideSection });
+  f6StateRef.current = { appMode, selectedCanvasItem, handleMoveSection, handleToggleHideSection };
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (isEditableTarget(event.target)) return;
+      if ((event.target as Element)?.closest?.(".freeform-slot")) return;
+      if (event.metaKey || event.ctrlKey) return;
+
+      const { appMode: mode, selectedCanvasItem: sel, handleMoveSection: moveSection, handleToggleHideSection: toggleHide } = f6StateRef.current;
+      if (event.key === "?") { setShowShortcuts((s) => !s); return; }
+      if (event.key === "Escape") { setShowShortcuts(false); setSelectedCanvasItem(undefined); return; }
+
+      if (mode !== "edit" || !sel) return;
+      if (sel.kind === "section") {
+        if (event.key === "ArrowUp") { event.preventDefault(); moveSection(sel.id, -1); return; }
+        if (event.key === "ArrowDown") { event.preventDefault(); moveSection(sel.id, 1); return; }
+        if (event.key === "Delete" || event.key === "Backspace") { event.preventDefault(); toggleHide(sel.id); return; }
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     let cancelled = false;
@@ -659,6 +693,7 @@ export default function App() {
           />
         ) : null}
       </section>
+      {showShortcuts && <KeyboardShortcutsOverlay onClose={() => setShowShortcuts(false)} />}
     </main>
   );
 }
