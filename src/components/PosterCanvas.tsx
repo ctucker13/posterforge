@@ -37,6 +37,9 @@ export interface PosterCanvasProps {
   onMoveSlot?: ((slotId: string, x: number, y: number) => void) | undefined;
   /** Resize a freeform slot to new bounds (poster-pixel coordinates). */
   onResizeSlot?: ((slotId: string, x: number, y: number, w: number, h: number) => void) | undefined;
+  onReorderSlot?: ((slotId: string, dir: 1 | -1) => void) | undefined;
+  onDeleteSlot?: ((slotId: string) => void) | undefined;
+  onDuplicateSlot?: ((slotId: string) => void) | undefined;
   onDeselectItem?: (() => void) | undefined;
   /** Slot ids with an in-flight generation request; used to show progress UI. */
   generatingSlotIds?: Set<string> | undefined;
@@ -74,11 +77,15 @@ export function PosterCanvas({
   onImageSlotSidecarLoaded,
   onMoveSlot,
   onResizeSlot,
+  onReorderSlot,
+  onDeleteSlot,
+  onDuplicateSlot,
   onDeselectItem,
   generatingSlotIds,
   canvasScale = 1,
 }: PosterCanvasProps) {
   const [activeBlockId, setActiveBlockId] = useState<string | null>(null);
+  const [snapGuides, setSnapGuides] = useState<{ h: number | null; v: number | null }>({ h: null, v: null });
   const palette = resolvePalette(poster.theme, poster.palette);
   const layout = resolveLayoutTemplate(poster.layout);
   const backgroundAsset = poster.assets?.find((a) => a.role === "background" && a.url);
@@ -359,14 +366,22 @@ export function PosterCanvas({
             slot={slot}
             mode={mode}
             canvasScale={canvasScale}
+            posterW={outputFrame.width}
+            posterH={outputFrame.height}
             generatingSlotIds={generatingSlotIds}
             onGenerate={onGenerateImageSlot}
             onUpdatePosition={onUpdateImageSlotPosition}
             onSidecarLoaded={onImageSlotSidecarLoaded}
             onMove={onMoveSlot}
             onResize={onResizeSlot}
+            onReorder={onReorderSlot}
+            onDelete={onDeleteSlot}
+            onDuplicate={onDuplicateSlot}
+            onSnapChange={(h, v) => setSnapGuides({ h, v })}
           />
         ))}
+        {snapGuides.h !== null && <div className="snap-guide snap-guide-h" style={{ top: snapGuides.h }} />}
+        {snapGuides.v !== null && <div className="snap-guide snap-guide-v" style={{ left: snapGuides.v }} />}
         <header className="poster-hero" data-poster-id="hero" data-poster-kind="hero">
           <div>
             <p className="poster-kicker">{layout.name} · {poster.audience}</p>
@@ -792,31 +807,58 @@ function SectionResizeHandles({ onCommit }: { onCommit: (spans: { columnSpan: 1 
 
 type FreeformSlotData = GeneratedImageSlot & { x: number; y: number; width_px: number; height_px: number };
 
+const SNAP_THRESHOLD = 15;
+
+function computeSnap(
+  targets: Array<{ snap: number; guide: number }>,
+  value: number,
+): { snapped: number; guide: number } | null {
+  let best: { snapped: number; guide: number; dist: number } | null = null;
+  for (const t of targets) {
+    const dist = Math.abs(t.snap - value);
+    if (dist < SNAP_THRESHOLD && (!best || dist < best.dist)) best = { snapped: t.snap, guide: t.guide, dist };
+  }
+  return best;
+}
+
 function FreeformSlot({
   slot,
   mode,
   canvasScale,
+  posterW,
+  posterH,
   generatingSlotIds,
   onGenerate,
   onUpdatePosition,
   onSidecarLoaded,
   onMove,
   onResize,
+  onReorder,
+  onDelete,
+  onDuplicate,
+  onSnapChange,
 }: {
   slot: FreeformSlotData;
   mode: PosterCanvasProps["mode"];
   canvasScale: number;
+  posterW: number;
+  posterH: number;
   generatingSlotIds: Set<string> | undefined;
   onGenerate: PosterCanvasProps["onGenerateImageSlot"];
   onUpdatePosition: PosterCanvasProps["onUpdateImageSlotPosition"];
   onSidecarLoaded: PosterCanvasProps["onImageSlotSidecarLoaded"];
   onMove: ((slotId: string, x: number, y: number) => void) | undefined;
   onResize: ((slotId: string, x: number, y: number, w: number, h: number) => void) | undefined;
+  onReorder: ((slotId: string, dir: 1 | -1) => void) | undefined;
+  onDelete: ((slotId: string) => void) | undefined;
+  onDuplicate: ((slotId: string) => void) | undefined;
+  onSnapChange: (h: number | null, v: number | null) => void;
 }) {
   const [livePos, setLivePos] = useState<{ x: number; y: number } | null>(null);
   const [liveSize, setLiveSize] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
   const [active, setActive] = useState(false);
   const moveStartRef = useRef<{ px: number; py: number; sx: number; sy: number } | null>(null);
+  const slotRef = useRef<HTMLDivElement>(null);
 
   const cx = livePos?.x ?? liveSize?.x ?? slot.x;
   const cy = livePos?.y ?? liveSize?.y ?? slot.y;
@@ -830,19 +872,41 @@ function FreeformSlot({
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     moveStartRef.current = { px: e.clientX, py: e.clientY, sx: slot.x, sy: slot.y };
     setActive(true);
+    slotRef.current?.focus({ preventScroll: true });
   };
   const handleMoveMove = (e: React.PointerEvent) => {
     if (!moveStartRef.current) return;
-    setLivePos({
-      x: moveStartRef.current.sx + (e.clientX - moveStartRef.current.px) / canvasScale,
-      y: moveStartRef.current.sy + (e.clientY - moveStartRef.current.py) / canvasScale,
-    });
+    const rawX = moveStartRef.current.sx + (e.clientX - moveStartRef.current.px) / canvasScale;
+    const rawY = moveStartRef.current.sy + (e.clientY - moveStartRef.current.py) / canvasScale;
+
+    const snapX = computeSnap(
+      [
+        { snap: 0, guide: 0 },
+        { snap: Math.round(posterW / 2 - cw / 2), guide: Math.round(posterW / 2) },
+        { snap: posterW - cw, guide: posterW },
+      ],
+      rawX,
+    );
+    const snapY = computeSnap(
+      [
+        { snap: 0, guide: 0 },
+        { snap: Math.round(posterH / 2 - ch / 2), guide: Math.round(posterH / 2) },
+        { snap: posterH - ch, guide: posterH },
+      ],
+      rawY,
+    );
+
+    onSnapChange(snapY?.guide ?? null, snapX?.guide ?? null);
+    setLivePos({ x: snapX?.snapped ?? rawX, y: snapY?.snapped ?? rawY });
   };
   const handleMoveUp = (e: React.PointerEvent) => {
     if (!moveStartRef.current) return;
-    const nx = moveStartRef.current.sx + (e.clientX - moveStartRef.current.px) / canvasScale;
-    const ny = moveStartRef.current.sy + (e.clientY - moveStartRef.current.py) / canvasScale;
-    onMove?.(slot.id, Math.round(nx), Math.round(ny));
+    const rawX = moveStartRef.current.sx + (e.clientX - moveStartRef.current.px) / canvasScale;
+    const rawY = moveStartRef.current.sy + (e.clientY - moveStartRef.current.py) / canvasScale;
+    const finalX = livePos?.x ?? rawX;
+    const finalY = livePos?.y ?? rawY;
+    onMove?.(slot.id, Math.round(finalX), Math.round(finalY));
+    onSnapChange(null, null);
     moveStartRef.current = null;
     setLivePos(null);
     setActive(false);
@@ -865,10 +929,25 @@ function FreeformSlot({
     [slot, canvasScale, onResize],
   );
 
+  // A8: arrow nudge, delete, duplicate via keyboard
+  function handleSlotKeyDown(e: React.KeyboardEvent) {
+    if (moveStartRef.current || livePos || liveSize) return;
+    const STEP = e.shiftKey ? 10 : 1;
+    if (e.key === "ArrowLeft")  { e.preventDefault(); onMove?.(slot.id, slot.x - STEP, slot.y); return; }
+    if (e.key === "ArrowRight") { e.preventDefault(); onMove?.(slot.id, slot.x + STEP, slot.y); return; }
+    if (e.key === "ArrowUp")    { e.preventDefault(); onMove?.(slot.id, slot.x, slot.y - STEP); return; }
+    if (e.key === "ArrowDown")  { e.preventDefault(); onMove?.(slot.id, slot.x, slot.y + STEP); return; }
+    if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); onDelete?.(slot.id); return; }
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "d") { e.preventDefault(); onDuplicate?.(slot.id); return; }
+  }
+
   return (
     <div
+      ref={slotRef}
+      tabIndex={isEdit ? 0 : -1}
       className={`freeform-slot${isEdit ? " freeform-slot-edit" : ""}${active ? " freeform-slot-active" : ""}`}
-      style={{ position: "absolute", left: cx, top: cy, width: cw, height: ch }}
+      style={{ position: "absolute", left: cx, top: cy, width: cw, height: ch, zIndex: slot.zOrder ?? 1 }}
+      onKeyDown={isEdit ? handleSlotKeyDown : undefined}
     >
       <GeneratedImageBlock
         blockId={slot.id}
@@ -890,6 +969,13 @@ function FreeformSlot({
           onPointerUp={handleMoveUp}
         >
           <Move size={14} />
+        </div>
+      )}
+      {isEdit && (
+        <div className="freeform-slot-toolbar">
+          <button type="button" className="freeform-toolbar-btn" title="Bring forward" onClick={() => onReorder?.(slot.id, 1)}>↑</button>
+          <button type="button" className="freeform-toolbar-btn" title="Send back" onClick={() => onReorder?.(slot.id, -1)}>↓</button>
+          <button type="button" className="freeform-toolbar-btn freeform-toolbar-delete" title="Remove slot (Del)" onClick={() => onDelete?.(slot.id)}>×</button>
         </div>
       )}
       {isEdit && (["nw", "n", "ne", "w", "e", "sw", "s", "se"] as const).map((corner) => (

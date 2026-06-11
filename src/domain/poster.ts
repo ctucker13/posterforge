@@ -148,6 +148,8 @@ export interface GeneratedImageSlot {
   /** CSS object-position for the rendered image (e.g. "50% 25%"). Canonical; block.objectPosition is legacy fallback. */
   objectPosition?: string | undefined;
   contentRegions?: ContentRegion[] | undefined;
+  /** Stacking order for freeform overlay slots. Higher = in front. */
+  zOrder?: number | undefined;
 }
 
 export type PosterBlock =

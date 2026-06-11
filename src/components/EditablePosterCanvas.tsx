@@ -464,6 +464,28 @@ export function EditablePosterCanvas({
                       ),
                     });
                   }}
+                  onReorderSlot={(slotId, dir) => {
+                    const slots = poster.imageSlots ?? [];
+                    const idx = slots.findIndex((s) => s.id === slotId);
+                    if (idx < 0) return;
+                    const current = slots[idx]?.zOrder ?? idx + 1;
+                    onPosterChange({
+                      ...poster,
+                      imageSlots: slots.map((s) => s.id === slotId ? { ...s, zOrder: current + dir } : s),
+                    });
+                  }}
+                  onDeleteSlot={(slotId) => {
+                    onPosterChange({
+                      ...poster,
+                      imageSlots: (poster.imageSlots ?? []).filter((s) => s.id !== slotId),
+                    });
+                  }}
+                  onDuplicateSlot={(slotId) => {
+                    const original = (poster.imageSlots ?? []).find((s) => s.id === slotId);
+                    if (!original) return;
+                    const copy = { ...original, id: `slot-${Date.now()}`, x: (original.x ?? 0) + 40, y: (original.y ?? 0) + 40 };
+                    onPosterChange({ ...poster, imageSlots: [...(poster.imageSlots ?? []), copy] });
+                  }}
                   canvasScale={zoom}
                 />
               </div>
