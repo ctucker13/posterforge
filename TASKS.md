@@ -14,13 +14,6 @@ Organised by milestone — see `docs/plans/product-roadmap-2026-06.md` for the f
 
 ### M1 — Canvas editing power
 
-- [ ] **A4. Block-level rearrange** — dnd-kit drag of blocks within and between sections with insert indicators.
-- [ ] **A5. Phase 3 — Layout spec generation** — Extend `buildLayoutSpec` to write one section per raster slot; SVG/svg-hybrid slots resolve through `ThemeMotifLayer`.
-- [ ] **A6. Phase 4 — Freeform slot overlay renderer** — Render generated slots as positioned surfaces (`x`/`y`/`width_px`/`height_px`); drag-move and corner-handle resize; deterministic content into sidecar content regions; keep pan/regenerate controls per slot.
-- [ ] **A7. Z-order and snap guides** — Bring-forward/send-back; alignment guides on edges/centres/margins; shift-drag axis lock.
-- [ ] **A8. Selection model upgrade** — Multi-select, marquee, arrow-key nudge, Delete, duplicate (Cmd+D).
-- [ ] **A9. Per-section style controls** — Text scale, alignment, palette-derived accent/background per section via existing skin/token CSS vars.
-- [ ] **A10. Visual sizing controls** — Height/aspect controls on `visual_ref` blocks with responsive chart re-render.
 - [ ] **A11. Phase 5 remainder — skins for timeline, network-graph, sankey** — Plus verify blueprint-engineering uppercase heading vars render correctly.
 
 ### M2 — Agentic generation pipeline
@@ -59,17 +52,9 @@ Organised by milestone — see `docs/plans/product-roadmap-2026-06.md` for the f
 
 ### Cross-cutting — UX and UI discipline (Apple-like: simple by default, powerful underneath)
 
-- [ ] **F3. Workspace simplification — implementation** — Decision recorded in `docs/plans/f3-workspace-decision.md` (single continuous workspace: generation as a flow, review as a lens, export as an action, one right-rail panel at a time). Implement incrementally alongside M2 (B1/B8). Until then: A3–A10 must not gate on `appMode`; new panels go in the right rail, not the mode population.
 - [ ] **F4. First-run and empty states** — "Paste a repo URL → poster" as the single obvious first action; teaching empty states; example project one click away. *Land with M2.*
-- [ ] **F5. Microinteraction and motion pass** — Smooth zoom/fit transitions, drag ghosting, stage-aware generation progress (wired to B1 traces), skeletons over spinners; `prefers-reduced-motion` support.
-- [ ] **F6. Keyboard parity + shortcuts overlay** — Every common action keyboard-reachable; `?` shortcuts overlay; consistent Cmd+Z/D/K conventions.
-- [ ] **F7. Plain-language error and recovery surfaces** — No raw API errors; each failure says what happened and offers one-click recovery. *Land with M2/M3.*
-- [ ] **F8. Accessibility baseline** — Focus rings, ARIA labels on canvas controls, contrast-checked app chrome.
-- [ ] **F9. Glass UI redesign** — Plan in `docs/plans/ui-redesign-glass.md`; poster canvas stays untouched. G1 (glass tokens/shell) and G2 (header + segmented mode bar) are **done**. Remaining: **G3 canvas stage** (floating glass toolbar, recessed stage, compact section navigator), **G4 control kit + rail content** (one button/field system, flatten Export cards, QA/trace rows), **G5 audit** (3-width screenshot pass, re-run interaction smokes, canvas pixel-diff).
 
 ### M5 — QA, persistence, and export polish
-
-- [ ] **E1. Autosave + project list** — IndexedDB persistence, autosave, multi-project list, named snapshots; auto-snapshot before each generation run.
 - [ ] **E2. Phase 6 — QA additions** — Checks for missing generated assets, stale dimensions, region overflow, low contrast, factual content in image prompts.
 - [ ] **E3. Colour contrast checks** — WCAG AA/AAA on poster text vs background, including text over generated images (shares sampling machinery with C2).
 - [ ] **E4. Chart clipping detection** — Flag charts where data extends beyond visible area.
@@ -84,6 +69,20 @@ Organised by milestone — see `docs/plans/product-roadmap-2026-06.md` for the f
 
 ## Completed
 
+- [x] E1 autosave + project list — IndexedDB persistence, autosave, multi-project list, named snapshots; auto-snapshot before each generation run
+- [x] F9 glass UI redesign — full G1–G5 pass: glass tokens/shell, header + segmented mode bar, canvas stage (recessed + floating toolbar), compact section navigator, grouped toolbar, flat export/QA rows, audit polish (`docs/plans/ui-redesign-glass.md`)
+- [x] F8 accessibility baseline — skip-to-canvas link, `aria-live` announcement region (generation, QA, errors), `aria-label` + `aria-roledescription` on poster article, focus trap in shortcuts overlay, `.sr-only` utility
+- [x] F7 plain-language errors — `friendlyError` utility maps API/network/quota/policy failures to user-facing messages across generation and image-gen paths
+- [x] F6 keyboard parity + shortcuts overlay — `?` opens overlay, Esc deselects/closes, arrow keys reorder sections, Delete hides section, arrow nudge/Cmd+D/Delete for freeform slots; `KeyboardShortcutsOverlay` with focus trap
+- [x] F5 microinteraction + motion pass — `@keyframes panel-in`, `badge-pop`, `selection-pop`; `panel-enter` wrapper on right-rail tab switches; `key`-prop remount on inspector section/block panels; `prefers-reduced-motion` guard
+- [x] F3 workspace simplification — collapse mode bar into segmented control, persistent right-rail tabs; decision in `docs/plans/f3-workspace-decision.md`
+- [x] A10 visual sizing controls — S/M/L size buttons on `visual_ref` inspector; `data-visual-size` attribute drives `flex` sizing in CSS; `size` field on `PosterVisual`
+- [x] A9 per-section style controls — text scale (S/M/L), alignment (L/C/R), and palette-derived accent color per section via CSS custom properties (`--section-text-scale`, `--section-text-align`, `--section-accent`); `SectionAccentPicker` swatches; fields on `PosterSectionLayout`
+- [x] A8 freeform slot keyboard controls — arrow nudge (1 px / 10 px with Shift), Delete removes slot, Cmd+D duplicates; `handleSlotKeyDown` in `FreeformSlot`; `tabIndex` + focus-on-drag
+- [x] A7 z-order + snap guides — bring-forward/send-back toolbar on freeform slot hover; `zOrder` field on `GeneratedImageSlot`; `computeSnap` aligns slot edges/centres to poster edges/centre with 15 px threshold; live guide lines
+- [x] A6 Phase 4 freeform slot overlay renderer — generated slots rendered as absolutely-positioned draggable surfaces with pointer capture; drag-move and corner/edge resize handles; pan/regen controls per slot
+- [x] A5 Phase 3 layout spec generation — `buildLayoutSpec` writes one section per raster slot; SVG/svg-hybrid slots resolve through `ThemeMotifLayer`
+- [x] A4 block-level drag-to-reorder — dnd-kit drag of blocks within and between sections with insert indicators
 - [x] A3 drag-resize sections — `SectionResizeHandles` in `PosterCanvas` (east/south/corner handles on the selected section): drag snaps to whole grid tracks with live reflow preview + span badge, commits `columnSpan`/`rowSpan` once on release (single undo step), Escape cancels; handles math converts computed track sizes into screen px to respect canvas zoom; starting a resize blurs any in-progress text edit so Cmd/Ctrl+Z routes to poster history; fixed pre-existing specificity bug where layout templates' per-section-type `grid-column` rules silently beat user `.span-N` classes (results-first, case-study); verified with Playwright (10 interaction checks)
 - [x] F1 app design language system — chrome design tokens in `:root` (`--chrome-*` ink ramp/surfaces/borders/accent+semantic colors, `--radius-*`, `--text-*` chrome type scale, `--space-*`, `--elevation-*`, `--motion-*`/`--ease-out`); 322 value-identical replacements across `app.css` (stray radii 3/5/7px normalised onto the 4/6/8 scale); baseline transitions on chrome buttons with `prefers-reduced-motion` guard; poster canvas explicitly excluded (stays on `--theme-*`/`--skin-*`); verified pixel-identical vs baseline screenshots except deliberate corner-radius normalisation
 - [x] F2 progressive-disclosure inspector — section selection shows title + Up/Down/Hide with span/emphasis behind a "Layout options" disclosure; visual selection shows validity + structured editor with metadata/raw-JSON/save behind "Advanced"; shared `.inspector-disclosure` style on F1 tokens; fixed pre-existing stretch bug (`align-content: start`) that blew inspector controls up to fill the rail height

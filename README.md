@@ -116,15 +116,31 @@ Python is intentionally not the app core. It can be added later with `uv` for da
 ### Canvas and Editor
 - Shared `PosterCanvas` component used by preview, editor, and A0 PDF export.
 - `EditablePosterCanvas` wraps the canvas with full in-canvas generation state: slot generation queue, progress indicators, sidecar callback, and image position updates wired through `onPosterChange`.
-- Continuous zoom controls, fit snapping, section focus zoom, layout check overlay, minimap, and virtual 16:9 preview mode.
-- Drag-to-reorder sections, section visibility toggle, span/emphasis controls, selected-section toolbar.
+- Continuous zoom controls, fit snapping, section focus zoom, layout check overlay, and virtual 16:9 preview mode.
+- Drag-to-reorder sections, section visibility toggle, span/emphasis controls (grid column/row span, featured emphasis), and selected-section toolbar.
+- Block-level drag-to-reorder with dnd-kit: drag blocks within and between sections with live insert indicators.
+- Drag-resize sections: east/south/corner handles snap to grid tracks with live span badge; single undo step on release.
+- Per-section style controls: text scale (S/M/L), alignment (L/C/R), and palette-derived accent colour applied via CSS custom properties.
+- Freeform image slots rendered as positioned draggable surfaces; pointer-capture drag-move and corner/edge resize handles; pan/regen controls per slot.
+- Z-order controls (bring-forward/send-back toolbar) and snap guides for freeform slots: slot edges and centres snap to poster edges and centre with a 15 px threshold.
+- Arrow nudge (1 px, 10 px with Shift), Delete, and Cmd+D duplicate for focused freeform slots.
+- Visual sizing controls (S/M/L) on `visual_ref` inspector blocks.
+- Progressive-disclosure inspector: section selection shows style controls and layout options; visual selection shows data editor and metadata.
 - Cmd+K text block revision flow with accept/reject diff.
-- VisualPicker wired into the Canvas Inspector "Add visual" button.
+- VisualPicker wired into the inspector "Add visual" button.
 
 ### Themes
 - 60 themes defined in `imagegen-themes.json` with `backgroundStrategy`, `density`, `htmlTokens`, `typography`, `chartStyle`, `diagramStyle`, and image prompt prefixes.
 - Theme and palette separation with swatch-based theme selection and opt-in palette override.
 - NatWest Group theme and palette scoped to explicit selection.
+
+### App UX and Accessibility
+- Glassmorphic app chrome: `--chrome-*` design tokens, glass header, segmented mode bar, recessed canvas stage, compact section navigator, grouped toolbar, flat export/QA rows.
+- IndexedDB autosave with multi-project list, named snapshots, and auto-snapshot before each generation run.
+- Keyboard shortcuts: `?` opens overlay, Esc deselects/closes, arrow keys reorder sections, Delete hides section; consistent Cmd+Z/Shift+Z, Cmd+D, Cmd+K conventions throughout.
+- Plain-language error surfaces: `friendlyError` maps API key errors, rate limits, quota exhaustion, timeouts, and content-policy blocks to user-facing messages.
+- Accessibility: skip-to-canvas link, `aria-live` announcement region wired to generation and QA events, `aria-label`/`aria-roledescription` on poster article, focus trap in shortcuts overlay.
+- `prefers-reduced-motion` guard on all CSS transitions and keyframe animations.
 
 ### QA and Export
 - QA panel with actionable issues, canvas navigation, renderer data-shape checks, print/virtual output-intent checks, preview density risks, and auto-fix for generated references.
@@ -144,7 +160,8 @@ Python is intentionally not the app core. It can be added later with `uv` for da
 
 ```text
 src/
-  components/   React UI panels (PosterCanvas, EditablePosterCanvas, VisualPicker, VisualDataEditor, ThemeMotifLayer, …)
+  app/          cross-cutting app utilities (posterHistory, friendlyError)
+  components/   React UI panels (PosterCanvas, EditablePosterCanvas, VisualPicker, VisualDataEditor, ThemeMotifLayer, KeyboardShortcutsOverlay, …)
   data/         sample PosterProject data
   domain/       poster types, generator, evidence helpers, validation
   exports/      export model, readiness checks, JSON downloads, bundle manifest
@@ -176,26 +193,25 @@ docs/plans/
 
 ## Near-Term Roadmap
 
-1. Add stronger source connector behavior:
-   - source document inspector
-   - local file ingestion placeholder
-   - web URL ingestion placeholder
+1. Complete M1 canvas editing:
+   - Phase 5 component skins for timeline, network-graph, and Sankey renderers (A11)
 
-2. Strengthen evidence extraction:
-   - evidence graph UI
-   - separate project results from literature claims
-   - citation quality checks
+2. Agentic generation pipeline (M2):
+   - Staged orchestrator with per-step trace events and re-runnable steps
+   - Schema-validated structured outputs (zod)
+   - Evidence-grounded section drafting and visual planner
+   - Conversational edit agent (extend Cmd+K beyond text blocks)
+   - First-run and empty states wired to M2 flow
 
-3. Strengthen QA:
-   - colour contrast checks
-   - chart clipping detection
-   - QR scanability
-   - visual hierarchy scoring
+3. Strengthen source connectors (M4):
+   - Source document inspector UI
+   - Local file and web URL ingestion
+   - Notebook and repo figure import
 
-4. Strengthen export implementations:
-   - editable HTML project package
+4. Strengthen QA and export (M5):
+   - Colour contrast checks, chart clipping detection, QR scanability
+   - Editable HTML project package
    - Playwright PNG preview export
-   - optional richer PptxGenJS compatibility export
 
 ## Long-Term Roadmap
 
