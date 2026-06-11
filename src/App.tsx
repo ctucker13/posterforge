@@ -575,50 +575,52 @@ export default function App() {
       <section className="inspector-column" aria-label="Right panel">
         <RightRailTabs active={rightPanel} onSelect={setRightPanel} qaCount={qaIssues.length} />
         <div className="right-rail-content">
-          {rightPanel === "inspector" && (
-            <PosterInspector
-              poster={poster}
-              selectedId={selectedCanvasItem?.id}
-              selectedKind={selectedCanvasItem?.kind}
-              onPosterChange={handlePosterStateChange}
-              onMoveSection={handleMoveSection}
-              onToggleHideSection={handleToggleHideSection}
-            />
-          )}
-          {rightPanel === "sources" && (
-            <div className="workspace-tab-panel">
-              <SourceSearchPanel
+          <div key={rightPanel} className="panel-enter">
+            {rightPanel === "inspector" && (
+              <PosterInspector
                 poster={poster}
+                selectedId={selectedCanvasItem?.id}
+                selectedKind={selectedCanvasItem?.kind}
                 onPosterChange={handlePosterStateChange}
-                onUseExampleRepo={() => {
-                  setPrompt(gabeChoicePrompt);
-                  const nextTheme = "clean-academic";
-                  const nextPalette = themes[nextTheme]?.palette ?? "clean-blue";
-                  const nextPoster = { ...poster, theme: nextTheme, palette: nextPalette, logo: themes[nextTheme]?.logoUrl };
-                  const nextQaIssues = runQa(nextPoster);
-                  setPoster({ ...nextPoster, qaResults: nextQaIssues });
-                  setQaIssues(nextQaIssues);
-                }}
+                onMoveSection={handleMoveSection}
+                onToggleHideSection={handleToggleHideSection}
               />
-              <EvidencePanel poster={poster} />
-            </div>
-          )}
-          {rightPanel === "qa" && (
-            <QaPanel issues={qaIssues} onRunQa={handleRunQa} onApplyFix={handleQaFix} onNavigate={handleQaNavigate} />
-          )}
-          {rightPanel === "export" && (
-            <>
-              <ExportPanel poster={poster} />
-              <JsonProjectControls poster={poster} onImport={handleProjectImport} onReset={handleResetProject} />
-            </>
-          )}
-          {rightPanel === "trace" && (
-            <TracePanel events={trace} />
-          )}
+            )}
+            {rightPanel === "sources" && (
+              <div className="workspace-tab-panel">
+                <SourceSearchPanel
+                  poster={poster}
+                  onPosterChange={handlePosterStateChange}
+                  onUseExampleRepo={() => {
+                    setPrompt(gabeChoicePrompt);
+                    const nextTheme = "clean-academic";
+                    const nextPalette = themes[nextTheme]?.palette ?? "clean-blue";
+                    const nextPoster = { ...poster, theme: nextTheme, palette: nextPalette, logo: themes[nextTheme]?.logoUrl };
+                    const nextQaIssues = runQa(nextPoster);
+                    setPoster({ ...nextPoster, qaResults: nextQaIssues });
+                    setQaIssues(nextQaIssues);
+                  }}
+                />
+                <EvidencePanel poster={poster} />
+              </div>
+            )}
+            {rightPanel === "qa" && (
+              <QaPanel issues={qaIssues} onRunQa={handleRunQa} onApplyFix={handleQaFix} onNavigate={handleQaNavigate} />
+            )}
+            {rightPanel === "export" && (
+              <>
+                <ExportPanel poster={poster} />
+                <JsonProjectControls poster={poster} onImport={handleProjectImport} onReset={handleResetProject} />
+              </>
+            )}
+            {rightPanel === "trace" && (
+              <TracePanel events={trace} />
+            )}
+          </div>
         </div>
       </section>
 
-      <section className="preview-column" aria-label="Poster workspace">
+      <section id="poster-canvas" className="preview-column" aria-label="Poster workspace">
         <EditablePosterCanvas
           poster={poster}
           selectedId={selectedCanvasItem?.id}

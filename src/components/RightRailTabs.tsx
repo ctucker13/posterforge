@@ -33,7 +33,7 @@ export function RightRailTabs({
         >
           {tab.icon}
           <span>{tab.label}</span>
-          {tab.badge != null ? <strong>{tab.badge}</strong> : null}
+          {tab.badge != null ? <strong key={tab.badge}>{tab.badge}</strong> : null}
         </button>
       ))}
     </div>

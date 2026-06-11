@@ -151,7 +151,7 @@ export function PosterInspector({ poster, selectedId, selectedKind, onPosterChan
       ) : null}
 
       {selectedSection ? (
-        <div className="project-editor-body">
+        <div key={selectedSection.id} className="project-editor-body panel-enter-sm">
           <label className="field">
             <span>Section title</span>
             <input
@@ -268,7 +268,7 @@ export function PosterInspector({ poster, selectedId, selectedKind, onPosterChan
       ) : null}
 
       {selectedBlock ? (
-        <div className="project-editor-body">
+        <div key={selectedBlock.id} className="project-editor-body panel-enter-sm">
           <label className="field">
             <span>Text block</span>
             <textarea value={selectedBlock.block.text} onChange={(event) => updateTextBlock(selectedBlock.id, event.target.value)} rows={7} />

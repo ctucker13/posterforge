@@ -4775,3 +4775,257 @@ textarea {
   width: 100%;
   height: 100%;
 }
+
+/* =============================================
+   A7: Snap guides
+   ============================================= */
+
+.snap-guide {
+  position: absolute;
+  pointer-events: none;
+  z-index: 20;
+  background: #2563eb;
+  opacity: 0.55;
+}
+
+.snap-guide-h {
+  left: 0;
+  right: 0;
+  height: 2px;
+  transform: translateY(-50%);
+}
+
+.snap-guide-v {
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  transform: translateX(-50%);
+}
+
+/* A7: z-order + A8: delete toolbar (appears on slot hover) */
+.freeform-slot-toolbar {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  z-index: 15;
+}
+
+.freeform-slot-edit:hover .freeform-slot-toolbar,
+.freeform-slot-active .freeform-slot-toolbar {
+  opacity: 1;
+}
+
+.freeform-toolbar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+
+.freeform-toolbar-btn:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.freeform-toolbar-delete:hover {
+  background: rgba(220, 38, 38, 0.85);
+}
+
+/* F6: Keyboard shortcuts overlay */
+.shortcuts-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  animation: panel-in 0.18s ease-out both;
+}
+
+.shortcuts-modal {
+  background: var(--chrome-surface);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2);
+  padding: 20px 24px 24px;
+  min-width: 340px;
+  max-width: 440px;
+  width: 100%;
+}
+
+.shortcuts-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.shortcuts-modal-header h3 {
+  font-size: var(--text-md);
+  font-weight: 700;
+  color: var(--chrome-ink-strong);
+}
+
+.shortcuts-close {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--hairline);
+  background: var(--chrome-surface-inset);
+  font-size: 16px;
+  color: var(--chrome-muted);
+  cursor: pointer;
+}
+
+.shortcuts-close:hover {
+  color: var(--chrome-ink-strong);
+  background: var(--chrome-surface-hover, var(--chrome-surface-inset));
+}
+
+.shortcuts-group {
+  margin-bottom: 14px;
+}
+
+.shortcuts-group:last-child {
+  margin-bottom: 0;
+}
+
+.shortcuts-group h4 {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--chrome-muted);
+  margin-bottom: 6px;
+}
+
+.shortcut-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 3px 0;
+}
+
+.shortcut-keys {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+  min-width: 80px;
+}
+
+.shortcut-row kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid var(--hairline);
+  background: var(--chrome-surface-inset);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--chrome-ink-strong);
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.shortcut-row span {
+  font-size: var(--text-sm);
+  color: var(--chrome-ink-soft);
+}
+
+/* =============================================
+   F5: Microinteractions & Motion
+   ============================================= */
+
+@keyframes panel-in {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes selection-pop {
+  from { outline-offset: 10px; }
+  to   { outline-offset: 3px; }
+}
+
+@keyframes badge-pop {
+  0%, 100% { transform: scale(1); }
+  35%       { transform: scale(1.55); }
+}
+
+/* Applied via React key-prop remount on tab/panel switch */
+.panel-enter {
+  animation: panel-in var(--motion-medium) var(--ease-out) both;
+}
+
+/* Inspector section/block/visual content enter */
+.panel-enter-sm {
+  animation: panel-in var(--motion-fast) var(--ease-out) both;
+}
+
+/* Rail tab underline slides smoothly */
+.right-rail-tabs button {
+  transition:
+    color var(--motion-fast) var(--ease-out),
+    border-bottom-color var(--motion-fast) var(--ease-out),
+    background var(--motion-fast) var(--ease-out);
+}
+
+/* Mode bar pill slides smoothly */
+.mode-bar button {
+  transition:
+    background var(--motion-medium) var(--ease-out),
+    color var(--motion-fast) var(--ease-out),
+    box-shadow var(--motion-medium) var(--ease-out);
+}
+
+/* Disclosure content fade in on open */
+.inspector-disclosure[open] > :not(summary) {
+  animation: panel-in var(--motion-fast) var(--ease-out) both;
+}
+
+/* Selected item ring pops out */
+.poster-canvas-mode-edit .selected-canvas-item {
+  animation: selection-pop 0.28s var(--ease-out) both;
+}
+
+/* Poster card hover lift — edit mode only, not during capture */
+.poster-canvas-mode-edit .poster-output-frame .poster-card {
+  transition: box-shadow var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
+}
+
+.poster-canvas-mode-edit .poster-output-frame .poster-card:hover:not(.selected-canvas-item) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.10);
+}
+
+/* Freeform slot drop shadow when grabbed */
+.freeform-slot {
+  transition: filter var(--motion-fast) var(--ease-out);
+}
+
+.freeform-slot-active {
+  filter: drop-shadow(0 5px 18px rgba(0, 0, 0, 0.20));
+}
+
+/* QA badge pops when count changes (triggered by key remount in RightRailTabs) */
+.right-rail-tabs button strong {
+  animation: badge-pop 0.28s var(--ease-out) both;
+}
