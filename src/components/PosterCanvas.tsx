@@ -307,6 +307,8 @@ export function PosterCanvas({
       }
     >
       <article
+        aria-label={`${poster.title || "Untitled poster"} — A0 canvas`}
+        aria-roledescription="poster"
         className={`poster poster-output-frame poster-${poster.theme} poster-layout-${layout.cssClass}`}
         style={
           {

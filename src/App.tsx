@@ -26,6 +26,7 @@ import { examplePoster } from "./data/examplePoster";
 import type { PosterOutline, PosterProject, PosterSection, QaIssue, TraceEvent } from "./domain/poster";
 import type { PosterCanvasItemKind } from "./components/PosterCanvas";
 import { applyQaFix, runQa } from "./qa";
+import { friendlyError } from "./app/friendlyError";
 import { palettes, themes } from "./themes";
 import { debounce } from "./utils/debounce";
 import "./styles/app.css";
@@ -231,7 +232,9 @@ export default function App() {
       setPendingOutline(outline);
     } catch (err) {
       console.error("[posterforge] Outline generation error:", err);
-      setGenerationWarning(`Outline generation failed: ${err instanceof Error ? err.message : String(err)}`);
+      const msg = friendlyError(err);
+      setGenerationWarning(msg);
+      announce(msg);
     } finally {
       setIsGenerating(false);
     }
@@ -294,10 +297,13 @@ export default function App() {
       setPoster({ ...nextPoster, qaResults: nextQaIssues, traces: completedTrace });
       setQaIssues(nextQaIssues);
       setTrace(completedTrace);
+      announce(`Poster generated. QA found ${nextQaIssues.length} issue${nextQaIssues.length === 1 ? "" : "s"}.`);
     } catch (err) {
       if (generationIdRef.current !== thisId) return;
       console.error("[posterforge] Generation error:", err);
-      setGenerationWarning(`Generation failed: ${err instanceof Error ? err.message : String(err)}`);
+      const msg = friendlyError(err);
+      setGenerationWarning(msg);
+      announce(msg);
       setTrace((events) =>
         events.map((e) =>
           e.status === "running"
@@ -397,6 +403,7 @@ export default function App() {
     setQaIssues(nextQaIssues);
     setPoster((current) => ({ ...current, qaResults: nextQaIssues }), { skipHistory: true });
     if (nextQaIssues.length > 0) setRightPanel("qa");
+    announce(nextQaIssues.length === 0 ? "QA passed — no issues found." : `QA found ${nextQaIssues.length} issue${nextQaIssues.length === 1 ? "" : "s"}.`);
   }
 
   function handlePosterStateChange(nextPoster: PosterProject, options?: PosterChangeOptions) {
@@ -515,6 +522,8 @@ export default function App() {
 
   return (
     <main className="app-shell">
+      <a href="#poster-canvas" className="skip-link">Skip to poster canvas</a>
+      <div ref={liveRegionRef} aria-live="polite" aria-atomic="true" className="sr-only" />
       <header className="workspace-header">
         <div className="product-mark">
           <div className="mark-icon">

@@ -5,6 +5,7 @@ import type { PosterChangeOptions } from "../app/posterHistory";
 import type { PosterProject, QaIssue } from "../domain/poster";
 import { reviseTextBlock } from "../domain/generator";
 import { generateImageForSlot } from "../services/imageGen";
+import { friendlyError } from "../app/friendlyError";
 import { getA0PreviewFrame, PosterCanvas, type PosterCanvasItemKind } from "./PosterCanvas";
 import { BlockRevisionDiff } from "./BlockRevisionDiff";
 import { parseBlockId } from "./posterUtils";
@@ -254,7 +255,7 @@ export function EditablePosterCanvas({
         ),
       });
     } catch (error) {
-      setImageGenError(error instanceof Error ? error.message : String(error));
+      setImageGenError(friendlyError(error));
     } finally {
       setGeneratingSlotIds((prev) => {
         const next = new Set(prev);
