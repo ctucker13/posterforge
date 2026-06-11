@@ -289,7 +289,17 @@ export function PosterInspector({ poster, selectedId, selectedKind, onPosterChan
   );
 }
 
-function VisualDataInspector({ poster, visual, onPosterChange }: { poster: PosterProject; visual: PosterVisual; onPosterChange: (poster: PosterProject, options?: PosterChangeOptions) => void }) {
+function VisualDataInspector({ poster, visual, onPosterChange }: {
+  poster: PosterProject;
+  visual: PosterVisual;
+  onPosterChange: (poster: PosterProject, options?: PosterChangeOptions) => void;
+}) {
+  function updateVisual(patch: Partial<PosterVisual>) {
+    onPosterChange({
+      ...poster,
+      visuals: poster.visuals.map((v) => v.id === visual.id ? { ...v, ...patch } : v),
+    });
+  }
   const [draft, setDraft] = useState(formatVisualData(visual.data));
   const [message, setMessage] = useState<string | undefined>();
   const parseError = getVisualParseError(visual);
@@ -323,6 +333,24 @@ function VisualDataInspector({ poster, visual, onPosterChange }: { poster: Poste
 
   return (
     <div className="project-editor-body visual-data-inspector">
+      {/* A10: visual size control */}
+      <div className="inspector-field-group">
+        <span className="inspector-field-label">Size</span>
+        <div className="inspector-btn-group">
+          {(["compact", "default", "expanded"] as const).map((sz) => (
+            <button
+              key={sz}
+              type="button"
+              className={`inspector-btn${(visual.size ?? "default") === sz ? " active" : ""}`}
+              title={{ compact: "Compact — shorter height", default: "Default height", expanded: "Expanded — taller height" }[sz]}
+              onClick={() => updateVisual({ size: sz === "default" ? undefined : sz })}
+            >
+              {sz === "compact" ? "S" : sz === "default" ? "M" : "L"}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className={parseError ? "visual-data-status error" : "visual-data-status ready"}>
         {parseError ? null : <CheckCircle2 size={15} />}
         <span>{parseError ?? "Visual data is valid."}</span>

@@ -670,6 +670,7 @@ function renderBlock(
       className={`poster-visual-item ${selectedId === visual.id ? "selected-canvas-item" : ""}`}
       data-visual-id={visual.id}
       data-visual-type={visual.type}
+      data-visual-size={visual.size ?? "default"}
       data-poster-kind="visual"
       key={visual.id}
       onClick={(event) => {

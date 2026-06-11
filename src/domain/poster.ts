@@ -181,6 +181,8 @@ export interface PosterVisual {
   data?: Record<string, unknown> | undefined;
   options?: Record<string, unknown> | undefined;
   asset?: PosterAsset | undefined;
+  /** Controls vertical space the visual occupies within its section card. */
+  size?: "compact" | "default" | "expanded" | undefined;
 }
 
 export interface PosterProject {

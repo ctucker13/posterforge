@@ -2562,6 +2562,17 @@ textarea {
   min-height: 0;
 }
 
+/* A10: visual sizing — compact / default / expanded */
+.poster-output-frame .poster-card > [data-visual-size="compact"] {
+  flex: 0 0 360px;
+  max-height: 100%;
+}
+
+.poster-output-frame .poster-card > [data-visual-size="expanded"] {
+  flex: 2;
+  min-height: 560px;
+}
+
 .poster-output-frame .poster-card > [data-visual-id] {
   display: flex;
 }
