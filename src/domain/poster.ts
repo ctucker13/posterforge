@@ -115,6 +115,9 @@ export interface PosterSectionLayout {
   rowSpan?: 1 | 2 | undefined;
   emphasis?: "normal" | "featured" | "hero" | undefined;
   hidden?: boolean | undefined;
+  textScale?: "sm" | "md" | "lg" | undefined;
+  textAlign?: "left" | "center" | "right" | undefined;
+  accentColor?: string | undefined;
 }
 
 export interface ContentRegion {

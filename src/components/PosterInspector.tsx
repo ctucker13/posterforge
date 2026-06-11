@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { ArrowDown, ArrowUp, CheckCircle2, ChevronDown, Eye, EyeOff, MousePointer2, Plus } from "lucide-react";
+import { AlignCenter, AlignLeft, AlignRight, ArrowDown, ArrowUp, CheckCircle2, ChevronDown, Eye, EyeOff, MousePointer2, Plus } from "lucide-react";
 import type { PosterChangeOptions } from "../app/posterHistory";
 import type { PosterBlock, PosterProject, PosterSection, PosterSectionLayout, PosterVisual } from "../domain/poster";
 import type { PosterCanvasItemKind } from "./PosterCanvas";
+import { resolvePalette, type PosterPalette } from "../themes";
 import { parseBlockId } from "./posterUtils";
 import { VisualRegistryPanel } from "./VisualRegistryPanel";
 import { VisualPicker } from "./VisualPicker";
@@ -131,7 +132,7 @@ export function PosterInspector({ poster, selectedId, selectedKind, onPosterChan
   return (
     <section className="poster-inspector tool-panel" aria-label="Poster selection inspector">
       <div className="panel-header">
-        <h2>Canvas Inspector</h2>
+        <h2>Inspector</h2>
         <button className="panel-header-action" type="button" onClick={() => setShowVisualPicker(true)} title="Add visual">
           <Plus size={15} /> Add visual
         </button>
@@ -167,6 +168,52 @@ export function PosterInspector({ poster, selectedId, selectedKind, onPosterChan
             />
           </label>
 
+          {/* A9: text size + alignment */}
+          <div className="inspector-style-row">
+            <div className="inspector-field-group">
+              <span className="inspector-field-label">Size</span>
+              <div className="inspector-btn-group">
+                {(["sm", "md", "lg"] as const).map((scale) => (
+                  <button
+                    key={scale}
+                    type="button"
+                    className={`inspector-btn${(selectedSection.layout?.textScale ?? "md") === scale ? " active" : ""}`}
+                    title={{ sm: "Small text", md: "Default text size", lg: "Large text" }[scale]}
+                    onClick={() => updateSectionLayout(selectedSection.id, { textScale: scale === "md" ? undefined : scale })}
+                  >
+                    {scale === "sm" ? "S" : scale === "md" ? "M" : "L"}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="inspector-field-group">
+              <span className="inspector-field-label">Align</span>
+              <div className="inspector-btn-group">
+                {(["left", "center", "right"] as const).map((align) => (
+                  <button
+                    key={align}
+                    type="button"
+                    className={`inspector-btn${(selectedSection.layout?.textAlign ?? "left") === align ? " active" : ""}`}
+                    title={`Align ${align}`}
+                    onClick={() => updateSectionLayout(selectedSection.id, { textAlign: align === "left" ? undefined : align })}
+                  >
+                    {align === "left" ? <AlignLeft size={12} /> : align === "center" ? <AlignCenter size={12} /> : <AlignRight size={12} />}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* A9: accent color */}
+          <div className="inspector-field-group">
+            <span className="inspector-field-label">Accent</span>
+            <SectionAccentPicker
+              value={selectedSection.layout?.accentColor}
+              palette={resolvePalette(poster.theme, poster.palette)}
+              onChange={(color) => updateSectionLayout(selectedSection.id, { accentColor: color })}
+            />
+          </div>
+
           <div className="inspector-actions">
             <button type="button" onClick={() => (onMoveSection ?? moveSection)(selectedSection.id, -1)}>
               <ArrowUp size={15} /> Up
@@ -180,9 +227,10 @@ export function PosterInspector({ poster, selectedId, selectedKind, onPosterChan
             </button>
           </div>
 
+          {/* F2: structural layout behind disclosure */}
           <details className="inspector-disclosure">
             <summary>
-              <ChevronDown size={14} /> Layout options
+              <ChevronDown size={14} /> Layout
             </summary>
             <div className="field-grid">
               <label className="field">
@@ -624,6 +672,42 @@ function parseVisualData(visual: PosterVisual) {
     default:
       return { ok: true as const, data: visual.data ?? {} };
   }
+}
+
+function SectionAccentPicker({
+  value,
+  palette,
+  onChange,
+}: {
+  value: string | undefined;
+  palette: PosterPalette;
+  onChange: (color: string | undefined) => void;
+}) {
+  const swatches: Array<{ color: string | undefined; label: string }> = [
+    { color: undefined, label: "Default" },
+    { color: palette.colors.primary, label: "Primary" },
+    { color: palette.colors.accent, label: "Accent" },
+    ...(palette.colors.accentDark ? [{ color: palette.colors.accentDark, label: "Dark accent" }] : []),
+    { color: palette.colors.ink, label: "Ink" },
+  ];
+
+  return (
+    <div className="section-accent-swatches">
+      {swatches.map(({ color, label }) => (
+        <button
+          key={label}
+          type="button"
+          className={`accent-swatch${value === color ? " active" : ""}`}
+          style={color ? { background: color } : undefined}
+          title={label}
+          aria-pressed={value === color}
+          onClick={() => onChange(color)}
+        >
+          {!color && "×"}
+        </button>
+      ))}
+    </div>
+  );
 }
 
 function findTextBlock(poster: PosterProject, blockId: string): { id: string; block: Extract<PosterBlock, { type: "text" }> } | undefined {

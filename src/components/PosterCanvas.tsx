@@ -159,7 +159,14 @@ export function PosterCanvas({
         id={section.id}
         key={section.id}
         sortable={mode === "edit" && Boolean(onSectionReorder)}
-        skinStyle={toSkinStyle(skins.sectionCard)}
+        skinStyle={{
+          ...toSkinStyle(skins.sectionCard),
+          ...(section.layout?.textScale && section.layout.textScale !== "md" && {
+            "--section-text-scale": section.layout.textScale === "sm" ? "0.82" : "1.2",
+          }),
+          ...(section.layout?.textAlign && { "--section-text-align": section.layout.textAlign }),
+          ...(section.layout?.accentColor && { "--section-accent": section.layout.accentColor }),
+        } as CSSProperties}
         onClick={(event) => {
           if (mode === "edit") {
             event.stopPropagation();
